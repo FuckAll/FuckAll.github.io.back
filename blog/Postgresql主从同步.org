@@ -36,7 +36,7 @@ host    all             all             ::1/128                 md5
 #+END_SRC
 
          1. 第一行 local 代表着本地Unix连接，这里设置成trust(无需要密码登录)
-
+	 2. 第二行
 	 
 *** Slave Config
 
