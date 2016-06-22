@@ -1,0 +1,47 @@
+
+#+TITLE:       Postgresql主从同步
+#+AUTHOR:      武向东
+#+EMAIL:       KongFu@Battleplane.local
+#+DATE:        2016-06-22 Wed
+#+URI:         /blog/%y/%m/%d/postgresql主从同步
+#+KEYWORDS:    pgsql,postgresql,psql
+#+TAGS:        DataBase
+#+LANGUAGE:    en
+#+OPTIONS:     H:3 num:nil toc:nil \n:nil ::t |:t ^:nil -:nil f:t *:t <:t
+#+DESCRIPTION: Postgresql主从同步
+
+* Postgresql 主从同步
+
+** postgresql 主从同步配置：
+
+*** Master Config
+#+BEGIN_SRC sh
+#postgresql.conf必须改的几个选项
+listen_addresses = '*'          # what IP address(es) to listen on;
+wal_level = hot_standby
+max_wal_senders = 5
+wal_keep_segments = 64
+synchronous_standby_names = '*'  # 这个参数里面的设置对应slave配置中recovery.conf 文件中的配置文件primary_conninfo 中的application_name
+#+END_SRC
+
+
+#+BEGIN_SRC sh
+#pg_hba.conf 必须改的几个选项
+local   all             postgres                                trust
+local   all             all                                     peer
+host    all             all             0.0.0.0/0               md5
+host    replication     all             0.0.0.0/0               trust
+host    all             all             ::1/128                 md5
+
+#+END_SRC
+
+         1. 第一行 local 代表着本地Unix连接，这里设置成trust(无需要密码登录)
+
+	 
+*** Slave Config
+
+#begin
+
+
+
+
