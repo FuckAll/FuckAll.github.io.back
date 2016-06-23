@@ -1,0 +1,31 @@
+#    -*- mode: org -*-
+
+
+Archived entries from file /Users/KongFu/duitang/git/github/FuckAll.github.io/blog/Postgresql主从配置.org
+
+
+* PostgreSql安装：
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2016-06-23 Thu 17:51
+  :ARCHIVE_FILE: ~/duitang/git/github/FuckAll.github.io/blog/Postgresql主从配置.org
+  :ARCHIVE_OLPATH: PostgreSql主从配置
+  :ARCHIVE_CATEGORY: Postgresql主从配置
+  :END:
+ 1. 导入PostgreSql 9.5 源
+ #+BEGIN_SRC shell
+ $rpm -Uvh http://yum.postgresql.org/9.5/redhat/rhel-7-x86_64/pgdg-centos95-9.5-2.noarch.rpm
+ #+END_SRC
+ 2. 安装Postgresql
+ #+BEGIN_SRC shell
+ $yum install postgresql95-server postgresql95 # 这里一般是会安装最新的9.5稳定版，如果用到Postgresql插件，需要安装扩展，建议安装方式： yum install postgresql95*
+ #+END_SRC
+ 3.初始化目录结构
+ #+BEGIN_SRC sh
+ $/usr/pgsql-9.5/bin/postgresql95-setup initdb #这里是Centos7 的目录位置
+ #+END_SRC
+ 4.启动（这个可以在后面的主从配置完成之后进行启动）
+ #+BEGIN_SRC sh
+ $service  postgresql-9.5 start
+ $chkconfig postgresql-9.5 on #设置开机启动
+ #+END_SRC
+
