@@ -3,7 +3,7 @@
 #+AUTHOR:      武向东
 #+EMAIL:       izgnode@gmail.com
 #+DATE:        2016-06-22 Wed
-#+URI:         /blog/%y/%m/%d/postgresql主从同步
+#+URI:         /blog/2016/06/22/postgresql主从同步
 #+KEYWORDS:    pgsql,postgresql,psql
 #+TAGS:        DataBase
 #+LANGUAGE:    en
