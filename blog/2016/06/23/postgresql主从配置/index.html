@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <title>PostgreSql主从配置 - izgnod 技术男的剑舞人生</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="武向东" />
+    <meta name="description" content="postgresql" />
+    <meta name="keywords" content="postgresql,psql,pgsql" />
+    <link rel="stylesheet" href="/media/css/main.css" type="text/css">
+    <link rel="stylesheet" href="/media/css/prettify.css" type="text/css">
+  </head>
+  <body class="container">
+    <div>
+      <header class="masthead">
+        <h1 class="masthead-title"><a href="/">izgnod 技术男的剑舞人生</a></h1>
+        <p>================&gt; 剑能杀人，也能做舞</p>
+        <ul>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/tags/">Tags</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="https://github.com/FuckAll/FuckAll.github.io">GitHub</a></li>
+          <li><a href="/rss.xml">RSS</a></li>
+        </ul>
+        <form method="get" id="searchform" action="//www.google.com/search">
+          <input type="text" class="field" name="q" id="s" placeholder="Search">
+          <input type="hidden" name="as_sitesearch" value="FuckAll.github.io">
+        </form>
+      </header>
+    </div>
+
+<div>
+<div class="post">
+<h1>PostgreSql主从配置</h1>
+
+
+<div id="outline-container-orgheadline10" class="outline-2">
+<h2 id="orgheadline10">PostgreSql主从配置</h2>
+<div class="outline-text-2" id="text-orgheadline10">
+</div><div id="outline-container-orgheadline1" class="outline-3">
+<h3 id="orgheadline1">PostgreSql安装：</h3>
+<div class="outline-text-3" id="text-orgheadline1">
+<ol class="org-ol">
+<li>导入PostgreSql 9.5 源</li>
+</ol>
+<div class="org-src-container">
+
+<pre class="src src-shell">$rpm -Uvh http://yum.postgresql.org/9.5/redhat/rhel-7-x86_64/pgdg-centos95-9.5-2.noarch.rpm
+</pre>
+</div>
+<ol class="org-ol">
+<li>安装Postgresql</li>
+</ol>
+<div class="org-src-container">
+
+<pre class="src src-shell">yum install postgresql95-server postgresql95 # 这里一般是会安装最新的9.5稳定版，如果用到Postgresql插件，需要安装扩展，建议安装方式： yum install postgresql95*
+</pre>
+</div>
+<p>
+3.初始化目录结构
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">$/usr/pgsql-9.5/bin/postgresql95-setup initdb #这里是Centos7 的目录位置
+</pre>
+</div>
+<p>
+4.启动（这个可以在后面的主从配置完成之后进行启动）
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">$service  postgresql-9.5 start
+$chkconfig postgresql-9.5 on #设置开机启动
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline2" class="outline-3">
+<h3 id="orgheadline2">PostgreSql 主从配置意义：</h3>
+<div class="outline-text-3" id="text-orgheadline2">
+<ol class="org-ol">
+<li>主从配置能够在一台主机宕机的情况下立马切换到另外一台主机上，减少损失</li>
+<li>主从配置能够在读写分离，减轻数据库的压力,主库进行写，从库进行读。</li>
+<li>主从配置能够保证多数据库中的数据一致性。</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-orgheadline3" class="outline-3">
+<h3 id="orgheadline3">主从配置流程：</h3>
+<div class="outline-text-3" id="text-orgheadline3">
+<p>
+注意：这里使用的是Postgresql 9.5.3进行。由于Postgresql版本之间会有细微的差别。
+</p>
+</div>
+
+
+<div id="outline-container-orgheadline4" class="outline-4">
+<h4 id="orgheadline4">Master 配置：</h4>
+<div class="outline-text-4" id="text-orgheadline4">
+<ol class="org-ol">
+<li>配置:postgresql.conf 文件</li>
+</ol>
+<div class="org-src-container">
+
+<pre class="src src-sh">listen_addresses = '*'          # what IP address(es) to listen on;
+wal_level = hot_standby         # wal 日志的级别
+max_wal_senders = 5             # 控制主库最多可以有多少个并发的standby数据库；
+wal_keep_segments = 64          # 16M为单位，wal日志生成的单位，尽量的设置较大，防止日志没有来得及到standby就被循环覆盖了，这个如果数据量大的时候要慎重。
+synchronous_standby_names = '*' #synchronous_standby_names 这个参数对应着slave配置文件中的recovery.conf 中的primary_conninfo
+</pre>
+</div>
+
+<ol class="org-ol">
+<li>配置:pg_hba.conf文件(这个文件主要是用来配置数据库连接权限的)</li>
+</ol>
+<div class="org-src-container">
+
+<pre class="src src-shell"># local      DATABASE  USER  METHOD  [OPTIONS]
+# host       DATABASE  USER  ADDRESS  METHOD  [OPTIONS]
+# hostssl    DATABASE  USER  ADDRESS  METHOD  [OPTIONS]
+# hostnossl  DATABASE  USER  ADDRESS  METHOD  [OPTIONS]
+#第一列是指定能够连接数据库的类型，local是本地连接，host是远程的主机。
+#第二列是指能够连接那些数据库
+#第三列是哪个用户能够连接数据库
+#第四列是地址
+#第五列是认证的方式
+local   all             postgres                                trust
+local   all             all                                     peer
+host    all             all             0.0.0.0/0               md5
+host    replication     all             0.0.0.0/0               trust
+host    all             all             ::1/128                 md5
+</pre>
+</div>
+
+<p>
+配置说明：1. 允许本地的postgres连接
+</p>
+<ol class="org-ol">
+<li>允许所有的本地连接认证方式是获取本地的操作系统的用户名。</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-orgheadline5" class="outline-4">
+<h4 id="orgheadline5">Slave 配置：</h4>
+<div class="outline-text-4" id="text-orgheadline5">
+<p>
+1.配置:postgresql.conf 文件
+</p>
+<div class="org-src-container">
+
+<pre class="src src-shell">listen_addresses = '*'          # what IP address(es) to listen on;
+wal_level = hot_standby
+max_connections = 1000
+hot_standby = on
+hot_standby_feedback = on
+</pre>
+</div>
+
+<ol class="org-ol">
+<li>配置:pg_hba.conf文件(这个文件主要是用来配置数据库连接权限的)</li>
+</ol>
+<div class="org-src-container">
+
+<pre class="src src-shell">local   all             postgres                                trust
+local   all             all                                     peer
+host    all             all             0.0.0.0/0               md5
+host    replication     all             0.0.0.0/0               trust
+host    all             all             ::1/128                 md5
+</pre>
+</div>
+
+<ol class="org-ol">
+<li>配置: recovery.conf文件</li>
+</ol>
+<div class="org-src-container">
+
+<pre class="src src-shell">primary_conninfo = 'host=x.x.x.x user=test password=123 port=5432'
+EOF
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+<div id="outline-container-orgheadline9" class="outline-3">
+<h3 id="orgheadline9">过程如下：</h3>
+<div class="outline-text-3" id="text-orgheadline9">
+</div><div id="outline-container-orgheadline6" class="outline-4">
+<h4 id="orgheadline6">Master</h4>
+<div class="outline-text-4" id="text-orgheadline6">
+<ol class="org-ol">
+<li>启动Mater节点（没有任何的主从配置过程）</li>
+<li>修改postgres的密码, 创建主从同步需要的账号</li>
+</ol>
+<div class="org-src-container">
+
+<pre class="src src-sh">su postgres
+psql -c "ALTER USER postgres WITH PASSWORD '123';"
+psql -c " CREATE ROLE repluser REPLICATION LOGIN PASSWORD '123';"
+</pre>
+</div>
+<ol class="org-ol">
+<li>然后修改配置成如上的配置：</li>
+</ol>
+<p>
+5.重启Master
+6.Master打开备份状态：
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">psql -U postgres -c "select pg_start_backup('initial_backup');"
+</pre>
+</div>
+<p>
+7.将内容拷贝到远程的slave节点
+</p>
+<div class="org-src-container">
+
+<pre class="src src-shell">rsync -cva --inplace --exclude=*pg_xlog* /var/lib/pgsql/9.5/data/ slave_ipaddress:/var/lib/pgsql/9.5/data/
+</pre>
+</div>
+<p>
+8.退出备份状态
+</p>
+<div class="org-src-container">
+
+<pre class="src src-shell">psql -U postgres -c "select pg_stop_backup();"
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgheadline7" class="outline-4">
+<h4 id="orgheadline7">Slave</h4>
+<div class="outline-text-4" id="text-orgheadline7">
+<ol class="org-ol">
+<li>修改成如上的slave配置</li>
+<li>注意一下/var/lib/pgsql/9.5/data/目录的权限问题，尤其是recovery.conf</li>
+</ol>
+<div class="org-src-container">
+
+<pre class="src src-shell">chown -R postgres.postgres /var/lib/pgsql/9.5/data/
+</pre>
+</div>
+</div>
+<ul class="org-ul"><li><a id="orgheadline8"></a>检验方式：<br  /><div class="outline-text-5" id="text-orgheadline8">
+<div class="org-src-container">
+
+<pre class="src src-sh">#zai
+select * from pg_stat_replication;
+</pre>
+</div>
+<p>
+可以从输出的信息中看到是否
+</p>
+</div></li></ul>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+    <div>
+      <div class="post-meta">
+        <span title="post date" class="post-info">2016-06-23</span>
+        <span title="last modification date" class="post-info">2016-06-23</span>
+        <span title="tags" class="post-info"><a href="/tags/database/">DataBase</a></span>
+        <span title="author" class="post-info">武向东</span>
+      </div>
+      <section>
+        <h1>Comments</h1>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+          //var disqus_developer = 1;
+          var disqus_identifier = "/blog/2016/06/23/postgresql主从配置";
+          var disqus_url = "https://FuckAll.github.io/blog/2016/06/23/postgresql主从配置";
+          var disqus_shortname = 'izgnod';
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="//disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+      </section>
+      <script src="//code.jquery.com/jquery-latest.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script>
+      <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script src="/media/js/main.js"></script>
+      <div class="footer">
+        <p>Generated by <a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.x (<a href="http://orgmode.org">Org mode</a> 8.x)</p>
+        <p>
+          Copyright &copy; 2012 - <span id="footerYear"></span> <a href="mailto:izgnod &lt;at&gt; gmail &lt;dot&gt; com">武向东</a>
+          &nbsp;&nbsp;-&nbsp;&nbsp;
+          Powered by <a href="https://github.com/kelvinh/org-page" target="_blank">org-page</a>
+          <script type="text/javascript">document.getElementById("footerYear").innerHTML = (new Date()).getFullYear();</script>
+        </p>
+      </div>
+    </div>
+
+  </body>
+</html>
