@@ -147,17 +147,7 @@ chown -R postgres.postgres /var/lib/pgsql/9.5/data/
 
 **** 检验方式：
 #+BEGIN_SRC sh
-#zai
 select * from pg_stat_replication;
 #+END_SRC
 可以从输出的信息中看到是否同步成功。
-
-
-
-
-
-
-
-
-
 
