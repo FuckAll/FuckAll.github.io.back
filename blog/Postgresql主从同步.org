@@ -1,4 +1,3 @@
-
 #+TITLE:       Postgresql主从同步
 #+AUTHOR:      武向东
 #+EMAIL:       izgnode@gmail.com
