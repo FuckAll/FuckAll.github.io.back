@@ -1,0 +1,11 @@
+#+TITLE:       test
+#+AUTHOR:      武向东
+#+EMAIL:       KongFu@Battleplane.local
+#+DATE:        2016-06-23 Thu
+#+URI:         /blog/%y/%m/%d/test
+#+KEYWORDS:    test
+#+TAGS:        test
+#+LANGUAGE:    en
+#+OPTIONS:     H:3 num:nil toc:nil \n:nil ::t |:t ^:nil -:nil f:t *:t <:t
+#+DESCRIPTION: test
+i want test my blog
