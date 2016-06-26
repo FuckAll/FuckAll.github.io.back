@@ -1,0 +1,76 @@
+#+TITLE:       Docker Registry
+#+AUTHOR:      武向东
+#+EMAIL:       izgnod@gmail.com
+#+DATE:        2016-06-24 Fri
+#+URI:         /blog/2016/06/24/docker-registry
+#+KEYWORDS:    docker, registry
+#+TAGS:        docker,registry
+#+LANGUAGE:    en
+#+OPTIONS:     H:3 num:nil toc:nil \n:nil ::t |:t ^:nil -:nil f:t *:t <:t
+#+DESCRIPTION: Docker Registry
+* Docker Registry
+** Docker Registry 搭建的意义
+1. 安全问题：能够在不泄露公司代码的情况下，存储镜像
+2. 可用性： 不依赖其他的第三方的docker仓库
+3. Ci： 公司部署方式的改变，Docker Registry成为不可或缺的一部分。
+
+** 搭建准备：
+1. 镜像：registry:2
+2. 镜像存储的目录：例如：/DockerRegistry/
+3. 证书,安全证书
+
+** 搭建过程：
+1. 首先拉取Docker Registry镜像(由于国内墙的问题,使用DaoCloud镜像)
+#+BEGIN_SRC sh
+$docker pull daocloud.io/library/registry:2.4.1 
+#+END_SRC
+
+2. 创建镜像存储目录：
+#+BEGIN_SRC sh
+$mkdir /DockerRegistry/
+#+END_SRC
+
+3. 创建证书文件目录并且放入证书：
+#+BEGIN_SRC sh
+$mkdir /DockerRegistry/cert 
+#+END_SRC
+
+4.创建Docker Registry登录密码：
+#+BEGIN_SRC sh
+$mkdir auth
+$docker run --entrypoint htpasswd daocloud.io/library/registry:2.4.1  -Bbn testuser testpassword > auth/htpasswd
+#+END_SR
+
+5. 启动Registry (注意下面的证书都是要改为自己的证书)
+#+BEGIN_SRC shell
+$docker run -d -p 5000:5000 --restart=always --name registry \
+  -v `pwd`/auth:/auth \
+  -e "REGISTRY_AUTH=htpasswd" \
+  -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" \
+  -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
+  -v `pwd`/certs:/certs \
+  -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \
+  -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
+  daocloud.io/library/registry:2.4.1
+#+END_SRC
+
+6. 添加一个可视化的界面 
+#+BEGIN_SRC sh
+$docker run -d -p 8080:8080 -e REG1=http://dev:5000/v1/ -e REG2=http://prod/v1/ atcol/docker-registry-ui
+#+END_SRC
+
+7. nginx配置 (添加nginx配置)
+#+BEGIN_SRC sh
+$server {
+    server_name dev;
+    location / {
+        proxy_pass http://x.x.x.x:8080;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+    }
+}
+#+END_SRC
+
+** 总结：
+以上的步骤比较简单，已经满足大部分的需求，更加高端的需求可以定制registry的config.yaml文件。
+起始可以在第六步的时候不必要映射端口到host，包括第七部也可以不用，因为相同在同一台机器上的docker是可以直接连接。
