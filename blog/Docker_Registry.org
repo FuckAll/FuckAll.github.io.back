@@ -55,8 +55,14 @@ $docker run -d -p 5000:5000 --restart=always --name registry \
 #+END_SRC
 
 6. 添加一个可视化的界面 
+
 #+BEGIN_SRC sh
-$docker run -d -p 8080:8080 -e REG1=http://dev:5000/v1/ -e REG2=http://prod/v1/ atcol/docker-registry-ui
+$docker run \
+  -d \
+  -e ENV_DOCKER_REGISTRY_HOST=ENTER-YOUR-REGISTRY-HOST-HERE \
+  -e ENV_DOCKER_REGISTRY_PORT=ENTER-PORT-TO-YOUR-REGISTRY-HOST-HERE \
+  -p 8080:80 \
+  konradkleine/docker-registry-frontend:v2
 #+END_SRC
 
 7. nginx配置 (添加nginx配置)
