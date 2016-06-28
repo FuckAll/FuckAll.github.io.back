@@ -33,12 +33,9 @@
 <h1>Kubernetes应用的滚动升级</h1>
 
 
-<div id="outline-container-orgheadline5" class="outline-2">
-<h2 id="orgheadline5">Kubernetes 应用的滚动升级</h2>
-<div class="outline-text-2" id="text-orgheadline5">
-</div><div id="outline-container-orgheadline1" class="outline-3">
-<h3 id="orgheadline1">传统的高可用步骤：</h3>
-<div class="outline-text-3" id="text-orgheadline1">
+<div id="outline-container-orgheadline1" class="outline-2">
+<h2 id="orgheadline1">传统的高可用步骤：</h2>
+<div class="outline-text-2" id="text-orgheadline1">
 <ol class="org-ol">
 <li>将版本的业务进行启动</li>
 <li>切换nginx等的配置，切换生产环境</li>
@@ -60,9 +57,9 @@
 </ul>
 </div>
 </div>
-<div id="outline-container-orgheadline2" class="outline-3">
-<h3 id="orgheadline2">Kubernetes 方式滚动升级：</h3>
-<div class="outline-text-3" id="text-orgheadline2">
+<div id="outline-container-orgheadline2" class="outline-2">
+<h2 id="orgheadline2">Kubernetes 方式滚动升级：</h2>
+<div class="outline-text-2" id="text-orgheadline2">
 <ol class="org-ol">
 <li>升级过程：
 <ul class="org-ul">
@@ -123,9 +120,9 @@ $ kubectl rolling-update activity --rollback
 </div>
 </div>
 
-<div id="outline-container-orgheadline3" class="outline-3">
-<h3 id="orgheadline3">我是如何进行Kubernetes进行应用的升级的：</h3>
-<div class="outline-text-3" id="text-orgheadline3">
+<div id="outline-container-orgheadline3" class="outline-2">
+<h2 id="orgheadline3">我是如何进行Kubernetes进行应用的升级的：</h2>
+<div class="outline-text-2" id="text-orgheadline3">
 <p>
 1.以上两种方式遇到的问题：
 </p>
@@ -163,13 +160,12 @@ $ kubectl rolling-update activity --rollback
 </div>
 </div>
 
-<div id="outline-container-orgheadline4" class="outline-3">
-<h3 id="orgheadline4">总结：</h3>
-<div class="outline-text-3" id="text-orgheadline4">
+<div id="outline-container-orgheadline4" class="outline-2">
+<h2 id="orgheadline4">总结：</h2>
+<div class="outline-text-2" id="text-orgheadline4">
 <p>
 两个线上环境，快速升级和回滚都有好处。综合了一下传统的升级方式和Kubernetes的升级方式。早安，上海。
 </p>
-</div>
 </div>
 </div>
 
