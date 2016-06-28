@@ -1,0 +1,110 @@
+#+TITLE:       Kubernetes应用的滚动升级
+#+AUTHOR:      武向东
+#+EMAIL:       KongFu@Battleplane.local
+#+DATE:        2016-06-27 Mon
+#+URI:         /blog/2016/06/27/kubernetes应用的滚动升级
+#+KEYWORDS:    Kubernets
+#+TAGS:        Kubernets
+#+LANGUAGE:    en
+#+OPTIONS:     H:3 num:nil toc:nil \n:nil ::t |:t ^:nil -:nil f:t *:t <:t
+#+DESCRIPTION: Kubernets App Rolling update
+
+
+*** Kubernetes 应用的滚动升级
+**** 传统的高可用步骤：
+    1. 将版本的业务进行启动
+    2. 切换nginx等的配置，切换生产环境
+    3. 检查上线代码是否有问题
+    4. 如果没有问题就继续，如果有问题快速的切换配置，将版本快速的回退到上一个版本。
+ 这样做的优缺点：
+    先说优点
+    1. 回滚速度快，能够在第一时间发现错误.
+    再说缺点：
+    2. 过多的人工操作，导致人为失误很大程度上影响发布质量。
+**** Kubernetes 方式滚动升级：
+     升级过程：
+     1. 和传统的滚动升级的思路是一样的，即将新的pod升级上去，然后慢慢的将旧的pod数量降到0，从而实现升级。
+     下面演示升级过程：
+     1. 本地微服务：
+#+BEGIN_SRC shell
+$kubectl get rc 
+NAME           DESIRED   CURRENT   AGE
+account        2         2         1h
+activity       2         2         1h
+appway         2         2         1h
+authority      2         2         1h
+banner         2         2         1h
+confidant      2         2         1h
+config         2         2         1h
+coupon         2         2         1h
+credit         2         2         1h
+easemob        2         2         1h
+goods          2         2         1h
+hospital       2         2         1h
+hospway        2         2         1h
+interway       2         2         1h
+mediastore     2         2         1h
+message        2         2         1h
+order          2         2         1h
+other          2         2         1h
+payment        2         2         1h
+pgsql          1         1         7d
+push           2         2         1h
+share          2         2         1h
+sms            2         2         1h
+statistic      2         2         1h
+story          2         2         1h
+user           2         2         1h
+verification   2         2         1h
+version        2         2         1h
+wechat         2         2         1h
+#这里除了28个微服务还有一个Psql
+#+END_SRC
+      2. 服务升级：
+#+BEGIN_SRC shell
+#例如account微服务
+$[root@ali-k8s-03 rc]# kubectl rolling-update account --image=reg.17mei.top/account/8092af07-account:v1.2.1
+Created account-e041dc4989c5cd11b305bab7075dd2e7
+Scaling up account-e041dc4989c5cd11b305bab7075dd2e7 from 0 to 2, scaling down account from 2 to 0 (keep 2 pods available, don't exceed 3 pods)
+Scaling account-e041dc4989c5cd11b305bab7075dd2e7 up to 1
+Scaling account down to 1
+Scaling account-e041dc4989c5cd11b305bab7075dd2e7 up to 2
+Scaling account down to 0
+Update succeeded. Deleting old controller: account
+Renaming account-e041dc4989c5cd11b305bab7075dd2e7 to account
+replicationcontroller "account" rolling updated
+#+END_SRC
+         过程解释：首先，k8s创建一个新的RC，名字叫account-e041dc4989c5cd11b305bab7075dd2e7，总数为2个pod，这个过程是保证有两个pods是可用的。最终滚动升级完成。
+      3. 服务回滚：
+	 如果发布的过程中发现有问题，那么就需要回滚操作，下面是回滚操作的步骤：
+#+BEGIN_SRC shell
+account                                     2         2         47m
+activity                                    2         2         2h
+activity-db96883e53ab1ed3f11a99ddfbdf31f7   1         1         28m
+#此时用activity进行回滚演示，因为已经发布完成的就不能直接回滚，已经发布的回滚相当于一次从新的发布，此时如果想要回滚操作的话就是直接进行下面的操作
+$ kubectl rolling-update activity --rollback
+#+END_SRC
+****  我是如何进行Kubernetes进行应用的升级的：
+    1.以上两种方式遇到的问题：
+      先说kubernets.
+      1. Kubernetes滚动升级的方式对于我这种使用配置比较低的机器，速度较慢，时间成本高.
+      2. 回滚的速度更加的慢，有种想死的冲动。
+      3. 发到线上测试人员发现问题要立马回滚，搞得大家都很紧张。
+      再说传统的方式
+      1. 部署速度慢，大公司有专门的代码发布平台，小公司可能就手动发布了。
+      2. 人工出错情况多，由于一次上线需要很多的步骤所以人为出错的可能性就很高。
+      3. 因为代码的运行环境问题引发的问题是很难排除的，也许就是一个软件的版本问题。
+    2. 那么我是如何使用的。
+      1. 双份生产环境（业务量不大，不需要更多的生产环境），production01 和 production02，可以同时使用，也可以有一个备用，看业务量和对业务高可用的要求衡量。
+      2. 每个微服务有一个yaml配置文件，用来快速升级部署。
+      3. 升级过程：
+            1. 首先将nginx对应组的业务下线，nginx已经做的很好了，能够平滑的下线。
+            2. 升级刚才下线的一组服务，过程是删除一组服务，然后重新用新的配置文件上线一组服务。
+            3. 刚上线的一组服务可以进行测试。无论测试多久都不会影响。
+            4. 测试没有问题之后，可以切换nginx配置将应用上线。
+      4. 升级过程出现问题回滚：
+            1. 如果发布的过程中发现有问题，那么直接停止升级或者升级完成，因为是在一组下线的生产环境中，都不会发生问题。
+      5.升级成功之后，将另外一组没有升级的线上节点不做任何的处理，防止有Bug要回滚到上一个版本。
+
+**** 总结：
+     两个线上环境，快速升级和回滚都有好处。综合了一下传统的升级方式和Kubernetes的升级方式。早安，上海。
