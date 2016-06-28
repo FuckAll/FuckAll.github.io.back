@@ -47,73 +47,44 @@
 </ol>
 <p>
 这样做的优缺点：
-   先说优点
 </p>
-<ol class="org-ol">
+<ul class="org-ul">
+<li>先说优点
+<ul class="org-ul">
 <li>回滚速度快，能够在第一时间发现错误.</li>
-</ol>
-<p>
-再说缺点：
-</p>
-<ol class="org-ol">
+</ul></li>
+<li>再说缺点：
+<ul class="org-ul">
 <li>过多的人工操作，导致人为失误很大程度上影响发布质量。</li>
-</ol>
+</ul></li>
+</ul>
 </div>
 </div>
 <div id="outline-container-orgheadline2" class="outline-3">
 <h3 id="orgheadline2">Kubernetes 方式滚动升级：</h3>
 <div class="outline-text-3" id="text-orgheadline2">
-<p>
-升级过程：
-</p>
 <ol class="org-ol">
+<li>升级过程：
+<ul class="org-ul">
 <li>和传统的滚动升级的思路是一样的，即将新的pod升级上去，然后慢慢的将旧的pod数量降到0，从而实现升级。</li>
-</ol>
-<p>
-下面演示升级过程：
-</p>
+</ul></li>
+<li>下面演示升级过程：
 <ol class="org-ol">
-<li>本地微服务：</li>
-</ol>
+<li><p>
+本地微服务：
+</p>
 <div class="org-src-container">
 
 <pre class="src src-shell">$kubectl get rc 
-NAME           DESIRED   CURRENT   AGE
-account        2         2         1h
-activity       2         2         1h
-appway         2         2         1h
-authority      2         2         1h
-banner         2         2         1h
-confidant      2         2         1h
-config         2         2         1h
-coupon         2         2         1h
-credit         2         2         1h
-easemob        2         2         1h
-goods          2         2         1h
-hospital       2         2         1h
-hospway        2         2         1h
-interway       2         2         1h
-mediastore     2         2         1h
-message        2         2         1h
-order          2         2         1h
-other          2         2         1h
-payment        2         2         1h
-pgsql          1         1         7d
-push           2         2         1h
-share          2         2         1h
-sms            2         2         1h
-statistic      2         2         1h
-story          2         2         1h
-user           2         2         1h
-verification   2         2         1h
-version        2         2         1h
-wechat         2         2         1h
-#这里除了28个微服务还有一个Psql
+ NAME           DESIRED   CURRENT   AGE
+ account        2         2         1h
+ activity       2         2         1h
+ #例如有以上两个微服务
 </pre>
-</div>
-<ol class="org-ol">
-<li>服务升级：</li>
-</ol>
+</div></li>
+<li><p>
+服务升级：
+</p>
 <div class="org-src-container">
 
 <pre class="src src-shell">#例如account微服务
@@ -129,13 +100,14 @@ Renaming account-e041dc4989c5cd11b305bab7075dd2e7 to account
 replicationcontroller "account" rolling updated
 </pre>
 </div>
-<p>
-过程解释：首先，k8s创建一个新的RC，名字叫account-e041dc4989c5cd11b305bab7075dd2e7，总数为2个pod，这个过程是保证有两个pods是可用的。最终滚动升级完成。
-</p>
-<ol class="org-ol">
+<ul class="org-ul">
+<li>过程解释：首先，k8s创建一个新的RC，名字叫account-e041dc4989c5cd11b305bab7075dd2e7，总数为2个pod，这个过程是保证有两个pods是可用的。最终滚动升级完成。</li>
+</ul></li>
 <li>服务回滚：
-如果发布的过程中发现有问题，那么就需要回滚操作，下面是回滚操作的步骤：</li>
-</ol>
+<ul class="org-ul">
+<li><p>
+如果发布的过程中发现有问题，那么就需要回滚操作，下面是回滚操作的步骤：
+</p>
 <div class="org-src-container">
 
 <pre class="src src-shell">account                                     2         2         47m
@@ -144,33 +116,33 @@ activity-db96883e53ab1ed3f11a99ddfbdf31f7   1         1         28m
 #此时用activity进行回滚演示，因为已经发布完成的就不能直接回滚，已经发布的回滚相当于一次从新的发布，此时如果想要回滚操作的话就是直接进行下面的操作
 $ kubectl rolling-update activity --rollback
 </pre>
+</div></li>
+</ul></li>
+</ol></li>
+</ol>
 </div>
 </div>
-</div>
+
 <div id="outline-container-orgheadline3" class="outline-3">
 <h3 id="orgheadline3">我是如何进行Kubernetes进行应用的升级的：</h3>
 <div class="outline-text-3" id="text-orgheadline3">
 <p>
 1.以上两种方式遇到的问题：
-  先说kubernets.
 </p>
+<ul class="org-ul">
+<li>先说kubernets.
 <ol class="org-ol">
 <li>Kubernetes滚动升级的方式对于我这种使用配置比较低的机器，速度较慢，时间成本高.</li>
 <li>回滚的速度更加的慢，有种想死的冲动。</li>
 <li>发到线上测试人员发现问题要立马回滚，搞得大家都很紧张。</li>
-</ol>
-<p>
-再说传统的方式
-</p>
+</ol></li>
+<li>再说传统的方式
 <ol class="org-ol">
 <li>部署速度慢，大公司有专门的代码发布平台，小公司可能就手动发布了。</li>
 <li>人工出错情况多，由于一次上线需要很多的步骤所以人为出错的可能性就很高。</li>
 <li>因为代码的运行环境问题引发的问题是很难排除的，也许就是一个软件的版本问题。</li>
-</ol>
-<ol class="org-ol">
-<li><p>
-那么我是如何使用的。
-</p>
+</ol></li>
+<li>那么我是如何使用的。
 <ol class="org-ol">
 <li>双份生产环境（业务量不大，不需要更多的生产环境），production01 和 production02，可以同时使用，也可以有一个备用，看业务量和对业务高可用的要求衡量。</li>
 <li>每个微服务有一个yaml配置文件，用来快速升级部署。</li>
@@ -185,11 +157,9 @@ $ kubectl rolling-update activity --rollback
 <ol class="org-ol">
 <li>如果发布的过程中发现有问题，那么直接停止升级或者升级完成，因为是在一组下线的生产环境中，都不会发生问题。</li>
 </ol></li>
-</ol>
-<p>
-5.升级成功之后，将另外一组没有升级的线上节点不做任何的处理，防止有Bug要回滚到上一个版本。
-</p></li>
-</ol>
+<li>升级成功之后，将另外一组没有升级的线上节点不做任何的处理，防止有Bug要回滚到上一个版本。</li>
+</ol></li>
+</ul>
 </div>
 </div>
 
