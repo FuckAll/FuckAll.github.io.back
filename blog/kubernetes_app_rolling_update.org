@@ -10,7 +10,6 @@
 #+DESCRIPTION: Kubernets App Rolling update
 
 
-*** Kubernetes 应用的滚动升级
 **** 传统的高可用步骤：
     1. 将版本的业务进行启动
     2. 切换nginx等的配置，切换生产环境
