@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <title>Nginx HTTP2.0 - izgnod 技术男的剑舞人生</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="武向东" />
+    <meta name="description" content="Nginx HTTP2.0" />
+    <meta name="keywords" content="nginx,http" />
+    <link rel="stylesheet" href="/media/css/main.css" type="text/css">
+    <link rel="stylesheet" href="/media/css/prettify.css" type="text/css">
+  </head>
+  <body class="container">
+    <div>
+      <header class="masthead">
+        <h1 class="masthead-title"><a href="/">izgnod 技术男的剑舞人生</a></h1>
+        <p>================&gt; 剑能杀人，也能做舞</p>
+        <ul>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/tags/">Tags</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="https://github.com/FuckAll/FuckAll.github.io">GitHub</a></li>
+          <li><a href="/rss.xml">RSS</a></li>
+        </ul>
+        <form method="get" id="searchform" action="//www.google.com/search">
+          <input type="text" class="field" name="q" id="s" placeholder="Search">
+          <input type="hidden" name="as_sitesearch" value="FuckAll.github.io">
+        </form>
+      </header>
+    </div>
+
+<div>
+<div class="post">
+<h1>Nginx HTTP2.0</h1>
+<p>
+Nginx 从1.9.5已经能够支持HTTP2.0，但是对Openssl版本有要求，下面是过程：
+</p>
+
+<div id="outline-container-orgheadline1" class="outline-2">
+<h2 id="orgheadline1">环境准备：</h2>
+<div class="outline-text-2" id="text-orgheadline1">
+<div class="org-src-container">
+
+<pre class="src src-sh">$yum install gcc gcc-c++ autoconf automake zlib zlib-devel pcre-devel
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline2" class="outline-2">
+<h2 id="orgheadline2">编译Nginx版本：</h2>
+<div class="outline-text-2" id="text-orgheadline2">
+<div class="org-src-container">
+
+<pre class="src src-sh">$wget http://nginx.org/download/nginx-1.11.1.tar.gz
+$tar xf /nginx-1.10.0.tar.gz
+$./configure \
+--prefix=/etc/nginx\
+--sbin-path=/usr/sbin/nginx \
+--conf-path=/etc/nginx/nginx.conf \
+--error-log-path=/var/log/nginx/error.log \
+--http-log-path=/var/log/nginx/access.log \
+--pid-path=/var/run/nginx.pid \
+--lock-path=/var/run/nginx.lock \
+--http-client-body-temp-path=/var/cache/nginx/client_temp \
+--http-proxy-temp-path=/var/cache/nginx/proxy_temp \
+--http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
+--http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp \
+--http-scgi-temp-path=/var/cache/nginx/scgi_temp \
+--user=nginx \
+--group=nginx \
+--with-openssl=/usr/src/openssl-1.0.2h \
+--with-http_ssl_module \
+--with-http_realip_module \
+--with-http_addition_module \
+--with-http_sub_module \
+--with-http_dav_module \
+--with-http_flv_module \
+--with-http_mp4_module \
+--with-http_gunzip_module \
+--with-http_gzip_static_module \
+--with-http_random_index_module \
+--with-http_secure_link_module \
+--with-http_stub_status_module \
+--with-http_auth_request_module \
+--with-mail \
+--with-debug \
+--with-mail_ssl_module \
+--with-file-aio \
+--with-ipv6 \
+--with-threads \
+--with-stream \
+--with-stream_ssl_module \
+--with-http_slice_module \
+--with-http_v2_module
+$make &amp;&amp; make install
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline3" class="outline-2">
+<h2 id="orgheadline3">修改配置并且运行</h2>
+<div class="outline-text-2" id="text-orgheadline3">
+<ol class="org-ol">
+<li><p>
+修改配置：
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">$修改配置文件：
+ 添加：listen 443 ssl http2;
+      server_name x.17mei.cn;
+      #ssl on;
+      ssl_certificate /etc/cert1.pem;
+      ssl_certificate_key /etc/privkey1.pem;
+</pre>
+</div></li>
+<li><p>
+运行：
+</p>
+<ol class="org-ol">
+<li>可执行文件在objs 目录下，直接可以使用。</li>
+<li>运行过程例如：</li>
+</ol>
+<div class="org-src-container">
+
+<pre class="src src-sh">$./nginx -c /etc/nginx/nginx.conf
+</pre>
+</div></li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-orgheadline4" class="outline-2">
+<h2 id="orgheadline4">效果：</h2>
+<div class="outline-text-2" id="text-orgheadline4">
+<p>
+能够在浏览器审核中，看到Network-&gt;Protocol中有h2等关键字，说明http2已经成功。
+<a href="http://o9l83saod.bkt.clouddn.com/http2.0.png" title="nginx http2.0, on Flickr"><img src="http://o9l83saod.bkt.clouddn.com/http2.0.png" alt="http2.0"></a>
+</p>
+</div>
+</div>
+
+</div>
+</div>
+    <div>
+      <div class="post-meta">
+        <span title="post date" class="post-info">2016-06-30</span>
+        <span title="last modification date" class="post-info">2016-06-30</span>
+        <span title="tags" class="post-info"><a href="/tags/nginx/">nginx</a>, <a href="/tags/http/">http</a></span>
+        <span title="author" class="post-info">武向东</span>
+      </div>
+      <section>
+        <h1>Comments</h1>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+          //var disqus_developer = 1;
+          var disqus_identifier = "/blog/2016/6/30/nginx-http2.0";
+          var disqus_url = "https://FuckAll.github.io/blog/2016/6/30/nginx-http2.0";
+          var disqus_shortname = 'izgnod';
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="//disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+      </section>
+      <script src="//code.jquery.com/jquery-latest.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script>
+      <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script src="/media/js/main.js"></script>
+      <div class="footer">
+        <p>Generated by <a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.x (<a href="http://orgmode.org">Org mode</a> 8.x)</p>
+        <p>
+          Copyright &copy; 2012 - <span id="footerYear"></span> <a href="mailto:KongFu &lt;at&gt; Battleplane &lt;dot&gt; local">武向东</a>
+          &nbsp;&nbsp;-&nbsp;&nbsp;
+          Powered by <a href="https://github.com/kelvinh/org-page" target="_blank">org-page</a>
+          <script type="text/javascript">document.getElementById("footerYear").innerHTML = (new Date()).getFullYear();</script>
+        </p>
+      </div>
+    </div>
+
+  </body>
+</html>

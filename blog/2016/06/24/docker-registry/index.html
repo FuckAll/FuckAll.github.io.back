@@ -102,10 +102,8 @@ $docker run -d -p 5000:5000 --restart=always --name registry \
   -e "REGISTRY_AUTH=htpasswd" \
   -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" \
   -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
-  -v `pwd`/certs:/certs \
-  -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \
-  -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
   daocloud.io/library/registry:2.4.1
+#不建议直接暴露端口出来
 </pre>
 </div>
 
@@ -119,8 +117,10 @@ $docker run -d -p 5000:5000 --restart=always --name registry \
   -d \
   -e ENV_DOCKER_REGISTRY_HOST=ENTER-YOUR-REGISTRY-HOST-HERE \
   -e ENV_DOCKER_REGISTRY_PORT=ENTER-PORT-TO-YOUR-REGISTRY-HOST-HERE \
+  -e ENV_MODE_BROWSE_ONLY=false
   -p 8080:80 \
   konradkleine/docker-registry-frontend:v2
+#建议不进行端口映射，因为只要在一台主机上，容器的地址都是可以被其他的容器所找到的，所以可以通过下面的nginx反向代理的方式进行。
 </pre>
 </div>
 
@@ -159,7 +159,7 @@ $docker run -d -p 5000:5000 --restart=always --name registry \
     <div>
       <div class="post-meta">
         <span title="post date" class="post-info">2016-06-24</span>
-        <span title="last modification date" class="post-info">2016-06-28</span>
+        <span title="last modification date" class="post-info">2016-06-30</span>
         <span title="tags" class="post-info"><a href="/tags/docker/">docker</a>, <a href="/tags/registry/">registry</a></span>
         <span title="author" class="post-info">武向东</span>
       </div>
