@@ -1,0 +1,19 @@
+#+TITLE:       NSQ-分布式消息处理系统
+#+AUTHOR:      武向东
+#+EMAIL:       izgnod@gmail.com
+#+DATE:        2016-06-28 Tue
+#+URI:         /blog/2016/06/28/nsq-分布式消息处理系统
+#+KEYWORDS:    nsq,消息处理
+#+TAGS:        nsq
+#+LANGUAGE:    en
+#+OPTIONS:     H:3 num:nil toc:nil \n:nil ::t |:t ^:nil -:nil f:t *:t <:t
+#+DESCRIPTION: Nsq-分布式消息处理系统
+
+NSQ 是一个实时的分布式消息处理的平台，设计的目的是处理处理每天数以十计的消息。
+
+
+--------------------------------------------------------------------------
+
+
+*** 组件：
+
