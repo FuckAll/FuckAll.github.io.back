@@ -1,0 +1,32 @@
+#+TITLE:       2016 TODO
+#+AUTHOR:      武向东
+#+EMAIL:       KongFu@Battleplane.local
+#+DATE:        2016-07-01 Fri
+#+URI:         /blog/2016/07/01/2016-todo
+#+KEYWORDS:    TODO
+#+TAGS:        TODO
+#+LANGUAGE:    en
+#+OPTIONS:     H:3 num:nil toc:nil \n:nil ::t |:t ^:nil -:nil f:t *:t <:t
+#+DESCRIPTION: TODO
+
+#+TYP_TODO: 工作(w!) 学习(s!) 休闲(l!)
+#+SEQ_TODO: PENDING(p!) TODO(t!) | DONE(d!) ABORT(a@/!)
+
+
+
+<2016-07-01 Fri>
+--------------------------———————————
+*** TODO [#1] :  线上环境切换
+**** TODO [#1] : 检查配置
+***** TODO [#1] : pgsql
+***** TODO [#1] : redis  
+***** TODO [#1] : etcd
+**** TODO [#1] : 数据库切换
+**** TODO [#1] : 业务上线
+**** TODO [#1] : 修改解析
+**** TODO [#1] : 申请证书
+**** TODO [#1] : 上线检查
+
+
+
+
