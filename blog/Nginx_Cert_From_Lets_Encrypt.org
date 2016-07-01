@@ -77,11 +77,11 @@ Let's Encrypt作为一个公益项目，给我们带来最大的好处就是能�
          
    - 申请之后的产物
 
-     - cert.pem 这个就是域名的证书，Nginx 需要。
-     - privkey.pem 这个是秘钥,Nginx 需要。
-     - chain.pem 这信任let's encrypt 的证书
-     - fullchain.pem 这个是cert.pem 和 chain.pem证书的结合体。
-     - chain.pem 这是是一个let's
+     + cert.pem 这个就是域名的证书，Nginx 需要。
+     + privkey.pem 这个是秘钥,Nginx 需要。
+     + chain.pem 这信任let's encrypt 的证书
+     + fullchain.pem 这个是cert.pem 和 chain.pem证书的结合体。
+     + chain.pem 这是是一个let's
    
    - Nginx 配置使用证书：
 
@@ -99,7 +99,7 @@ Let's Encrypt作为一个公益项目，给我们带来最大的好处就是能�
      #+BEGIN_SRC sh
      $sudo crontab -e
      #+END_SRC
-     - 添加定时任务：
+     + 添加定时任务：
         
      #+BEGIN_SRC sh
      30 2 * * 1 /opt/letsencrypt/letsencrypt-auto renew >> /var/log/le-renew.log
