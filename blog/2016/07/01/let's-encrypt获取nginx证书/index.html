@@ -40,23 +40,23 @@ Let's Encrypt作为一个公益项目，给我们带来最大的好处就是能�
 <ol class="org-ol">
 <li>流程以及结果：
 
-<ol class="org-ol">
+<ul class="org-ul">
 <li>安装let's encrypt 客户端</li>
 <li>多个证书申请</li>
 <li>定期更新证书</li>
-</ol></li>
+</ul></li>
 
 <li>准备：
 
-<ol class="org-ol">
+<ul class="org-ul">
 <li>首先要有一台nginx服务器</li>
 <li>有域名的控制权，也就是可以解析到nginx服务器上</li>
 <li>这里使用的是CentOS 7</li>
-</ol></li>
+</ul></li>
 
 <li>流程开始：
 
-<ol class="org-ol">
+<ul class="org-ul">
 <li><p>
 安装必要的软件
 </p>
@@ -180,7 +180,7 @@ ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
 35 2 * * 1 /usr/bin/systemctl reload nginx
 </pre>
 </div></li>
-</ol></li>
+</ul></li>
 
 <li>总结:以上步骤很简单，并且很好用，如果以后需要升级let's encrypt客户端软件，直接git pull即可，非常方便。</li>
 </ol>
