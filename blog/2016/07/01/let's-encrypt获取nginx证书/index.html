@@ -69,7 +69,7 @@ Let's Encrypt作为一个公益项目，给我们带来最大的好处就是能�
 </pre>
 </div></li>
 <li>获取证书
-<ol class="org-ol">
+<ul class="org-ul">
 <li><p>
 修该nginx 配置文件,在Nginx的/etc/nginx/conf.d/default.conf文件中添加如下的内容。
 </p>
@@ -128,16 +128,16 @@ Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
 Donating to EFF:                    https://eff.org/donate-len
 </pre>
 </div></li>
-</ol></li>
+</ul></li>
 
 <li>申请之后的产物
-<ol class="org-ol">
+<ul class="org-ul">
 <li>cert.pem 这个就是域名的证书，Nginx 需要。</li>
 <li>privkey.pem 这个是秘钥,Nginx 需要。</li>
 <li>chain.pem 这信任let's encrypt 的证书</li>
 <li>fullchain.pem 这个是cert.pem 和 chain.pem证书的结合体。</li>
 <li>chain.pem 这是是一个let's</li>
-</ol></li>
+</ul></li>
 
 <li><p>
 Nginx 配置使用证书：
