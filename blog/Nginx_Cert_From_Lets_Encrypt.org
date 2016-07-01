@@ -15,96 +15,96 @@ Let's Encrypt作为一个公益项目，给我们带来最大的好处就是能�
 
 1. 流程以及结果：
 
-   1) 安装let's encrypt 客户端
-   2) 多个证书申请
-   3) 定期更新证书
+   - 安装let's encrypt 客户端
+   - 多个证书申请
+   - 定期更新证书
 
 2. 准备：
 
-   1) 首先要有一台nginx服务器
-   2) 有域名的控制权，也就是可以解析到nginx服务器上
-   3) 这里使用的是CentOS 7
+   - 首先要有一台nginx服务器
+   - 有域名的控制权，也就是可以解析到nginx服务器上
+   - 这里使用的是CentOS 7
 
 3. 流程开始：
 
-   1) 安装必要的软件
+   - 安装必要的软件
+    #+BEGIN_SRC sh
+    $ sudo yum -y install git bc
+    #+END_SRC
+   - 安装let's encrypt 客户端
      #+BEGIN_SRC sh
-     $ sudo yum -y install git bc
+     $sudo git clone https://github.com/letsencrypt/letsencrypt /opt/letsencrypt
      #+END_SRC
-   2) 安装let's encrypt 客户端
+   - 获取证书
+     + 修该nginx 配置文件,在Nginx的/etc/nginx/conf.d/default.conf文件中添加如下的内容。
       #+BEGIN_SRC sh
-      $sudo git clone https://github.com/letsencrypt/letsencrypt /opt/letsencrypt
+      $ location ~ /.well-known {
+       allow all;
+       }
       #+END_SRC
-   3) 获取证书
-      + 修该nginx 配置文件,在Nginx的/etc/nginx/conf.d/default.conf文件中添加如下的内容。
+     + 重启nginx
+      #+BEGIN_SRC sh
+      $ sudo systemctl restart nginx
+      #+END_SRC
+     + 申请证书
+      #+BEGIN_SRC sh
+      $ cd /opt/letsencrypt
+      $./letsencrypt-auto certonly -a webroot --webroot-path=/usr/share/nginx/html -d example.com -d www.example.com
+      #+END_SRC
+       - 注意：这里的webroot，我用的是默认的，应为我的nginx是yum直接安装的，如果是自己编译的版本请指定，这样let's encrypt 才能够验证域名的绝对控制权，-d 后面的参数可以选择多个，但是这几个域名都要解析到本机的nginx上面。
+     + 填写邮箱地址
+       - 注意：这里是let's encrypt 的客户端的ui界面，只要将你的邮箱地址填入即可，这个邮箱的作用是用来进行账号找回的，也可以下次重新的申请，但是如果要申请的话你要把所有的上面的程序走一遍，但是如果同样的账号，那么至于要一条命令重新的申请以下就好了，比较方便。
+	      然后一路的同意，最后是输出信息，有Congratulations!等字眼，说明申请已经成功了，注意这时候的输出信息，这些信息中包括了你的证书在什么地方，证书过期证书等。
+       - 输出信息,例如:
        #+BEGIN_SRC sh
-       $ location ~ /.well-known {
-        allow all;
-	}
-       #+END_SRC
-      + 重启nginx
-       #+BEGIN_SRC sh
-       $ sudo systemctl restart nginx
-       #+END_SRC
-      + 申请证书
-       #+BEGIN_SRC sh
-       $ cd /opt/letsencrypt
-       $./letsencrypt-auto certonly -a webroot --webroot-path=/usr/share/nginx/html -d example.com -d www.example.com
-       #+END_SRC
-	- 注意：这里的webroot，我用的是默认的，应为我的nginx是yum直接安装的，如果是自己编译的版本请指定，这样let's encrypt 才能够验证域名的绝对控制权，-d 后面的参数可以选择多个，但是这几个域名都要解析到本机的nginx上面。
-      + 填写邮箱地址
-	- 注意：这里是let's encrypt 的客户端的ui界面，只要将你的邮箱地址填入即可，这个邮箱的作用是用来进行账号找回的，也可以下次重新的申请，但是如果要申请的话你要把所有的上面的程序走一遍，但是如果同样的账号，那么至于要一条命令重新的申请以下就好了，比较方便。
-	       然后一路的同意，最后是输出信息，有Congratulations!等字眼，说明申请已经成功了，注意这时候的输出信息，这些信息中包括了你的证书在什么地方，证书过期证书等。
-	- 输出信息,例如:
-	#+BEGIN_SRC sh
-	IMPORTANT NOTES:
-	- If you lose your account credentials, you can recover through
-	e-mails sent to sammy@digitalocean.com
-	- Congratulations! Your certificate and chain have been saved at
-	/etc/letsencrypt/live/example.com/fullchain.pem. Your
-	cert will expire on 2016-03-15. To obtain a new version of the
-	certificate in the future, simply run Let's Encrypt again.
-	- Your account credentials have been saved in your Let's Encrypt
-	configuration directory at /etc/letsencrypt. You should make a
-	secure backup of this folder now. This configuration directory will
-	also contain certificates and private keys obtained by Let's
-	Encrypt so making regular backups of this folder is ideal.
-	- If like Let's Encrypt, please consider supporting our work by:
+       IMPORTANT NOTES:
+       - If you lose your account credentials, you can recover through
+       e-mails sent to sammy@digitalocean.com
+       - Congratulations! Your certificate and chain have been saved at
+       /etc/letsencrypt/live/example.com/fullchain.pem. Your
+       cert will expire on 2016-03-15. To obtain a new version of the
+       certificate in the future, simply run Let's Encrypt again.
+       - Your account credentials have been saved in your Let's Encrypt
+       configuration directory at /etc/letsencrypt. You should make a
+       secure backup of this folder now. This configuration directory will
+       also contain certificates and private keys obtained by Let's
+       Encrypt so making regular backups of this folder is ideal.
+       - If like Let's Encrypt, please consider supporting our work by:
 
-	Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
-	Donating to EFF:                    https://eff.org/donate-len
-	#+END_SRC
+       Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
+       Donating to EFF:                    https://eff.org/donate-len
+       #+END_SRC
          
-   4) 申请之后的产物
+   - 申请之后的产物
 
-      - cert.pem 这个就是域名的证书，Nginx 需要。
-      - privkey.pem 这个是秘钥,Nginx 需要。
-      - chain.pem 这信任let's encrypt 的证书
-      - fullchain.pem 这个是cert.pem 和 chain.pem证书的结合体。
-      - chain.pem 这是是一个let's
+     - cert.pem 这个就是域名的证书，Nginx 需要。
+     - privkey.pem 这个是秘钥,Nginx 需要。
+     - chain.pem 这信任let's encrypt 的证书
+     - fullchain.pem 这个是cert.pem 和 chain.pem证书的结合体。
+     - chain.pem 这是是一个let's
    
-   5) Nginx 配置使用证书：
+   - Nginx 配置使用证书：
 
-      在对应的域名的配置文件中加入：
-      #+BEGIN_SRC sh
-      listen 443 ssl;
-      server_name example.com www.example.com;
-      ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
-      ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
-      #+END_SRC
+     在对应的域名的配置文件中加入：
+     #+BEGIN_SRC sh
+     listen 443 ssl;
+     server_name example.com www.example.com;
+     ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
+     ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+     #+END_SRC
    
-   6) 重启nginx，并且https请求。
+   - 重启nginx，并且https请求。
 
-   7) 定时任务，每周进行一次证书的申请以及重启nginx
-      #+BEGIN_SRC sh
-      $sudo crontab -e
-      #+END_SRC
-      - 添加定时任务：
+   - 定时任务，每周进行一次证书的申请以及重启nginx
+     #+BEGIN_SRC sh
+     $sudo crontab -e
+     #+END_SRC
+     - 添加定时任务：
         
-      #+BEGIN_SRC sh
-      30 2 * * 1 /opt/letsencrypt/letsencrypt-auto renew >> /var/log/le-renew.log
-      35 2 * * 1 /usr/bin/systemctl reload nginx
-      #+END_SRC
+     #+BEGIN_SRC sh
+     30 2 * * 1 /opt/letsencrypt/letsencrypt-auto renew >> /var/log/le-renew.log
+     35 2 * * 1 /usr/bin/systemctl reload nginx
+     #+END_SRC
 
 4. 总结:以上步骤很简单，并且很好用，如果以后需要升级let's encrypt客户端软件，直接git pull即可，非常方便。
 
