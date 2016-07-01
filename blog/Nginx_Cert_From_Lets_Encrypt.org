@@ -14,14 +14,19 @@ Let's Encrypt作为一个公益项目，给我们带来最大的好处就是能�
 ------------------------------------------------------------------------------
 
 1. 流程以及结果：
+
    1) 安装let's encrypt 客户端
    2) 多个证书申请
    3) 定期更新证书
+
 2. 准备：
+
    1) 首先要有一台nginx服务器
    2) 有域名的控制权，也就是可以解析到nginx服务器上
    3) 这里使用的是CentOS 7
+
 3. 流程开始：
+
    1) 安装必要的软件
      #+BEGIN_SRC sh
      $ sudo yum -y install git bc
@@ -71,6 +76,7 @@ Let's Encrypt作为一个公益项目，给我们带来最大的好处就是能�
 	#+END_SRC
          
    4) 申请之后的产物
+
       - cert.pem 这个就是域名的证书，Nginx 需要。
       - privkey.pem 这个是秘钥,Nginx 需要。
       - chain.pem 这信任let's encrypt 的证书
@@ -78,6 +84,7 @@ Let's Encrypt作为一个公益项目，给我们带来最大的好处就是能�
       - chain.pem 这是是一个let's
    
    5) Nginx 配置使用证书：
+
       在对应的域名的配置文件中加入：
       #+BEGIN_SRC sh
       listen 443 ssl;
@@ -87,6 +94,7 @@ Let's Encrypt作为一个公益项目，给我们带来最大的好处就是能�
       #+END_SRC
    
    6) 重启nginx，并且https请求。
+
    7) 定时任务，每周进行一次证书的申请以及重启nginx
       #+BEGIN_SRC sh
       $sudo crontab -e
