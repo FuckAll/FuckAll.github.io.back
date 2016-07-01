@@ -39,18 +39,23 @@ Let's Encrypt作为一个公益项目，给我们带来最大的好处就是能�
 
 <ol class="org-ol">
 <li>流程以及结果：
+
 <ol class="org-ol">
 <li>安装let's encrypt 客户端</li>
 <li>多个证书申请</li>
 <li>定期更新证书</li>
 </ol></li>
+
 <li>准备：
+
 <ol class="org-ol">
 <li>首先要有一台nginx服务器</li>
 <li>有域名的控制权，也就是可以解析到nginx服务器上</li>
 <li>这里使用的是CentOS 7</li>
 </ol></li>
+
 <li>流程开始：
+
 <ol class="org-ol">
 <li><p>
 安装必要的软件
@@ -131,6 +136,7 @@ Donating to EFF:                    https://eff.org/donate-len
 </ul></li>
 
 <li>申请之后的产物
+
 <ul class="org-ul">
 <li>cert.pem 这个就是域名的证书，Nginx 需要。</li>
 <li>privkey.pem 这个是秘钥,Nginx 需要。</li>
@@ -141,6 +147,9 @@ Donating to EFF:                    https://eff.org/donate-len
 
 <li><p>
 Nginx 配置使用证书：
+</p>
+
+<p>
 在对应的域名的配置文件中加入：
 </p>
 <div class="org-src-container">
@@ -153,6 +162,7 @@ ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
 </div></li>
 
 <li>重启nginx，并且https请求。</li>
+
 <li><p>
 定时任务，每周进行一次证书的申请以及重启nginx
 </p>
