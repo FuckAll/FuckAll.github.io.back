@@ -1,0 +1,122 @@
+#+TITLE:       Golang基础
+#+AUTHOR:      武向东
+#+EMAIL:       izgnod@gmial.com
+#+DATE:        2016-07-01 Fri
+#+URI:         /blog/2016/07/1/golang基础
+#+KEYWORDS:    Golang
+#+TAGS:        Golang
+#+LANGUAGE:    en
+#+OPTIONS:     H:3 num:nil toc:nil \n:nil ::t |:t ^:nil -:nil f:t *:t <:t
+#+DESCRIPTION: Golang 基础
+
+*** 关于Golang数组的问题：
+**** 声明Golang数组有两种方式：
+       #+BEGIN_SRC golang
+       var arr1 = new([5]int)
+       var arr2 [5]int
+       #+END_SRC
+      + Golang认为数组是一种值类型，但new的时候返回的是数组的指针。
+      + 第一种返回的是一个指针，传递的时候是不进行内存拷贝的。
+      + 第二种方式返回的是数组本身，传递的时候是进行内存拷贝的。
+      + 事实：
+       #+BEGIN_SRC golang
+      package main
+      import (
+      "fmt"
+      )
+      func main() {
+	var arr1 = new([5]int)
+	var arr2 [5]int
+	fmt.Println(arr1)
+	fmt.Println(arr2)
+	test := arr1
+	test[0] = 123
+	fmt.Println(test)
+	fmt.Println(arr1)
+	test2 := arr2
+	test2[0] = 345
+	fmt.Println(test2)
+	fmt.Println(arr2)
+	}
+       $输出结果：
+	&[0 0 0 0 0]
+	[0 0 0 0 0]
+	&[123 0 0 0 0]
+	&[123 0 0 0 0]
+	[345 0 0 0 0]
+	[0 0 0 0 0]
+       #+END_SRC
+**** 切片的问题：
+      + 切片在进行传递的时候也是指针传递
+      + 事实：
+	#+BEGIN_SRC golang
+	package main
+
+	import (
+	"fmt"
+	)
+
+	func f(a []int) {
+	fmt.Println(a)
+	a[0] = 123
+	}
+	func fp(a *[3]int) {
+	fmt.Println(a)
+	a[0] = 456
+	}
+
+	func main() {
+	var ar [3]int
+	f(ar[1:2])
+	fp(&ar)
+	fmt.Println(ar)
+	}
+       $输出结果：
+	&[0 0 0 0 0]
+	[0 0 0 0 0]
+	&[123 0 0 0 0]
+	&[123 0 0 0 0]
+	[345 0 0 0 0]
+	[0 0 0 0 0]
+       #+END_SRC 
+      + 初始化数组的时候如果是不定长的数组初始化，那么这个数组也会是一个切片：          
+       #+BEGIN_SRC golang
+       package main
+
+       import (
+	"fmt"
+	)
+
+	func test(a []int) {
+	a[1] = 4
+	}
+	func main() {
+	var arrlazy = []int{5, 6, 6, 7}
+	fmt.Println(arrlazy)
+	test(arrlazy)
+	fmt.Println(arrlazy)
+
+	}
+       $输出结果：
+       [5 6 6 7]
+       [5 4 6 7]
+       #+END_SRC 
+      + 总结：除了数组本身，切片和new一个都是指针的形式，数组本身是值类型，其余两种情况得到的嗾使指针，如果想要在传递的时候不进行拷贝操作，那么两种方式，一种就是直接传指针，另外一种的直接传切片。 
+      1. 注意：C中数组的终止位是靠\0这种标识来判断的，Golang中的数组是依靠一个结构体来实现的：
+	 例如：slice 切片的结构体：
+	 #+BEGIN_SRC C
+	  type slice struct{
+	  first *T
+	  len int
+	  cap int
+	  }
+	 #+END_SRC
+**** new() 和 make() 的关系：
+       + new() 是为变量分配内存，然后就将分配好的地址的首地址返回，并且也是进行初始化。
+       + make() 这个是用来直接初始化，然后将变量直接返回。
+**** 关于效率问题：
+       + 字符串的拼凑应该直接使用bytes的buffer进行操作，会快一些。
+**** 数组和切片问题：
+        1. 数组一旦定义好，就固定长度即len == cap
+        2. 数组想要扩容或者是缩容可以转换成切片进行使用,即先要make一个切片，然后将数组中的数据放入其中。
+        
