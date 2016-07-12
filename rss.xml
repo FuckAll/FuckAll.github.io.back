@@ -4,16 +4,23 @@
     <title>izgnod 技术男的剑舞人生</title>
     <link>https://FuckAll.github.io</link>
     <description>================&gt; 剑能杀人，也能做舞</description>
-    <pubDate>Fri, 01 Jul 2016 11:25:02 CST</pubDate>
-    <lastBuildDate>Fri, 01 Jul 2016 11:25:02 CST</lastBuildDate>
+    <pubDate>Tue, 12 Jul 2016 18:33:14 CST</pubDate>
+    <lastBuildDate>Tue, 12 Jul 2016 18:33:14 CST</lastBuildDate>
     <docs>http://www.rssboard.org/rss-specification</docs>
     <generator>Org-page static site generator (https://github.com/kelvinh/org-page)</generator>
     <item>
       <title>2016 TODO</title>
       <link>https://FuckAll.github.io/blog/2016/07/01/2016-todo</link>
       <description><![CDATA[TODO]]></description>
-      <pubDate>2016-07-01</pubDate>
+      <pubDate>2016-07-11</pubDate>
       <guid>https://FuckAll.github.io/blog/2016/07/01/2016-todo</guid>
+    </item>
+    <item>
+      <title>Golang基础</title>
+      <link>https://FuckAll.github.io/blog/2016/07/1/golang基础</link>
+      <description><![CDATA[Golang 基础]]></description>
+      <pubDate>2016-07-05</pubDate>
+      <guid>https://FuckAll.github.io/blog/2016/07/1/golang基础</guid>
     </item>
     <item>
       <title>Docker Registry</title>

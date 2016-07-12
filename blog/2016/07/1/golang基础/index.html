@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <title>Golang基础 - izgnod 技术男的剑舞人生</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="武向东" />
+    <meta name="description" content="Golang 基础" />
+    <meta name="keywords" content="Golang" />
+    <link rel="stylesheet" href="/media/css/main.css" type="text/css">
+    <link rel="stylesheet" href="/media/css/prettify.css" type="text/css">
+  </head>
+  <body class="container">
+    <div>
+      <header class="masthead">
+        <h1 class="masthead-title"><a href="/">izgnod 技术男的剑舞人生</a></h1>
+        <p>================&gt; 剑能杀人，也能做舞</p>
+        <ul>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/tags/">Tags</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="https://github.com/FuckAll/FuckAll.github.io">GitHub</a></li>
+          <li><a href="/rss.xml">RSS</a></li>
+        </ul>
+        <form method="get" id="searchform" action="//www.google.com/search">
+          <input type="text" class="field" name="q" id="s" placeholder="Search">
+          <input type="hidden" name="as_sitesearch" value="FuckAll.github.io">
+        </form>
+      </header>
+    </div>
+
+<div>
+<div class="post">
+<h1>Golang基础</h1>
+
+<div id="outline-container-orgheadline6" class="outline-2">
+<h2 id="orgheadline6">关于Golang数组的问题：</h2>
+<div class="outline-text-2" id="text-orgheadline6">
+</div><div id="outline-container-orgheadline1" class="outline-3">
+<h3 id="orgheadline1">声明Golang数组有两种方式：</h3>
+<div class="outline-text-3" id="text-orgheadline1">
+<div class="org-src-container">
+
+<pre class="src src-golang">var arr1 = new([5]int)
+var arr2 [5]int
+</pre>
+</div>
+<ul class="org-ul">
+<li>Golang认为数组是一种值类型，但new的时候返回的是数组的指针。</li>
+<li>第一种返回的是一个指针，传递的时候是不进行内存拷贝的。</li>
+<li>第二种方式返回的是数组本身，传递的时候是进行内存拷贝的。</li>
+<li><p>
+事实：
+</p>
+<div class="org-src-container">
+
+<pre class="src src-golang">package main
+import (
+"fmt"
+)
+func main() {
+  var arr1 = new([5]int)
+  var arr2 [5]int
+  fmt.Println(arr1)
+  fmt.Println(arr2)
+  test := arr1
+  test[0] = 123
+  fmt.Println(test)
+  fmt.Println(arr1)
+  test2 := arr2
+  test2[0] = 345
+  fmt.Println(test2)
+  fmt.Println(arr2)
+  }
+ $输出结果：
+  &amp;[0 0 0 0 0]
+  [0 0 0 0 0]
+  &amp;[123 0 0 0 0]
+  &amp;[123 0 0 0 0]
+  [345 0 0 0 0]
+  [0 0 0 0 0]
+</pre>
+</div></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgheadline2" class="outline-3">
+<h3 id="orgheadline2">切片的问题：</h3>
+<div class="outline-text-3" id="text-orgheadline2">
+<ul class="org-ul">
+<li>切片在进行传递的时候也是指针传递</li>
+<li><p>
+事实：
+</p>
+<div class="org-src-container">
+
+<pre class="src src-golang"> package main
+
+ import (
+ "fmt"
+ )
+
+ func f(a []int) {
+ fmt.Println(a)
+ a[0] = 123
+ }
+ func fp(a *[3]int) {
+ fmt.Println(a)
+ a[0] = 456
+ }
+
+ func main() {
+ var ar [3]int
+ f(ar[1:2])
+ fp(&amp;ar)
+ fmt.Println(ar)
+ }
+$输出结果：
+ &amp;[0 0 0 0 0]
+ [0 0 0 0 0]
+ &amp;[123 0 0 0 0]
+ &amp;[123 0 0 0 0]
+ [345 0 0 0 0]
+ [0 0 0 0 0]
+</pre>
+</div></li>
+<li><p>
+初始化数组的时候如果是不定长的数组初始化，那么这个数组也会是一个切片：          
+</p>
+<div class="org-src-container">
+
+<pre class="src src-golang">package main
+
+import (
+ "fmt"
+ )
+
+ func test(a []int) {
+ a[1] = 4
+ }
+ func main() {
+ var arrlazy = []int{5, 6, 6, 7}
+ fmt.Println(arrlazy)
+ test(arrlazy)
+ fmt.Println(arrlazy)
+
+ }
+$输出结果：
+[5 6 6 7]
+[5 4 6 7]
+</pre>
+</div></li>
+<li>总结：除了数组本身，切片和new一个都是指针的形式，数组本身是值类型，其余两种情况得到的嗾使指针，如果想要在传递的时候不进行拷贝操作，那么两种方式，一种就是直接传指针，另外一种的直接传切片。</li>
+<li><p>
+注意：C中数组的终止位是靠\0这种标识来判断的，Golang中的数组是依靠一个结构体来实现的：
+例如：slice 切片的结构体：
+</p>
+<div class="org-src-container">
+
+<pre class="src src-C">type slice struct{
+first *T
+len int
+cap int
+}
+</pre>
+</div></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgheadline3" class="outline-3">
+<h3 id="orgheadline3">new() 和 make() 的关系：</h3>
+<div class="outline-text-3" id="text-orgheadline3">
+<ul class="org-ul">
+<li>new() 是为变量分配内存，然后就将分配好的地址的首地址返回，并且也是进行初始化。</li>
+<li>make() 这个是用来直接初始化，然后将变量直接返回。</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgheadline4" class="outline-3">
+<h3 id="orgheadline4">关于效率问题：</h3>
+<div class="outline-text-3" id="text-orgheadline4">
+<ul class="org-ul">
+<li>字符串的拼凑应该直接使用bytes的buffer进行操作，会快一些。</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgheadline5" class="outline-3">
+<h3 id="orgheadline5">数组和切片问题：</h3>
+<div class="outline-text-3" id="text-orgheadline5">
+<ol class="org-ol">
+<li>数组一旦定义好，就固定长度即len == cap</li>
+<li>数组想要扩容或者是缩容可以转换成切片进行使用,即先要make一个切片，然后将数组中的数据放入其中。</li>
+</ol>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+    <div>
+      <div class="post-meta">
+        <span title="post date" class="post-info">2016-07-01</span>
+        <span title="last modification date" class="post-info">2016-07-05</span>
+        <span title="tags" class="post-info"><a href="/tags/golang/">Golang</a></span>
+        <span title="author" class="post-info">武向东</span>
+      </div>
+      <section>
+        <h1>Comments</h1>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+          //var disqus_developer = 1;
+          var disqus_identifier = "/blog/2016/07/1/golang基础";
+          var disqus_url = "https://FuckAll.github.io/blog/2016/07/1/golang基础";
+          var disqus_shortname = 'izgnod';
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="//disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+      </section>
+      <script src="//code.jquery.com/jquery-latest.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script>
+      <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script src="/media/js/main.js"></script>
+      <div class="footer">
+        <p>Generated by <a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.x (<a href="http://orgmode.org">Org mode</a> 8.x)</p>
+        <p>
+          Copyright &copy; 2012 - <span id="footerYear"></span> <a href="mailto:izgnod &lt;at&gt; gmial &lt;dot&gt; com">武向东</a>
+          &nbsp;&nbsp;-&nbsp;&nbsp;
+          Powered by <a href="https://github.com/kelvinh/org-page" target="_blank">org-page</a>
+          <script type="text/javascript">document.getElementById("footerYear").innerHTML = (new Date()).getFullYear();</script>
+        </p>
+      </div>
+    </div>
+
+  </body>
+</html>
