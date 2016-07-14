@@ -53,3 +53,7 @@
      - State "工作"       from "TODO"       [2016-07-11 Mon 17:40]
 **** 工作 减少一个authority
      - State "工作"       from "TODO"       [2016-07-11 Mon 17:40]
+
+*** 工作 [#1]: golang goroutine
+**** 学习 如何使用，写博客
+**** 工作 用在DockerCi

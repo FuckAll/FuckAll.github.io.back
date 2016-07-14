@@ -120,3 +120,243 @@
         1. 数组一旦定义好，就固定长度即len == cap
         2. 数组想要扩容或者是缩容可以转换成切片进行使用,即先要make一个切片，然后将数组中的数据放入其中。
         
+*** 关于Golang指针问题：
+**** Golang指针
+     除了正常的指针之外，还有以下两种指针，一种是unsafe.Pointer指针，把任何的指针看成一个正常的指针，uintptr是
+将任何的一个指针都看成一个整数。
+     1. unsafe.Pointer指针
+	#+BEGIN_SRC C
+	// unsafe.Pointer 指针
+	func test4() {
+	    type data struct {
+	        x [1024 * 100]byte
+	    }
+	    tmp := func() unsafe.Pointer {
+		p := &data{}
+		return unsafe.Pointer(p)
+	    }
+	    const N = 10000
+	    cache := new([N]unsafe.Pointer)
+	    for i := 0; i < N; i++ {
+		cache[i] = tmp()
+		time.Sleep(time.Millisecond)
+	     }
+        }
+        #+END_SRC
+     2. uintptr指针(将指针看成一个整数)
+        #+BEGIN_SRC C
+          // uintptr 指针
+	  func test3() {
+	      type data struct {
+		  x [1024 * 100]byte
+	      }
+	      tmp := func() uintptr {
+	          p := &data{}
+	          return uintptr(unsafe.Pointer(p))
+	      }
+	      const N = 10000
+	      cache := new([N]uintptr)
+	      fmt.Println(reflect.TypeOf(cache))
+	      for i := 0; i < N; i++ {
+		  cache[i] = tmp()
+		  time.Sleep(time.Millisecond)
+              }
+	} 
+        #+END_SRC
+       
+*** 关于Golang反射问题：
+**** 指针的反射：
+     #+BEGIN_SRC C
+     func test6() {
+	type User struct {
+		Username string
+	}
+	type Admin struct {
+		User
+		title string
+	}
+	u := new(Admin)
+	t := reflect.TypeOf(u)
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+     }
+     #+END_SRC
+**** 结构体的反射：
+     #+BEGIN_SRC C
+       // 反射结构体内容
+       func test5() {
+           type User struct {
+	       Username string
+           }
+           type Admin struct {
+		User
+		title string
+	   }
+	   func() {
+		var u Admin
+		t := reflect.TypeOf(u)
+		for i, n := 0, t.NumField(); i < n; i++ {
+			f := t.Field(i)
+			fmt.Println(f.Name, f.Type)
+		}
+	   }()
+       }
+     #+END_SRC
+
+*** 关于Golang并发问题：
+**** go关键字带来的并发：
+     #+BEGIN_SRC C
+       func loop() {
+	// fmt.Println("wood")
+           for i := 0; i < 10; i++ {
+		fmt.Printf("%d", i)
+	   }
+        }
+       func test() {
+	   loop()
+	   go loop()
+	   time.Sleep(time.Second)// 如果不等待，test会在goruntine没有开始执行就已经退出了。
+       }
+     #+END_SRC
+**** 信道带来的goroutine通信
+     1. 无缓存信道(放入信道的必须取出，否则会阻塞当前的goroutine)
+         #+BEGIN_SRC C
+         func test1() {
+	     go func() {
+		fmt.Println("step 1")
+		messages <- "step 1"
+	     }()
+	     fmt.Println("step 2")
+	     time.Sleep(time.Second)
+          }
+     #+END_SRC
+     2. 这种情况信道中放入东西，但是没有人取,能够正常退出。
+         #+BEGIN_SRC shell
+     ➜  src git:(master) ✗ go run hello.go
+     go run hello.go
+     step 1
+     step 2
+     #+END_SRC
+         #+BEGIN_SRC go
+     func test4() {
+	go func() {
+		fmt.Println("step 1")
+	}()
+	<-messages
+     }
+     #+END_SRC
+	* 这种情况信道没有人放东西，但是有取得操作。所以会发生死锁。
+	 #+BEGIN_SRC shell
+	➜  src git:(master) ✗ go run hello.go
+	go run hello.go
+	step 1
+	fatal error: all goroutines are asleep - deadlock!
+	#+END_SRC
+	 #+BEGIN_SRC go
+	   func test6() {
+	       complete := make(chan int)
+		go func() {
+		   for i := 0; i < 10; i++ {
+			   fmt.Printf("%d", i)
+
+		   }
+		   complete <- 0
+
+		}()
+		fmt.Println("step 1")
+		<-complete
+		fmt.Println("step 2")
+	    }
+	    #+END_SRC
+	  * 通过设置标志位，能够控制执行顺序
+	* 总结：也就是说，无缓存的信道，在存和取得时候都会临时挂起自己的goroutine,等到另外一端准备好之后才够恢复。
+	  无缓冲的信道永远不会存储数据，只是负责数据的流通，所以数据要流转起来。
+     3. 死锁：线程或者进程在等待资源的时候，一直无法得到所需要的就会陷入一种状态，这种状态就叫做死锁。
+	1. 几种情况：
+	   - 在单独的gorunitine中操作无缓冲的信道，一定发生死锁。
+	     例如：
+		#+BEGIN_SRC go
+	     func main() {
+		 ch := make(chan int)
+		 ch <- 1 // 1流入信道，堵塞当前线, 没人取走数据信道不会打开
+		 fmt.Println("This line code wont run") //在此行执行之前Go就会报死锁
+	     }
+	     #+END_SRC
+	   - 多个无缓冲的信道相互依赖，可能会发生死锁。
+	     例如：
+		#+BEGIN_SRC go
+	     func test7() {
+		 ch1 := make(chan int)
+		 ch2 := make(chan int)
+		 go func() {
+		 fmt.Println("wonder")
+		 ch1 <- <-ch2
+		 }()
+		 <-ch1
+             }
+	  
+	     #+END_SRC
+	   - 多个无缓冲的信道，部分信道数据不能流动。
+	     例如：
+		 #+BEGIN_SRC go
+	             c, quit := make(chan int), make(chan int)
+		     go func() {
+		     c <- 1  // c通道的数据没有被其他goroutine读取走，堵塞当前goroutine
+		     quit <- 0 // quit始终没有办法写入数据
+		     }()
+		     <- quit // quit 等待数据的写
+		 #+END_SRC
+	2. 解决死锁的方法：
+	   1. 把没有放入的数据，赶紧放入，把没有取走的数据，赶紧取走。
+	      #+BEGIN_SRC go
+   	          c, quit := make(chan int), make(chan int)
+		  go func() {
+	              c <- 1
+		      quit <- 0
+		  }()
+		  <- c // 取走c的数据！
+		  <-quit
+	      	      #+END_SRC
+	   2. 设置缓冲信道,这样信道就可以保存数据了，可以保存的数据长度为信道的长度，并且只有在存储的数据要超出信道的长度的时候，才会挂起，等待第一个数据被其他的goroutine拿走。
+	      #+BEGIN_SRC go
+	          func test() {
+                      ch := make(chan int, 3)
+		      ch <- 1
+		      ch <- 2
+		      ch <- 3
+		      for v := range ch {
+		          fmt.Println(v)
+			  if len(ch) <= 0 {
+			  break
+			  }
+		      }
+                  }
+	      #+END_SRC
+	      * 上述就是设置了一个缓冲的信道，长度为3，最大能够录入3个，如果大于3个会阻塞，等待有channel被消费。
+	      * 缓冲的信道是能够用range来遍历的，但是由于range不等到信道关闭是不会结束读取的，所以即使是ch长度为0，range也是会
+		继续去取，所以会报死锁的错误，所以通过判断ch的长度决定退出。(注意，这个如果是在信道存取的时候进行长度判断会出问题的。最好的方法是显示的关闭信道,
+                信道关闭之后，信道是只读的，不能写。)
+		#+BEGIN_SRC go
+		func test() {
+		    ch := make(chan int, 4)
+		    ch <- 1
+		    ch <- 2
+		    ch <- 3
+		    close(ch)
+		    //ch <- 4 //
+	            for v := range ch {
+		    fmt.Println(v)
+
+		    }
+  	        }
+		#+END_SRC
+**** 并发Or并行
+     1. 并发区别于并行： 并发的意思是多个goroutine轮流的使用单核CPU，并行是每个goroutine都可以在另外单独的CPU上单独的运行。
+
+
+未完待续。。。。。。
+   
+		
+	  
+
