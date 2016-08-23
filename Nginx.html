@@ -79,6 +79,8 @@
             <li><a href="%E5%AE%B9%E5%99%A8%E7%9B%B8%E5%85%B3.html">容器相关</a></li>
         
             <li><a href="Nginx.html">Nginx</a></li>
+        
+            <li><a href="%E6%95%B0%E6%8D%AE%E5%BA%93.html">数据库</a></li>
          
 
       </ul>
@@ -101,126 +103,93 @@
 		<div class="markdown-body home-categories">
 		
 			<div class="article">
-                <a class="clearlink" href="14719253380529.html">
+                <a class="clearlink" href="14719476150773.html">
                 
-                  <h1>Let's Encrypt 获取Nginx证书</h1>
+                  <h1>Nginx HTTP2.0</h1>
                   <div class="a-content">
                       
                       <div class="a-content-text">
                         
-                        	<p>Let&#39;s Encrypt作为一个公益项目，给我们带来最大的好处就是能够免费的获取证书，而且申请过程简单，证书有效时间为90天，建议60天的时候主动更新证书。</p>
+                        	<p>Nginx 从1.9.5已经能够支持HTTP2.0，但是对Openssl版本有要求，下面是过程：</p>
 
-<hr/>
+<h2 id="toc_0">环境准备：</h2>
 
-<h2 id="toc_0">流程以及结果：</h2>
-
-<ol>
-<li>安装let&#39;s encrypt 客户端</li>
-<li>多个证书申请</li>
-<li>定期更新证书</li>
-</ol>
-
-<h2 id="toc_1">准备：</h2>
-
-<ol>
-<li>首先要有一台nginx服务器</li>
-<li>有域名的控制权，也就是可以解析到nginx服务器上</li>
-<li>这里使用的是CentOS 7</li>
-</ol>
-
-<h2 id="toc_2">流程开始：</h2>
-
-<ol>
-<li><p>安装必要的软件</p>
-
-<pre><code> sudo yum -y install git bc
-</code></pre></li>
-<li><p>安装let&#39;s encrypt 客户端</p>
-
-<pre><code class="language-bash">  $sudo git clone https://github.com/letsencrypt/letsencrypt /opt/letsencrypt
-</code></pre></li>
-<li><p>获取证书</p>
-
-<ol>
-<li><p>修该nginx 配置文件,在Nginx的/etc/nginx/conf.d/default.conf文件中添加如下的内容。</p>
-
-<pre><code class="language-bash">$ location ~ /.well-known {
-allow all;
-}
- ```
-</code></pre></li>
-<li><p>重启nginx</p>
-
-<pre><code class="language-bash">$ sudo systemctl restart nginx
-</code></pre></li>
-<li><p>申请证书</p>
-
-<pre><code class="language-bash">$ cd /opt/letsencrypt
-$./letsencrypt-auto certonly -a webroot --webroot-path=/usr/share/nginx/html -d example.com -d www.example.com
+<pre><code>$yum install gcc gcc-c++ autoconf automake zlib zlib-devel pcre-devel
 </code></pre>
 
-<p>这里的webroot，我用的是默认的，应为我的nginx是yum直接安装的，如果是自己编译的版本请指定，这样let&#39;s encrypt 才能够验证域名的绝对控制权，-d 后面的参数可以选择多个，但是这几个域名都要解析到本机的nginx上面。</p></li>
-<li><p>填写邮箱地址</p>
+<h2 id="toc_1">编译Nginx版本：</h2>
 
-<ol>
-<li><p>注意：这里是let&#39;s encrypt 的客户端的ui界面，只要将你的邮箱地址填入即可，这个邮箱的作用是用来进行账号找回的，也可以下次重新的申请，但是如果要申请的话你要把所有的上面的程序走一遍，但是如果同样的账号，那么至于要一条命令重新的申请以下就好了，比较方便。<br/>
-然后一路的同意，最后是输出信息，有Congratulations!等字眼，说明申请已经成功了，注意这时候的输出信息，这些信息中包括了你的证书在什么地方，证书过期证书等。</p></li>
-<li><p>输出信息,例如:</p></li>
-</ol>
-
-<pre><code class="language-bash">IMPORTANT NOTES:
-If you lose your account credentials, you can recover through
-e-mails sent to sammy@digitalocean.com
-Congratulations! Your certificate and chain have been saved at
-/etc/letsencrypt/live/example.com/fullchain.pem. Your
-cert will expire on 2016-03-15. To obtain a new version of the
-certificate in the future, simply run Let&#39;s Encrypt again.
-Your account credentials have been saved in your Let&#39;s Encrypt
-configuration directory at /etc/letsencrypt. You should make a
-secure backup of this folder now. This configuration directory will
-also contain certificates and private keys obtained by Let&#39;s
-Encrypt so making regular backups of this folder is ideal.
-If like Let&#39;s Encrypt, please consider supporting our work by:
-
-Donating to ISRG / Let&#39;s Encrypt:   https://letsencrypt.org/donate
-Donating to EFF:                    https://eff.org/donate-len
+<pre><code>$wget http://nginx.org/download/nginx-1.11.1.tar.gz
+$tar xf /nginx-1.10.0.tar.gz
+$./configure \
+--prefix=/etc/nginx\
+--sbin-path=/usr/sbin/nginx \
+--conf-path=/etc/nginx/nginx.conf \
+--error-log-path=/var/log/nginx/error.log \
+--http-log-path=/var/log/nginx/access.log \
+--pid-path=/var/run/nginx.pid \
+--lock-path=/var/run/nginx.lock \
+--http-client-body-temp-path=/var/cache/nginx/client_temp \
+--http-proxy-temp-path=/var/cache/nginx/proxy_temp \
+--http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
+--http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp \
+--http-scgi-temp-path=/var/cache/nginx/scgi_temp \
+--user=nginx \
+--group=nginx \
+--with-openssl=/usr/src/openssl-1.0.2h \
+--with-http_ssl_module \
+--with-http_realip_module \
+--with-http_addition_module \
+--with-http_sub_module \
+--with-http_dav_module \
+--with-http_flv_module \
+--with-http_mp4_module \
+--with-http_gunzip_module \
+--with-http_gzip_static_module \
+--with-http_random_index_module \
+--with-http_secure_link_module \
+--with-http_stub_status_module \
+--with-http_auth_request_module \
+--with-mail \
+--with-debug \
+--with-mail_ssl_module \
+--with-file-aio \
+--with-ipv6 \
+--with-threads \
+--with-stream \
+--with-stream_ssl_module \
+--with-http_slice_module \
+--with-http_v2_module
+$make &amp;&amp; make install 
 </code></pre>
 
-<ol>
-<li><p>申请之后的产物</p>
+<h2 id="toc_2">修改配置并且运行</h2>
 
-<ul>
-<li>cert.pem 这个就是域名的证书，Nginx 需要。</li>
-<li>privkey.pem 这个是秘钥,Nginx 需要。</li>
-<li>chain.pem 这信任let&#39;s encrypt 的证书。</li>
-<li>fullchain.pem 这个是cert.pem 和 chain.pem证书的结合体。</li>
-<li>chain.pem 这是是一个let&#39;s Encrypt 用来找回证书的一个标志文件</li>
-</ul></li>
-</ol></li>
-</ol></li>
-<li><p>Nginx 配置使用证书：</p>
+<p>1) 修改配置：</p>
 
-<p>在对应的域名的配置文件中加入：</p>
-
-<pre><code>listen 443 ssl;
-server_name example.com www.example.com;
-ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
-ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
-</code></pre></li>
-<li><p>重启nginx，并且https请求。</p></li>
-<li><p>定时任务，每周进行一次证书的申请以及重启nginx</p>
-
-<pre><code> $sudo crontab -e
+<pre><code>$修改配置文件：
+添加：listen 443 ssl http2;
+server_name x.17mei.cn;
+#ssl on;
+ssl_certificate /etc/cert1.pem;
+ssl_certificate_key /etc/privkey1.pem;
 </code></pre>
 
-<p>添加如下定时任务： </p>
+<p>2) 运行：<br/>
+    1. 可执行文件在objs 目录下，直接可以使用。<br/>
+    2. 运行过程例如：</p>
 
-<pre><code>  30 2 * * 1 /opt/letsencrypt/letsencrypt-auto renew &gt;&gt; /var/log/le-renew.log
-  35 2 * * 1 /usr/bin/systemctl reload nginx
-</code></pre></li>
-</ol>
+<pre><code>    ```
+    $./nginx -c /etc/nginx/nginx.conf
+    ```
+</code></pre>
 
-<h2 id="toc_3">总结:以上步骤很简单，并且很好用，如果以后需要升级let&#39;s encrypt客户端软件，直接git pull即可，非常方便。</h2>
+<h2 id="toc_3">效果：</h2>
+
+<pre><code>能够在浏览器审核中，看到Network-&gt;Protocol中有h2等关键字，说明http2已经成功。
+</code></pre>
+
+<p><img src="http://o9l83saod.bkt.clouddn.com/http2.0.png" alt="Kubernets 架构图 v1"/></p>
 
                         
                       </div>
@@ -229,7 +198,7 @@ ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
                 <div class="read-more clearfix">
                   <div class="more-left left">
                   
-                    <span class="date">2016/8/23 12:8 PM</span>
+                    <span class="date">2016/8/23 18:20 PM</span>
                     <span>posted in&nbsp;</span> 
           				  
           					    <span class="posted-in"><a href='Nginx.html'>Nginx</a></span>
@@ -256,7 +225,7 @@ ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
 			  </div>
 			  <div class="large-6 columns">
 			<p class="text-right" style="padding-top:25px;">
-			
+			 <a href="Nginx_1.html">&raquo; Next Page</a> 
 			</p>
 			  </div>
 			</div>
@@ -300,6 +269,8 @@ ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
             <a href="%E5%AE%B9%E5%99%A8%E7%9B%B8%E5%85%B3.html"><strong>容器相关</strong></a>
         
             <a href="Nginx.html"><strong>Nginx</strong></a>
+        
+            <a href="%E6%95%B0%E6%8D%AE%E5%BA%93.html"><strong>数据库</strong></a>
          
         </p>
 
@@ -316,15 +287,35 @@ ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
 	      
 		      
 			      <li class="post">
-			        <a href="14719253380529.html">Let's Encrypt 获取Nginx证书</a>
+			        <a href="14719510431478.html">PostgreSql主从配置</a>
 			      </li>
 		     
 		  
 		      
 			      <li class="post">
-			        <a href="14719166233226.html">Docker Registry</a>
+			        <a href="14719476150773.html">Nginx HTTP2.0</a>
 			      </li>
 		     
+		  
+		      
+			      <li class="post">
+			        <a href="14719470938560.html">Kubernetes应用的滚动升级</a>
+			      </li>
+		     
+		  
+		      
+			      <li class="post">
+			        <a href="14719470176268.html">Web 基础</a>
+			      </li>
+		     
+		  
+		      
+			      <li class="post">
+			        <a href="14719253380529.html">Let's Encrypt 获取Nginx证书</a>
+			      </li>
+		     
+		  
+		      
 		   
 		  		</ul>
                 </div>

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
     
-  Let's Encrypt 获取Nginx证书 - 重剑无锋，大巧不工。
+  Kubernetes应用的滚动升级 - 重剑无锋，大巧不工。
   
   </title>
   
@@ -103,14 +103,14 @@
       <div class="markdown-body article-wrap">
        <div class="article">
           
-          <h1>Let's Encrypt 获取Nginx证书</h1>
+          <h1>Kubernetes应用的滚动升级</h1>
      
         <div class="read-more clearfix">
-          <span class="date">2016/8/23 12:8 PM</span>
+          <span class="date">2016/8/23 18:11 PM</span>
 
           <span>posted in&nbsp;</span> 
           
-              <span class="posted-in"><a href='Nginx.html'>Nginx</a></span>
+              <span class="posted-in"><a href='%E5%AE%B9%E5%99%A8%E7%9B%B8%E5%85%B3.html'>容器相关</a></span>
            
          
           <span class="comments">
@@ -123,119 +123,121 @@
       </div><!-- article -->
 
       <div class="article-content">
-      <p>Let&#39;s Encrypt作为一个公益项目，给我们带来最大的好处就是能够免费的获取证书，而且申请过程简单，证书有效时间为90天，建议60天的时候主动更新证书。</p>
-
-<hr/>
-
-<h2 id="toc_0">流程以及结果：</h2>
+      <h2 id="toc_0">传统的高可用步骤：</h2>
 
 <ol>
-<li>安装let&#39;s encrypt 客户端</li>
-<li>多个证书申请</li>
-<li>定期更新证书</li>
-</ol>
-
-<h2 id="toc_1">准备：</h2>
-
-<ol>
-<li>首先要有一台nginx服务器</li>
-<li>有域名的控制权，也就是可以解析到nginx服务器上</li>
-<li>这里使用的是CentOS 7</li>
-</ol>
-
-<h2 id="toc_2">流程开始：</h2>
-
-<ol>
-<li><p>安装必要的软件</p>
-
-<pre><code> sudo yum -y install git bc
-</code></pre></li>
-<li><p>安装let&#39;s encrypt 客户端</p>
-
-<pre><code class="language-bash">  $sudo git clone https://github.com/letsencrypt/letsencrypt /opt/letsencrypt
-</code></pre></li>
-<li><p>获取证书</p>
-
-<ol>
-<li><p>修该nginx 配置文件,在Nginx的/etc/nginx/conf.d/default.conf文件中添加如下的内容。</p>
-
-<pre><code class="language-bash">$ location ~ /.well-known {
-allow all;
-}
- ```
-</code></pre></li>
-<li><p>重启nginx</p>
-
-<pre><code class="language-bash">$ sudo systemctl restart nginx
-</code></pre></li>
-<li><p>申请证书</p>
-
-<pre><code class="language-bash">$ cd /opt/letsencrypt
-$./letsencrypt-auto certonly -a webroot --webroot-path=/usr/share/nginx/html -d example.com -d www.example.com
-</code></pre>
-
-<p>这里的webroot，我用的是默认的，应为我的nginx是yum直接安装的，如果是自己编译的版本请指定，这样let&#39;s encrypt 才能够验证域名的绝对控制权，-d 后面的参数可以选择多个，但是这几个域名都要解析到本机的nginx上面。</p></li>
-<li><p>填写邮箱地址</p>
-
-<ol>
-<li><p>注意：这里是let&#39;s encrypt 的客户端的ui界面，只要将你的邮箱地址填入即可，这个邮箱的作用是用来进行账号找回的，也可以下次重新的申请，但是如果要申请的话你要把所有的上面的程序走一遍，但是如果同样的账号，那么至于要一条命令重新的申请以下就好了，比较方便。<br/>
-然后一路的同意，最后是输出信息，有Congratulations!等字眼，说明申请已经成功了，注意这时候的输出信息，这些信息中包括了你的证书在什么地方，证书过期证书等。</p></li>
-<li><p>输出信息,例如:</p></li>
-</ol>
-
-<pre><code class="language-bash">IMPORTANT NOTES:
-If you lose your account credentials, you can recover through
-e-mails sent to sammy@digitalocean.com
-Congratulations! Your certificate and chain have been saved at
-/etc/letsencrypt/live/example.com/fullchain.pem. Your
-cert will expire on 2016-03-15. To obtain a new version of the
-certificate in the future, simply run Let&#39;s Encrypt again.
-Your account credentials have been saved in your Let&#39;s Encrypt
-configuration directory at /etc/letsencrypt. You should make a
-secure backup of this folder now. This configuration directory will
-also contain certificates and private keys obtained by Let&#39;s
-Encrypt so making regular backups of this folder is ideal.
-If like Let&#39;s Encrypt, please consider supporting our work by:
-
-Donating to ISRG / Let&#39;s Encrypt:   https://letsencrypt.org/donate
-Donating to EFF:                    https://eff.org/donate-len
-</code></pre>
-
-<ol>
-<li><p>申请之后的产物</p>
+<li>将版本的业务进行启动</li>
+<li>切换nginx等的配置，切换生产环境</li>
+<li>检查上线代码是否有问题</li>
+<li>如果没有问题就继续，如果有问题快速的切换配置，将版本快速的回退到上一个版本。
+这样做的优缺点：
 
 <ul>
-<li>cert.pem 这个就是域名的证书，Nginx 需要。</li>
-<li>privkey.pem 这个是秘钥,Nginx 需要。</li>
-<li>chain.pem 这信任let&#39;s encrypt 的证书。</li>
-<li>fullchain.pem 这个是cert.pem 和 chain.pem证书的结合体。</li>
-<li>chain.pem 这是是一个let&#39;s Encrypt 用来找回证书的一个标志文件</li>
+<li>先说优点
+
+<ul>
+<li>回滚速度快，能够在第一时间发现错误.</li>
 </ul></li>
-</ol></li>
-</ol></li>
-<li><p>Nginx 配置使用证书：</p>
+<li>再说缺点：
 
-<p>在对应的域名的配置文件中加入：</p>
-
-<pre><code>listen 443 ssl;
-server_name example.com www.example.com;
-ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
-ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
-</code></pre></li>
-<li><p>重启nginx，并且https请求。</p></li>
-<li><p>定时任务，每周进行一次证书的申请以及重启nginx</p>
-
-<pre><code> $sudo crontab -e
-</code></pre>
-
-<p>添加如下定时任务： </p>
-
-<pre><code>  30 2 * * 1 /opt/letsencrypt/letsencrypt-auto renew &gt;&gt; /var/log/le-renew.log
-  35 2 * * 1 /usr/bin/systemctl reload nginx
-</code></pre></li>
+<ul>
+<li>过多的人工操作，导致人为失误很大程度上影响发布质量。</li>
+</ul></li>
+</ul></li>
 </ol>
 
-<h2 id="toc_3">总结:以上步骤很简单，并且很好用，如果以后需要升级let&#39;s encrypt客户端软件，直接git pull即可，非常方便。</h2>
+<h2 id="toc_1">Kubernetes 方式滚动升级：</h2>
+
+<ol>
+<li>升级过程：
+
+<ul>
+<li>和传统的滚动升级的思路是一样的，即将新的pod升级上去，然后慢慢的将旧的pod数量降到0，从而实现升级。</li>
+</ul></li>
+<li><p>下面演示升级过程：</p>
+
+<ol>
+<li><p>本地微服务：</p>
+
+<pre><code>$kubectl get rc 
+NAME           DESIRED   CURRENT   AGE
+account        2         2         1h
+activity       2         2         1h
+
+</code></pre></li>
+<li><p>服务升级：</p>
+
+<pre><code> $[root@ali-k8s-03 rc]# kubectl rolling-update account --image=reg.17mei.top/account/8092af07-account:v1.2.1
+ Created account-e041dc4989c5cd11b305bab7075dd2e7
+ Scaling up account-e041dc4989c5cd11b305bab7075dd2e7 from 0 to 2, scaling down account from 2 to 0 (keep 2 pods available, don&#39;t exceed 3 pods)
+ Scaling account-e041dc4989c5cd11b305bab7075dd2e7 up to 1
+ Scaling account down to 1
+ Scaling account-e041dc4989c5cd11b305bab7075dd2e7 up to 2
+ Scaling account down to 0
+ Update succeeded. Deleting old controller: account
+ Renaming account-e041dc4989c5cd11b305bab7075dd2e7 to account
+ replicationcontroller &quot;account&quot; rolling updated
+</code></pre>
+
+<ul>
+<li>过程解释：首先，k8s创建一个新的RC，名字叫account-e041dc4989c5cd11b305bab7075dd2e7，总数为2个pod，这个过程是保证有两个pods是可用的。最终滚动升级完成。</li>
+</ul></li>
+<li><p>服务回滚：<br/>
+如果发布的过程中发现有问题，那么就需要回滚操作，下面是回滚操作的步骤：</p>
+
+<pre><code>account                                     2         2         47m
+activity                                    2         2         2h
+activity-db96883e53ab1ed3f11a99ddfbdf31f7   1         1         28m
+#此时用activity进行回滚演示，因为已经发布完成的就不能直接回滚，已经发布的回滚相当于一次从新的发布，此时如果想要回滚操作的话就是直接进行下面的操作
+$ kubectl rolling-update activity --rollback
+</code></pre></li>
+</ol></li>
+</ol>
+
+<h2 id="toc_2">我是如何进行Kubernetes进行应用的升级的：</h2>
+
+<ol>
+<li><p>以上两种方式遇到的问题：</p>
+
+<ul>
+<li><p>先说kubernets.</p>
+
+<ol>
+<li>Kubernetes滚动升级的方式对于我这种使用配置比较低的机器，速度较慢，时间成本高.</li>
+<li>回滚的速度更加的慢，有种想死的冲动。</li>
+<li>发到线上测试人员发现问题要立马回滚，搞得大家都很紧张。</li>
+</ol></li>
+<li><p>再说传统的方式</p>
+
+<ol>
+<li>部署速度慢，大公司有专门的代码发布平台，小公司可能就手动发布了。</li>
+<li>人工出错情况多，由于一次上线需要很多的步骤所以人为出错的可能性就很高。</li>
+<li>因为代码的运行环境问题引发的问题是很难排除的，也许就是一个软件的版本问题。</li>
+</ol></li>
+<li><p>那么我是如何使用的。</p>
+
+<ol>
+<li>双份生产环境（业务量不大，不需要更多的生产环境），production01 和 production02，可以同时使用，也可以有一个备用，看业务量和对业务高可用的要求衡量。</li>
+<li>每个微服务有一个yaml配置文件，用来快速升级部署。</li>
+<li>升级过程：
+  1) 首先将nginx对应组的业务下线，nginx已经做的很好了，能够平滑的下线。
+  2) 升级刚才下线的一组服务，过程是删除一组服务，然后重新用新的配置文件上线一组服务。
+  3) 刚上线的一组服务可以进行测试。无论测试多久都不会影响。
+  4) 测试没有问题之后，可以切换nginx配置将应用上线。</li>
+<li>升级过程出现问题回滚：
+
+<ol>
+<li>如果发布的过程中发现有问题，那么直接停止升级或者升级完成，因为是在一组下线的生产环境中，都不会发生问题。</li>
+</ol></li>
+<li>升级成功之后，将另外一组没有升级的线上节点不做任何的处理，防止有Bug要回滚到上一个版本。</li>
+</ol></li>
+</ul></li>
+</ol>
+
+<h2 id="toc_3">总结：</h2>
+
+<pre><code>两个线上环境，快速升级和回滚都有好处。综合了一下传统的升级方式和Kubernetes的升级方式。早安，上海。
+</code></pre>
 
 
     
@@ -246,16 +248,16 @@ ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
         <div class="large-6 columns">
         <p class="text-left" style="padding:15px 0px;">
       
-          <a href="14719470176268.html" 
-          title="Previous Post: Web 基础">&laquo; Web 基础</a>
+          <a href="14719476150773.html" 
+          title="Previous Post: Nginx HTTP2.0">&laquo; Nginx HTTP2.0</a>
       
         </p>
         </div>
         <div class="large-6 columns">
       <p class="text-right" style="padding:15px 0px;">
       
-          <a  href="14719166233226.html" 
-          title="Next Post: Docker Registry">Docker Registry &raquo;</a>
+          <a  href="14719470176268.html" 
+          title="Next Post: Web 基础">Web 基础 &raquo;</a>
       
       </p>
         </div>
