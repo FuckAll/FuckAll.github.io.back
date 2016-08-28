@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[重剑无锋，大巧不工。]]></title>
-  <link href="https://blog.izgnod.com/atom.xml" rel="self"/>
-  <link href="https://blog.izgnod.com/"/>
-  <updated>2016-08-23T21:43:28+08:00</updated>
-  <id>https://blog.izgnod.com/</id>
+  <link href="http://blog.izgnod.com/atom.xml" rel="self"/>
+  <link href="http://blog.izgnod.com/"/>
+  <updated>2016-08-28T16:48:04+08:00</updated>
+  <id>http://blog.izgnod.com/</id>
   <author>
     <name><![CDATA[]]></name>
     
@@ -14,9 +14,9 @@
   
   <entry>
     <title type="html"><![CDATA[股票]]></title>
-    <link href="https://blog.izgnod.com/14723728209790.html"/>
+    <link href="http://blog.izgnod.com/14723728209790.html"/>
     <updated>2016-08-28T16:27:00+08:00</updated>
-    <id>https://blog.izgnod.com/14723728209790.html</id>
+    <id>http://blog.izgnod.com/14723728209790.html</id>
     <content type="html"><![CDATA[
 
 ]]></content>
@@ -24,9 +24,9 @@
   
   <entry>
     <title type="html"><![CDATA[股票线图]]></title>
-    <link href="https://blog.izgnod.com/14723721762973.html"/>
+    <link href="http://blog.izgnod.com/14723721762973.html"/>
     <updated>2016-08-28T16:16:16+08:00</updated>
-    <id>https://blog.izgnod.com/14723721762973.html</id>
+    <id>http://blog.izgnod.com/14723721762973.html</id>
     <content type="html"><![CDATA[
 <ol>
 <li>k线
@@ -48,9 +48,9 @@
   
   <entry>
     <title type="html"><![CDATA[股票量价比]]></title>
-    <link href="https://blog.izgnod.com/14723615341044.html"/>
+    <link href="http://blog.izgnod.com/14723615341044.html"/>
     <updated>2016-08-28T13:18:54+08:00</updated>
-    <id>https://blog.izgnod.com/14723615341044.html</id>
+    <id>http://blog.izgnod.com/14723615341044.html</id>
     <content type="html"><![CDATA[
 <ol>
 <li>价增量升
@@ -110,9 +110,9 @@
   
   <entry>
     <title type="html"><![CDATA[PostgreSql主从配置]]></title>
-    <link href="https://blog.izgnod.com/14719510431478.html"/>
+    <link href="http://blog.izgnod.com/14719510431478.html"/>
     <updated>2016-08-23T19:17:23+08:00</updated>
-    <id>https://blog.izgnod.com/14719510431478.html</id>
+    <id>http://blog.izgnod.com/14719510431478.html</id>
     <content type="html"><![CDATA[
 <h2 id="toc_0">PostgreSql主从配置</h2>
 
@@ -270,9 +270,9 @@ select * from pg_stat_replication;
   
   <entry>
     <title type="html"><![CDATA[Nginx HTTP2.0]]></title>
-    <link href="https://blog.izgnod.com/14719476150773.html"/>
+    <link href="http://blog.izgnod.com/14719476150773.html"/>
     <updated>2016-08-23T18:20:15+08:00</updated>
-    <id>https://blog.izgnod.com/14719476150773.html</id>
+    <id>http://blog.izgnod.com/14719476150773.html</id>
     <content type="html"><![CDATA[
 <p>Nginx 从1.9.5已经能够支持HTTP2.0，但是对Openssl版本有要求，下面是过程：</p>
 
@@ -360,9 +360,9 @@ ssl_certificate_key /etc/privkey1.pem;
   
   <entry>
     <title type="html"><![CDATA[Kubernetes应用的滚动升级]]></title>
-    <link href="https://blog.izgnod.com/14719470938560.html"/>
+    <link href="http://blog.izgnod.com/14719470938560.html"/>
     <updated>2016-08-23T18:11:33+08:00</updated>
-    <id>https://blog.izgnod.com/14719470938560.html</id>
+    <id>http://blog.izgnod.com/14719470938560.html</id>
     <content type="html"><![CDATA[
 <h2 id="toc_0">传统的高可用步骤：</h2>
 
@@ -485,9 +485,9 @@ $ kubectl rolling-update activity --rollback
   
   <entry>
     <title type="html"><![CDATA[Web 基础]]></title>
-    <link href="https://blog.izgnod.com/14719470176268.html"/>
+    <link href="http://blog.izgnod.com/14719470176268.html"/>
     <updated>2016-08-23T18:10:17+08:00</updated>
-    <id>https://blog.izgnod.com/14719470176268.html</id>
+    <id>http://blog.izgnod.com/14719470176268.html</id>
     <content type="html"><![CDATA[
 <ol>
 <li><p>服务器响应：</p>
@@ -510,9 +510,9 @@ $ kubectl rolling-update activity --rollback
   
   <entry>
     <title type="html"><![CDATA[Let's Encrypt 获取Nginx证书]]></title>
-    <link href="https://blog.izgnod.com/14719253380529.html"/>
+    <link href="http://blog.izgnod.com/14719253380529.html"/>
     <updated>2016-08-23T12:08:58+08:00</updated>
-    <id>https://blog.izgnod.com/14719253380529.html</id>
+    <id>http://blog.izgnod.com/14719253380529.html</id>
     <content type="html"><![CDATA[
 <p>Let&#39;s Encrypt作为一个公益项目，给我们带来最大的好处就是能够免费的获取证书，而且申请过程简单，证书有效时间为90天，建议60天的时候主动更新证书。</p>
 
@@ -633,9 +633,9 @@ ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
   
   <entry>
     <title type="html"><![CDATA[Docker Registry]]></title>
-    <link href="https://blog.izgnod.com/14719166233226.html"/>
+    <link href="http://blog.izgnod.com/14719166233226.html"/>
     <updated>2016-08-23T09:43:43+08:00</updated>
-    <id>https://blog.izgnod.com/14719166233226.html</id>
+    <id>http://blog.izgnod.com/14719166233226.html</id>
     <content type="html"><![CDATA[
 <ol>
 <li>安全问题：能够在不泄露公司代码的情况下，存储镜像</li>
