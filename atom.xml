@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[重剑无锋，大巧不工。]]></title>
-  <link href="https://fuckall.github.io/atom.xml" rel="self"/>
-  <link href="https://fuckall.github.io/"/>
-  <updated>2016-08-23T19:34:44+08:00</updated>
-  <id>https://fuckall.github.io/</id>
+  <link href="https://blog.izgnod.com/atom.xml" rel="self"/>
+  <link href="https://blog.izgnod.com/"/>
+  <updated>2016-08-23T21:43:28+08:00</updated>
+  <id>https://blog.izgnod.com/</id>
   <author>
     <name><![CDATA[]]></name>
     
@@ -13,10 +13,106 @@
   <generator uri="http://www.mweb.im/">MWeb</generator>
   
   <entry>
+    <title type="html"><![CDATA[股票]]></title>
+    <link href="https://blog.izgnod.com/14723728209790.html"/>
+    <updated>2016-08-28T16:27:00+08:00</updated>
+    <id>https://blog.izgnod.com/14723728209790.html</id>
+    <content type="html"><![CDATA[
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[股票线图]]></title>
+    <link href="https://blog.izgnod.com/14723721762973.html"/>
+    <updated>2016-08-28T16:16:16+08:00</updated>
+    <id>https://blog.izgnod.com/14723721762973.html</id>
+    <content type="html"><![CDATA[
+<ol>
+<li>k线
+
+<ol>
+<li>锤子线：
+
+<ol>
+<li>定义： 锤子线是指实体的一侧有一条长尾巴，越长越好，另一侧尽量不要有尾巴。</li>
+<li>使用前提： </li>
+</ol></li>
+</ol></li>
+<li>5日，10日，20日，30日，60日平均线</li>
+<li></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[股票量价比]]></title>
+    <link href="https://blog.izgnod.com/14723615341044.html"/>
+    <updated>2016-08-28T13:18:54+08:00</updated>
+    <id>https://blog.izgnod.com/14723615341044.html</id>
+    <content type="html"><![CDATA[
+<ol>
+<li>价增量升
+
+<ol>
+<li>定义：股价随着股票的成交量上涨。</li>
+<li>信号：一般来说这是股票上涨的信号</li>
+</ol></li>
+<li>价增量减
+
+<ol>
+<li>定义： 价格上涨，成交量反跌。</li>
+<li>信号： 股票下跌信号，多头占主力，但是由于成交量的低迷，多头无法长时间维持，最终下跌。</li>
+</ol></li>
+<li>价减量减
+
+<ol>
+<li>定义： 价格下降，成交量减少。</li>
+<li>信号： 股票上涨信号， 卖方是主力，并且持股坚定，不轻易出，卖方看向高位，等待拉高。</li>
+</ol></li>
+<li><p>价减量升：</p>
+
+<ol>
+<li><p>定义：价格下降，成交量升高。</p></li>
+<li><p>信号： 股票下跌信号，空头占优，不坚定的卖方出货，空头打压。</p>
+
+<h2 id="toc_0">总结：价格和成交量保持一致的增长，降低态势，说明多头占主力，反之空头占主力，这也就影响到了股票的趋势。</h2></li>
+</ol></li>
+<li><p>天量天价</p>
+
+<ol>
+<li>股价上行应该是一个渐进的过程，成交量的方法</li>
+<li><p>要有一段时间的上涨<br/>
+放量滞涨，天量天价的一个特征，廊坊发展，国中水务。<br/>
+天量天价不要再买入了，是卖出的信号。</p>
+
+<p>上证指数8天结构的调整,第9天是一个变盘的，跌破20日线是向下，但是目前是5日线和20日线震荡，8 + 5 = 13天的结构，回落，再反弹，再选择方向，大概方向是偏好的。突破5日线或者跌破20日线。</p>
+
+<ol>
+<li>脉冲式建仓，回落0.382，买入</li>
+<li>回落式建仓</li>
+<li>回落反拉式建仓</li>
+</ol></li>
+</ol></li>
+<li><p>地量地价<br/>
+放量不是买点，放量之后再缩量就是买点</p></li>
+<li><p>底部放量</p></li>
+</ol>
+
+<p>蹄子线： 就是涨跌不超过百分之三，大部分情况是庄家吸筹</p>
+
+<p>买阴线，卖阳线<br/>
+买缩量，卖放量</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[PostgreSql主从配置]]></title>
-    <link href="https://fuckall.github.io/14719510431478.html"/>
+    <link href="https://blog.izgnod.com/14719510431478.html"/>
     <updated>2016-08-23T19:17:23+08:00</updated>
-    <id>https://fuckall.github.io/14719510431478.html</id>
+    <id>https://blog.izgnod.com/14719510431478.html</id>
     <content type="html"><![CDATA[
 <h2 id="toc_0">PostgreSql主从配置</h2>
 
@@ -174,9 +270,9 @@ select * from pg_stat_replication;
   
   <entry>
     <title type="html"><![CDATA[Nginx HTTP2.0]]></title>
-    <link href="https://fuckall.github.io/14719476150773.html"/>
+    <link href="https://blog.izgnod.com/14719476150773.html"/>
     <updated>2016-08-23T18:20:15+08:00</updated>
-    <id>https://fuckall.github.io/14719476150773.html</id>
+    <id>https://blog.izgnod.com/14719476150773.html</id>
     <content type="html"><![CDATA[
 <p>Nginx 从1.9.5已经能够支持HTTP2.0，但是对Openssl版本有要求，下面是过程：</p>
 
@@ -264,9 +360,9 @@ ssl_certificate_key /etc/privkey1.pem;
   
   <entry>
     <title type="html"><![CDATA[Kubernetes应用的滚动升级]]></title>
-    <link href="https://fuckall.github.io/14719470938560.html"/>
+    <link href="https://blog.izgnod.com/14719470938560.html"/>
     <updated>2016-08-23T18:11:33+08:00</updated>
-    <id>https://fuckall.github.io/14719470938560.html</id>
+    <id>https://blog.izgnod.com/14719470938560.html</id>
     <content type="html"><![CDATA[
 <h2 id="toc_0">传统的高可用步骤：</h2>
 
@@ -389,9 +485,9 @@ $ kubectl rolling-update activity --rollback
   
   <entry>
     <title type="html"><![CDATA[Web 基础]]></title>
-    <link href="https://fuckall.github.io/14719470176268.html"/>
+    <link href="https://blog.izgnod.com/14719470176268.html"/>
     <updated>2016-08-23T18:10:17+08:00</updated>
-    <id>https://fuckall.github.io/14719470176268.html</id>
+    <id>https://blog.izgnod.com/14719470176268.html</id>
     <content type="html"><![CDATA[
 <ol>
 <li><p>服务器响应：</p>
@@ -414,9 +510,9 @@ $ kubectl rolling-update activity --rollback
   
   <entry>
     <title type="html"><![CDATA[Let's Encrypt 获取Nginx证书]]></title>
-    <link href="https://fuckall.github.io/14719253380529.html"/>
+    <link href="https://blog.izgnod.com/14719253380529.html"/>
     <updated>2016-08-23T12:08:58+08:00</updated>
-    <id>https://fuckall.github.io/14719253380529.html</id>
+    <id>https://blog.izgnod.com/14719253380529.html</id>
     <content type="html"><![CDATA[
 <p>Let&#39;s Encrypt作为一个公益项目，给我们带来最大的好处就是能够免费的获取证书，而且申请过程简单，证书有效时间为90天，建议60天的时候主动更新证书。</p>
 
@@ -537,9 +633,9 @@ ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
   
   <entry>
     <title type="html"><![CDATA[Docker Registry]]></title>
-    <link href="https://fuckall.github.io/14719166233226.html"/>
+    <link href="https://blog.izgnod.com/14719166233226.html"/>
     <updated>2016-08-23T09:43:43+08:00</updated>
-    <id>https://fuckall.github.io/14719166233226.html</id>
+    <id>https://blog.izgnod.com/14719166233226.html</id>
     <content type="html"><![CDATA[
 <ol>
 <li>安全问题：能够在不泄露公司代码的情况下，存储镜像</li>

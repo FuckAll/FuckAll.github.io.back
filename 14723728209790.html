@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
     
-  重剑无锋，大巧不工。
+  股票 - 重剑无锋，大巧不工。
   
   </title>
   
@@ -96,143 +96,84 @@
        
 
  <script type="text/javascript">
-	$(function(){
-		$('#menu_item_index').addClass('is_active');
-	});
+  $(function(){
+    $('#menu_item_index').addClass('is_active');
+  });
 </script>
 <div class="row">
-	<div class="large-8 medium-8 columns">
-		<div class="markdown-body home-categories">
-		
-			<div class="article">
-                <a class="clearlink" href="14719476150773.html">
-                
-                  <h1>Nginx HTTP2.0</h1>
-                  <div class="a-content">
-                      
-                      <div class="a-content-text">
-                        
-                        	<p>Nginx 从1.9.5已经能够支持HTTP2.0，但是对Openssl版本有要求，下面是过程：</p>
+  <div class="large-8 medium-8 columns">
+      <div class="markdown-body article-wrap">
+       <div class="article">
+          
+          <h1>股票</h1>
+     
+        <div class="read-more clearfix">
+          <span class="date">2016/8/28 16:27 PM</span>
 
-<h2 id="toc_0">环境准备：</h2>
+          <span>posted in&nbsp;</span> 
+          
+              <span class="posted-in"><a href='%E8%82%A1%E7%A5%A8%E5%9F%BA%E7%A1%80.html'>股票基础</a></span>
+           
+         
+          <span class="comments">
+            
 
-<pre><code>$yum install gcc gcc-c++ autoconf automake zlib zlib-devel pcre-devel
-</code></pre>
+            
+          </span>
 
-<h2 id="toc_1">编译Nginx版本：</h2>
+        </div>
+      </div><!-- article -->
 
-<pre><code>$wget http://nginx.org/download/nginx-1.11.1.tar.gz
-$tar xf /nginx-1.10.0.tar.gz
-$./configure \
---prefix=/etc/nginx\
---sbin-path=/usr/sbin/nginx \
---conf-path=/etc/nginx/nginx.conf \
---error-log-path=/var/log/nginx/error.log \
---http-log-path=/var/log/nginx/access.log \
---pid-path=/var/run/nginx.pid \
---lock-path=/var/run/nginx.lock \
---http-client-body-temp-path=/var/cache/nginx/client_temp \
---http-proxy-temp-path=/var/cache/nginx/proxy_temp \
---http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
---http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp \
---http-scgi-temp-path=/var/cache/nginx/scgi_temp \
---user=nginx \
---group=nginx \
---with-openssl=/usr/src/openssl-1.0.2h \
---with-http_ssl_module \
---with-http_realip_module \
---with-http_addition_module \
---with-http_sub_module \
---with-http_dav_module \
---with-http_flv_module \
---with-http_mp4_module \
---with-http_gunzip_module \
---with-http_gzip_static_module \
---with-http_random_index_module \
---with-http_secure_link_module \
---with-http_stub_status_module \
---with-http_auth_request_module \
---with-mail \
---with-debug \
---with-mail_ssl_module \
---with-file-aio \
---with-ipv6 \
---with-threads \
---with-stream \
---with-stream_ssl_module \
---with-http_slice_module \
---with-http_v2_module
-$make &amp;&amp; make install 
-</code></pre>
+      <div class="article-content">
+      
 
-<h2 id="toc_2">修改配置并且运行</h2>
+    
 
-<p>1) 修改配置：</p>
+      </div>
 
-<pre><code>$修改配置文件：
-添加：listen 443 ssl http2;
-server_name x.17mei.cn;
-#ssl on;
-ssl_certificate /etc/cert1.pem;
-ssl_certificate_key /etc/privkey1.pem;
-</code></pre>
+      <div class="row">
+        <div class="large-6 columns">
+        <p class="text-left" style="padding:15px 0px;">
+      
+        </p>
+        </div>
+        <div class="large-6 columns">
+      <p class="text-right" style="padding:15px 0px;">
+      
+          <a  href="14723721762973.html" 
+          title="Next Post: 股票线图">股票线图 &raquo;</a>
+      
+      </p>
+        </div>
+      </div>
+      <div class="comments-wrap">
+        <div class="share-comments">
+          <!-- 多说评论框 start -->
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"fuckall"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- 多说公共JS代码 end -->
 
-<p>2) 运行：<br/>
-    1. 可执行文件在objs 目录下，直接可以使用。<br/>
-    2. 运行过程例如：</p>
+          
 
-<pre><code>    ```
-    $./nginx -c /etc/nginx/nginx.conf
-    ```
-</code></pre>
-
-<h2 id="toc_3">效果：</h2>
-
-<pre><code>能够在浏览器审核中，看到Network-&gt;Protocol中有h2等关键字，说明http2已经成功。
-</code></pre>
-
-<p><img src="http://o9l83saod.bkt.clouddn.com/http2.0.png" alt="Kubernets 架构图 v1"/></p>
-
-                        
-                      </div>
-                  </div>
-                </a>
-                <div class="read-more clearfix">
-                  <div class="more-left left">
-                  
-                    <span class="date">2016/8/23 18:20 PM</span>
-                    <span>posted in&nbsp;</span> 
-          				  
-          					    <span class="posted-in"><a href='Nginx.html'>Nginx</a></span>
-          				   
-                  </div>
-                  <div class="more-right right">
-                  <span class="comments">
-                      
-
-                       
-                  </span>
-                  </div>
-                </div>
-              </div><!-- article -->
-        
-              
+          
+        </div>
+      </div>
+    </div><!-- article-wrap -->
+  </div><!-- large 8 -->
 
 
-			<div class="row">
-			  <div class="large-6 columns">
-			  <p class="text-left" style="padding-top:25px;">
-			   <a href="all_3.html">&laquo; Prev Page</a>  
-			  </p>
-			  </div>
-			  <div class="large-6 columns">
-			<p class="text-right" style="padding-top:25px;">
-			 <a href="all_5.html">&raquo; Next Page</a> 
-			</p>
-			  </div>
-			</div>
-		</div>
-	</div><!-- large 8 -->
+
 
  <div class="large-4 medium-4 columns">
   <div class="hide-for-small">
