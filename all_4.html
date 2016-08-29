@@ -105,93 +105,68 @@
 		<div class="markdown-body home-categories">
 		
 			<div class="article">
-                <a class="clearlink" href="14719476150773.html">
+                <a class="clearlink" href="14723615341044.html">
                 
-                  <h1>Nginx HTTP2.0</h1>
+                  <h1>股票量价比</h1>
                   <div class="a-content">
                       
                       <div class="a-content-text">
                         
-                        	<p>Nginx 从1.9.5已经能够支持HTTP2.0，但是对Openssl版本有要求，下面是过程：</p>
+                        	<ol>
+<li>价增量升
 
-<h2 id="toc_0">环境准备：</h2>
+<ol>
+<li>定义：股价随着股票的成交量上涨。</li>
+<li>信号：一般来说这是股票上涨的信号</li>
+</ol></li>
+<li>价增量减
 
-<pre><code>$yum install gcc gcc-c++ autoconf automake zlib zlib-devel pcre-devel
-</code></pre>
+<ol>
+<li>定义： 价格上涨，成交量反跌。</li>
+<li>信号： 股票下跌信号，多头占主力，但是由于成交量的低迷，多头无法长时间维持，最终下跌。</li>
+</ol></li>
+<li>价减量减
 
-<h2 id="toc_1">编译Nginx版本：</h2>
+<ol>
+<li>定义： 价格下降，成交量减少。</li>
+<li>信号： 股票上涨信号， 卖方是主力，并且持股坚定，不轻易出，卖方看向高位，等待拉高。</li>
+</ol></li>
+<li>价减量升：
 
-<pre><code>$wget http://nginx.org/download/nginx-1.11.1.tar.gz
-$tar xf /nginx-1.10.0.tar.gz
-$./configure \
---prefix=/etc/nginx\
---sbin-path=/usr/sbin/nginx \
---conf-path=/etc/nginx/nginx.conf \
---error-log-path=/var/log/nginx/error.log \
---http-log-path=/var/log/nginx/access.log \
---pid-path=/var/run/nginx.pid \
---lock-path=/var/run/nginx.lock \
---http-client-body-temp-path=/var/cache/nginx/client_temp \
---http-proxy-temp-path=/var/cache/nginx/proxy_temp \
---http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
---http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp \
---http-scgi-temp-path=/var/cache/nginx/scgi_temp \
---user=nginx \
---group=nginx \
---with-openssl=/usr/src/openssl-1.0.2h \
---with-http_ssl_module \
---with-http_realip_module \
---with-http_addition_module \
---with-http_sub_module \
---with-http_dav_module \
---with-http_flv_module \
---with-http_mp4_module \
---with-http_gunzip_module \
---with-http_gzip_static_module \
---with-http_random_index_module \
---with-http_secure_link_module \
---with-http_stub_status_module \
---with-http_auth_request_module \
---with-mail \
---with-debug \
---with-mail_ssl_module \
---with-file-aio \
---with-ipv6 \
---with-threads \
---with-stream \
---with-stream_ssl_module \
---with-http_slice_module \
---with-http_v2_module
-$make &amp;&amp; make install 
-</code></pre>
+<ol>
+<li>定义：价格下降，成交量升高。</li>
+<li>信号： 股票下跌信号，空头占优，不坚定的卖方出货，空头打压。</li>
+</ol></li>
+</ol>
 
-<h2 id="toc_2">修改配置并且运行</h2>
+<p><strong>总结：价格和成交量保持一致的增长，降低态势，说明多头占主力，反之空头占主力，这也就影响到了股票的趋势。</strong></p>
 
-<p>1) 修改配置：</p>
+<ol>
+<li><p>天量天价</p>
 
-<pre><code>$修改配置文件：
-添加：listen 443 ssl http2;
-server_name x.17mei.cn;
-#ssl on;
-ssl_certificate /etc/cert1.pem;
-ssl_certificate_key /etc/privkey1.pem;
-</code></pre>
+<ol>
+<li>股价上行应该是一个渐进的过程，成交量的方法</li>
+<li><p>要有一段时间的上涨<br/>
+放量滞涨，天量天价的一个特征，廊坊发展，国中水务。<br/>
+天量天价不要再买入了，是卖出的信号。</p>
 
-<p>2) 运行：<br/>
-    1. 可执行文件在objs 目录下，直接可以使用。<br/>
-    2. 运行过程例如：</p>
+<p>上证指数8天结构的调整,第9天是一个变盘的，跌破20日线是向下，但是目前是5日线和20日线震荡，8 + 5 = 13天的结构，回落，再反弹，再选择方向，大概方向是偏好的。突破5日线或者跌破20日线。</p>
 
-<pre><code>    ```
-    $./nginx -c /etc/nginx/nginx.conf
-    ```
-</code></pre>
+<ol>
+<li>脉冲式建仓，回落0.382，买入</li>
+<li>回落式建仓</li>
+<li>回落反拉式建仓</li>
+</ol></li>
+</ol></li>
+<li><p>地量地价<br/>
+放量不是买点，放量之后再缩量就是买点</p></li>
+<li><p>底部放量</p></li>
+</ol>
 
-<h2 id="toc_3">效果：</h2>
+<p>蹄子线： 就是涨跌不超过百分之三，大部分情况是庄家吸筹</p>
 
-<pre><code>能够在浏览器审核中，看到Network-&gt;Protocol中有h2等关键字，说明http2已经成功。
-</code></pre>
-
-<p><img src="http://o9l83saod.bkt.clouddn.com/http2.0.png" alt="Kubernets 架构图 v1"/></p>
+<p>买阴线，卖阳线<br/>
+买缩量，卖放量</p>
 
                         
                       </div>
@@ -200,10 +175,10 @@ ssl_certificate_key /etc/privkey1.pem;
                 <div class="read-more clearfix">
                   <div class="more-left left">
                   
-                    <span class="date">2016/8/23 18:20 PM</span>
+                    <span class="date">2016/8/28 13:18 PM</span>
                     <span>posted in&nbsp;</span> 
           				  
-          					    <span class="posted-in"><a href='Nginx.html'>Nginx</a></span>
+          					    <span class="posted-in"><a href='%E8%82%A1%E7%A5%A8%E5%9F%BA%E7%A1%80.html'>股票基础</a></span>
           				   
                   </div>
                   <div class="more-right right">
@@ -291,7 +266,19 @@ ssl_certificate_key /etc/privkey1.pem;
 	      
 		      
 			      <li class="post">
-			        <a href="14723728209790.html">股票</a>
+			        <a href="14724588246571.html">PostgreSql语句集锦</a>
+			      </li>
+		     
+		  
+		      
+			      <li class="post">
+			        <a href="14724369503027.html">Postgresql 备份与恢复</a>
+			      </li>
+		     
+		  
+		      
+			      <li class="post">
+			        <a href="14723863067284.html">选股模型</a>
 			      </li>
 		     
 		  
@@ -308,16 +295,8 @@ ssl_certificate_key /etc/privkey1.pem;
 		     
 		  
 		      
-			      <li class="post">
-			        <a href="14719510431478.html">PostgreSql主从配置</a>
-			      </li>
-		     
 		  
 		      
-			      <li class="post">
-			        <a href="14719476150773.html">Nginx HTTP2.0</a>
-			      </li>
-		     
 		  
 		      
 		  
