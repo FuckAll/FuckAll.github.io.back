@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
     
-  重剑无锋，大巧不工。
+  容器脚本 - 重剑无锋，大巧不工。
   
   </title>
   
@@ -100,178 +100,146 @@
        
 
  <script type="text/javascript">
-	$(function(){
-		$('#menu_item_index').addClass('is_active');
-	});
+  $(function(){
+    $('#menu_item_index').addClass('is_active');
+  });
 </script>
 <div class="row">
-	<div class="large-8 medium-8 columns">
-		<div class="markdown-body home-categories">
-		
-			<div class="article">
-                <a class="clearlink" href="14719470938560.html">
-                
-                  <h1>Kubernetes应用的滚动升级</h1>
-                  <div class="a-content">
-                      
-                      <div class="a-content-text">
-                        
-                        	<h2 id="toc_0">传统的高可用步骤：</h2>
+  <div class="large-8 medium-8 columns">
+      <div class="markdown-body article-wrap">
+       <div class="article">
+          
+          <h1>容器脚本</h1>
+     
+        <div class="read-more clearfix">
+          <span class="date">2016/8/31 10:53 AM</span>
 
-<ol>
-<li>将版本的业务进行启动</li>
-<li>切换nginx等的配置，切换生产环境</li>
-<li>检查上线代码是否有问题</li>
-<li>如果没有问题就继续，如果有问题快速的切换配置，将版本快速的回退到上一个版本。
-这样做的优缺点：
+          <span>posted in&nbsp;</span> 
+          
+              <span class="posted-in"><a href='%E5%AE%B9%E5%99%A8%E7%9B%B8%E5%85%B3.html'>容器相关</a></span>
+           
+         
+          <span class="comments">
+            
 
-<ul>
-<li>先说优点
+            
+          </span>
 
-<ul>
-<li>回滚速度快，能够在第一时间发现错误.</li>
-</ul></li>
-<li>再说缺点：
+        </div>
+      </div><!-- article -->
 
-<ul>
-<li>过多的人工操作，导致人为失误很大程度上影响发布质量。</li>
-</ul></li>
-</ul></li>
-</ol>
+      <div class="article-content">
+      <h3 id="toc_0">容器清理脚本</h3>
 
-<h2 id="toc_1">Kubernetes 方式滚动升级：</h2>
+<pre><code>#!/bin/sh
 
-<ol>
-<li>升级过程：
+&gt;/tmp/run_image_ids.$$
 
-<ul>
-<li>和传统的滚动升级的思路是一样的，即将新的pod升级上去，然后慢慢的将旧的pod数量降到0，从而实现升级。</li>
-</ul></li>
-<li><p>下面演示升级过程：</p>
+DOCKER_BIN=/usr/bin/docker
+LOG=/var/log/docker-cleanup.log
 
-<ol>
-<li><p>本地微服务：</p>
+rm /tmp/run_image_ids.$$
 
-<pre><code>$kubectl get rc 
-NAME           DESIRED   CURRENT   AGE
-account        2         2         1h
-activity       2         2         1h
+echo &quot;$(date) start-----&quot; &gt;&gt;$LOG
 
-</code></pre></li>
-<li><p>服务升级：</p>
+$DOCKER_BIN ps --no-trunc -a -q | while read cid
+do
+  running=$($DOCKER_BIN inspect -f &#39;{{.State.Running}}&#39; $cid )
+  if [ &quot;$running&quot;x = &quot;true&quot;x ]
+  then
+    id=$($DOCKER_BIN inspect -f &#39;{{.Image}}&#39; $cid )
+    echo $id &gt;&gt;/tmp/run_image_ids.$$
+    continue
+  fi 
+  fini=$($DOCKER_BIN inspect -f &#39;{{.State.FinishedAt}}&#39; $cid | awk -F. &#39;{print $1}&#39;)
+  diff=$(expr $(date +&quot;%s&quot;) - $(date --date=&quot;$fini&quot; +&quot;%s&quot;))    
+  #for MacOs 
+  #diff=$(expr $(date +&quot;%s&quot;) - $(date -j -f %Y-%m-%dT%H:%M:%S &quot;$fini&quot; +&quot;%s&quot;))
+  if [ $diff -gt 86400 ]
+  then
+     $DOCKER_BIN rm -v $cid &gt;&gt;$LOG 2&gt;&amp;1
+  fi 
+done
 
-<pre><code> $[root@ali-k8s-03 rc]# kubectl rolling-update account --image=reg.17mei.top/account/8092af07-account:v1.2.1
- Created account-e041dc4989c5cd11b305bab7075dd2e7
- Scaling up account-e041dc4989c5cd11b305bab7075dd2e7 from 0 to 2, scaling down account from 2 to 0 (keep 2 pods available, don&#39;t exceed 3 pods)
- Scaling account-e041dc4989c5cd11b305bab7075dd2e7 up to 1
- Scaling account down to 1
- Scaling account-e041dc4989c5cd11b305bab7075dd2e7 up to 2
- Scaling account down to 0
- Update succeeded. Deleting old controller: account
- Renaming account-e041dc4989c5cd11b305bab7075dd2e7 to account
- replicationcontroller &quot;account&quot; rolling updated
+
+$DOCKER_BIN images --no-trunc | grep -v REPOSITORY | while read line
+do
+  repo_tag=$(echo $line | awk &#39;{print $1&quot;:&quot;$2}&#39;)
+  image_id=$(echo $line | awk &#39;{print $3}&#39;)
+  grep -q $image_id /tmp/run_image_ids.$$
+  if [ $? -eq 0 ]
+  then
+    continue
+  fi
+  if [ &quot;$repo_tag&quot;x = &quot;&lt;none&gt;:&lt;none&gt;&quot;x ]
+  then
+    $DOCKER_BIN rmi $image_id &gt;&gt;$LOG 2&gt;&amp;1
+  else
+    $DOCKER_BIN rmi $repo_tag &gt;&gt;$LOG 2&gt;&amp;1
+  fi
+done
+
+rm /tmp/run_image_ids.$$
+
+
+echo &quot;$(date) end-----&quot; &gt;&gt;$LOG
 </code></pre>
 
-<ul>
-<li>过程解释：首先，k8s创建一个新的RC，名字叫account-e041dc4989c5cd11b305bab7075dd2e7，总数为2个pod，这个过程是保证有两个pods是可用的。最终滚动升级完成。</li>
-</ul></li>
-<li><p>服务回滚：<br/>
-如果发布的过程中发现有问题，那么就需要回滚操作，下面是回滚操作的步骤：</p>
-
-<pre><code>account                                     2         2         47m
-activity                                    2         2         2h
-activity-db96883e53ab1ed3f11a99ddfbdf31f7   1         1         28m
-#此时用activity进行回滚演示，因为已经发布完成的就不能直接回滚，已经发布的回滚相当于一次从新的发布，此时如果想要回滚操作的话就是直接进行下面的操作
-$ kubectl rolling-update activity --rollback
-</code></pre></li>
-</ol></li>
-</ol>
-
-<h2 id="toc_2">我是如何进行Kubernetes进行应用的升级的：</h2>
-
-<ol>
-<li><p>以上两种方式遇到的问题：</p>
-
-<ul>
-<li><p>先说kubernets.</p>
-
-<ol>
-<li>Kubernetes滚动升级的方式对于我这种使用配置比较低的机器，速度较慢，时间成本高.</li>
-<li>回滚的速度更加的慢，有种想死的冲动。</li>
-<li>发到线上测试人员发现问题要立马回滚，搞得大家都很紧张。</li>
-</ol></li>
-<li><p>再说传统的方式</p>
-
-<ol>
-<li>部署速度慢，大公司有专门的代码发布平台，小公司可能就手动发布了。</li>
-<li>人工出错情况多，由于一次上线需要很多的步骤所以人为出错的可能性就很高。</li>
-<li>因为代码的运行环境问题引发的问题是很难排除的，也许就是一个软件的版本问题。</li>
-</ol></li>
-<li><p>那么我是如何使用的。</p>
-
-<ol>
-<li>双份生产环境（业务量不大，不需要更多的生产环境），production01 和 production02，可以同时使用，也可以有一个备用，看业务量和对业务高可用的要求衡量。</li>
-<li>每个微服务有一个yaml配置文件，用来快速升级部署。</li>
-<li>升级过程：
-  1) 首先将nginx对应组的业务下线，nginx已经做的很好了，能够平滑的下线。
-  2) 升级刚才下线的一组服务，过程是删除一组服务，然后重新用新的配置文件上线一组服务。
-  3) 刚上线的一组服务可以进行测试。无论测试多久都不会影响。
-  4) 测试没有问题之后，可以切换nginx配置将应用上线。</li>
-<li>升级过程出现问题回滚：
-
-<ol>
-<li>如果发布的过程中发现有问题，那么直接停止升级或者升级完成，因为是在一组下线的生产环境中，都不会发生问题。</li>
-</ol></li>
-<li>升级成功之后，将另外一组没有升级的线上节点不做任何的处理，防止有Bug要回滚到上一个版本。</li>
-</ol></li>
-</ul></li>
-</ol>
-
-<h2 id="toc_3">总结：</h2>
-
-<pre><code>两个线上环境，快速升级和回滚都有好处。综合了一下传统的升级方式和Kubernetes的升级方式。早安，上海。
-</code></pre>
-
-                        
-                      </div>
-                  </div>
-                </a>
-                <div class="read-more clearfix">
-                  <div class="more-left left">
-                  
-                    <span class="date">2016/8/23 18:11 PM</span>
-                    <span>posted in&nbsp;</span> 
-          				  
-          					    <span class="posted-in"><a href='%E5%AE%B9%E5%99%A8%E7%9B%B8%E5%85%B3.html'>容器相关</a></span>
-          				   
-                  </div>
-                  <div class="more-right right">
-                  <span class="comments">
-                      
-
-                       
-                  </span>
-                  </div>
-                </div>
-              </div><!-- article -->
-        
-              
+<p><strong>清理内容</strong><br/>
+    1. 停止超过一天的容器<br/>
+    2. 一天之内没有运行过容器的镜像</p>
 
 
-			<div class="row">
-			  <div class="large-6 columns">
-			  <p class="text-left" style="padding-top:25px;">
-			   <a href="all_9.html">&laquo; Prev Page</a>  
-			  </p>
-			  </div>
-			  <div class="large-6 columns">
-			<p class="text-right" style="padding-top:25px;">
-			 <a href="all_11.html">&raquo; Next Page</a> 
-			</p>
-			  </div>
-			</div>
-		</div>
-	</div><!-- large 8 -->
+    
+
+      </div>
+
+      <div class="row">
+        <div class="large-6 columns">
+        <p class="text-left" style="padding:15px 0px;">
+      
+          <a href="14727777201831.html" 
+          title="Previous Post: 技术类博客收集">&laquo; 技术类博客收集</a>
+      
+        </p>
+        </div>
+        <div class="large-6 columns">
+      <p class="text-right" style="padding:15px 0px;">
+      
+          <a  href="14726074871676.html" 
+          title="Next Post: Golang 基础类型">Golang 基础类型 &raquo;</a>
+      
+      </p>
+        </div>
+      </div>
+      <div class="comments-wrap">
+        <div class="share-comments">
+          <!-- 多说评论框 start -->
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"fuckall"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- 多说公共JS代码 end -->
+
+          
+
+          
+        </div>
+      </div>
+    </div><!-- article-wrap -->
+  </div><!-- large 8 -->
+
+
+
 
  <div class="large-4 medium-4 columns">
   <div class="hide-for-small">
