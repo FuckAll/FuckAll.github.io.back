@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
     
-  PostgreSql语句集锦 - 重剑无锋，大巧不工。
+  重剑无锋，大巧不工。
   
   </title>
   
@@ -100,101 +100,151 @@
        
 
  <script type="text/javascript">
-  $(function(){
-    $('#menu_item_index').addClass('is_active');
-  });
+	$(function(){
+		$('#menu_item_index').addClass('is_active');
+	});
 </script>
 <div class="row">
-  <div class="large-8 medium-8 columns">
-      <div class="markdown-body article-wrap">
-       <div class="article">
-          
-          <h1>PostgreSql语句集锦</h1>
-     
-        <div class="read-more clearfix">
-          <span class="date">2016/8/29 16:20 PM</span>
+	<div class="large-8 medium-8 columns">
+		<div class="markdown-body home-categories">
+		
+			<div class="article">
+                <a class="clearlink" href="14719166233226.html">
+                
+                  <h1>Docker Registry</h1>
+                  <div class="a-content">
+                      
+                      <div class="a-content-text">
+                        
+                        	<ol>
+<li>安全问题：能够在不泄露公司代码的情况下，存储镜像</li>
+<li>可用性： 不依赖其他的第三方的docker仓库</li>
+<li>Ci： 公司部署方式的改变，Docker Registry成为不可或缺的一部分。</li>
+</ol>
 
-          <span>posted in&nbsp;</span> 
-          
-              <span class="posted-in"><a href='%E6%95%B0%E6%8D%AE%E5%BA%93.html'>数据库</a></span>
-           
-         
-          <span class="comments">
-            
-
-            
-          </span>
-
-        </div>
-      </div><!-- article -->
-
-      <div class="article-content">
-      <ol>
-<li><p>更正Jsonb中数据：</p>
+<h2 id="toc_0">搭建准备：</h2>
 
 <ol>
-<li><img src="media/14724588246571/14724588641183.jpg" alt=""/></li>
+<li>镜像：registry:2</li>
+<li>镜像存储的目录：例如：/DockerRegistry/</li>
+<li>证书,安全证书</li>
 </ol>
 
-<p>将其中不合法的数据改成:[&quot;镭射祛斑&quot;,&quot;c10&quot;, &quot;白瓷娃娃&quot;, &quot;黄雀斑&quot;, &quot;雀斑&quot;, &quot;色斑&quot;,&quot;微整形&quot;]<br/>
-语句：<br/>
-其中的问题：多个字段在一个双引号中，其中是中文的逗号。</p>
+<h2 id="toc_1">搭建过程：</h2>
 
-<pre><code>UPDATE table_name SET tags=to_jsonb(string_to_array(jsonb_array_elements_text(tags),&#39;，&#39;)) WHERE tags!=&#39;null&#39;;
-</code></pre></li>
+<ol>
+<li>首先拉取Docker Registry镜像(由于国内墙的问题,使用DaoCloud镜像)<br/></li>
 </ol>
 
+<pre><code>docker pull daocloud.io/library/registry:2.4.1
+</code></pre>
 
-    
+<ol>
+<li>创建镜像存储目录：</li>
+</ol>
 
-      </div>
+<pre><code>$mkdir /DockerRegistry/
+</code></pre>
 
-      <div class="row">
-        <div class="large-6 columns">
-        <p class="text-left" style="padding:15px 0px;">
-      
-          <a href="14726074871676.html" 
-          title="Previous Post: Golang 基础类型">&laquo; Golang 基础类型</a>
-      
-        </p>
-        </div>
-        <div class="large-6 columns">
-      <p class="text-right" style="padding:15px 0px;">
-      
-          <a  href="14724369503027.html" 
-          title="Next Post: Postgresql 备份与恢复">Postgresql 备份与恢复 &raquo;</a>
-      
-      </p>
-        </div>
-      </div>
-      <div class="comments-wrap">
-        <div class="share-comments">
-          <!-- 多说评论框 start -->
-<!-- 多说评论框 end -->
-<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
-<script type="text/javascript">
-var duoshuoQuery = {short_name:"fuckall"};
-	(function() {
-		var ds = document.createElement('script');
-		ds.type = 'text/javascript';ds.async = true;
-		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
-		ds.charset = 'UTF-8';
-		(document.getElementsByTagName('head')[0] 
-		 || document.getElementsByTagName('body')[0]).appendChild(ds);
-	})();
-	</script>
-<!-- 多说公共JS代码 end -->
+<ol>
+<li>创建证书文件目录并且放入证书：</li>
+</ol>
 
-          
+<pre><code>$mkdir /DockerRegistry/cert 
+</code></pre>
 
-          
-        </div>
-      </div>
-    </div><!-- article-wrap -->
-  </div><!-- large 8 -->
+<ol>
+<li>创建Docker Registry登录密码：</li>
+</ol>
+
+<pre><code class="language-bash">$mkdir auth
+$docker run --entrypoint htpasswd daocloud.io/library/registry:2.4.1  -Bbn testuser testpassword &gt; auth/htpasswd
+</code></pre>
+
+<ol>
+<li>启动Registry (注意下面的证书都是要改为自己的证书)</li>
+</ol>
+
+<pre><code class="language-bash">$docker run -d -p 5000:5000 --restart=always --name registry \
+  -v `pwd`/auth:/auth \
+  -e &quot;REGISTRY_AUTH=htpasswd&quot; \
+  -e &quot;REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm&quot; \
+  -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
+  daocloud.io/library/registry:2.4.1
+</code></pre>
+
+<ol>
+<li>添加一个可视化的界面 </li>
+</ol>
+
+<pre><code class="language-bash">$docker run \
+  -d \
+  -e ENV_DOCKER_REGISTRY_HOST=ENTER-YOUR-REGISTRY-HOST-HERE \
+  -e ENV_DOCKER_REGISTRY_PORT=ENTER-PORT-TO-YOUR-REGISTRY-HOST-HERE \
+  -e ENV_MODE_BROWSE_ONLY=false
+  -p 8080:80 \
+  konradkleine/docker-registry-frontend:v2
+</code></pre>
+
+<ol>
+<li>nginx配置 (添加nginx配置)</li>
+</ol>
+
+<pre><code class="language-nginx.conf">$server {
+    server_name dev;
+    location / {
+        proxy_pass http://x.x.x.x:8080;
+        proxy_http_version 1.1;
+        proxy_set_header Connection &quot;&quot;;
+    }
+}
+</code></pre>
+
+<h2 id="toc_2">总结：</h2>
+
+<p>以上的步骤比较简单，已经满足大部分的需求，更加高端的需求可以定制registry的config.yaml文件。<br/>
+起始可以在第六步的时候不必要映射端口到host，包括第七部也可以不用，因为相同在同一台机器上的docker是可以直接连接。</p>
+
+                        
+                      </div>
+                  </div>
+                </a>
+                <div class="read-more clearfix">
+                  <div class="more-left left">
+                  
+                    <span class="date">2016/8/23 9:43 AM</span>
+                    <span>posted in&nbsp;</span> 
+          				  
+          					    <span class="posted-in"><a href='%E5%AE%B9%E5%99%A8%E7%9B%B8%E5%85%B3.html'>容器相关</a></span>
+          				   
+                  </div>
+                  <div class="more-right right">
+                  <span class="comments">
+                      
+
+                       
+                  </span>
+                  </div>
+                </div>
+              </div><!-- article -->
+        
+              
 
 
-
+			<div class="row">
+			  <div class="large-6 columns">
+			  <p class="text-left" style="padding-top:25px;">
+			   <a href="all_15.html">&laquo; Prev Page</a>  
+			  </p>
+			  </div>
+			  <div class="large-6 columns">
+			<p class="text-right" style="padding-top:25px;">
+			
+			</p>
+			  </div>
+			</div>
+		</div>
+	</div><!-- large 8 -->
 
  <div class="large-4 medium-4 columns">
   <div class="hide-for-small">

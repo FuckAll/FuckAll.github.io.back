@@ -76,7 +76,7 @@
     <li><label>Categories</label></li>
 
         
-            <li><a href="%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80.html">编程语言</a></li>
+            <li><a href="Golang.html">Golang</a></li>
         
             <li><a href="%E5%AE%B9%E5%99%A8%E7%9B%B8%E5%85%B3.html">容器相关</a></li>
         
@@ -109,27 +109,162 @@
 		<div class="markdown-body home-categories">
 		
 			<div class="article">
-                <a class="clearlink" href="14719470176268.html">
+                <a class="clearlink" href="14719510431478.html">
                 
-                  <h1>Web 基础</h1>
+                  <h1>PostgreSql主从配置</h1>
                   <div class="a-content">
                       
                       <div class="a-content-text">
                         
-                        	<ol>
-<li><p>服务器响应：</p>
+                        	<h2 id="toc_0">PostgreSql主从配置</h2>
 
 <ol>
-<li>1xx 提示信息 - 表示请求被成功接收，继续处理</li>
-<li>2xx 成功 - 表示清酒已经被成功接收，理解，接收</li>
-<li>3xx 重定向 - 要完成请求必须要做进一步的处理</li>
-<li>4xx 客户端错误 - 请求有语法错误或者无法实现</li>
-<li>5xx 服务端错误 - 服务端未能实现合法的请求</li>
-</ol></li>
-<li><p>HTTP协议的无状态和Keep-alive的区别：</p>
+<li><p>PostgreSql安装：</p>
 
-<p>HTTP是一个无状态的面向连接的协议，无状态不代表HTTP不能保持TCP连接，更不能代表HTTP使用的是UDP协议（面对无连接）。<br/>
-   从HTTP/1.1起，默认都开启了Keep-Alive保持连接特性，简单地说，当一个网页打开完成后，客户端和服务器之间用于传输HTTP数据的TCP连接不会关闭，如果客户端再次访问这个服务器上的网页，会继续使用这一条已经建立的TCP连接。</p></li>
+<ol>
+<li><p>导入PostgreSql 9.5 源</p>
+
+<pre><code>$rpm -Uvh http://yum.postgresql.org/9.5/redhat/rhel-7-x86_64/pgdg-centos95-9.5-2.noarch.rpm
+</code></pre></li>
+<li><p>安装Postgresql</p>
+
+<pre><code>  $yum install postgresql95-server postgresql95 # 这里一般是会安装最新的9.5稳定版，如果用到Postgresql插件，需要安装扩展，建议安装方式： yum install postgresql95*
+</code></pre></li>
+<li><p>初始化目录结构</p>
+
+<pre><code>  $/usr/pgsql-9.5/bin/postgresql95-setup initdb #这里是Centos7 的目录位置
+</code></pre></li>
+<li><p>启动（这个可以在后面的主从配置完成之后进行启动）</p>
+
+<pre><code>  $service  postgresql-9.5 start
+  $chkconfig postgresql-9.5 on #设置开机启动
+</code></pre></li>
+</ol></li>
+<li><p>PostgreSql 主从配置意义：</p>
+
+<ol>
+<li><p>主从配置能够在一台主机宕机的情况下立马切换到另外一台主机上，减少损失</p></li>
+<li><p>主从配置能够在读写分离，减轻数据库的压力,主库进行写，从库进行读。</p></li>
+<li><p>主从配置能够保证多数据库中的数据一致性。</p></li>
+</ol></li>
+<li><p>主从配置流程：<br/>
+注意：这里使用的是Postgresql 9.5.3进行。由于Postgresql版本之间会有细微的差别。</p>
+
+<ol>
+<li><p>Master 配置：</p>
+
+<ol>
+<li><p>配置:postgresql.conf 文件</p>
+
+<pre><code>listen_addresses = &#39;*&#39;          # what IP address(es) to listen on;
+wal_level = hot_standby         # wal 日志的级别
+max_wal_senders = 5             # 控制主库最多可以有多少个并发的standby数据库；
+wal_keep_segments = 64          # 16M为单位，wal日志生成的单位，尽量的设置较大，防止日志没有来得及到standby就被循环覆盖了，这个如果数据量大的时候要慎重。
+synchronous_standby_names = &#39;*&#39; #synchronous_standby_names 这个参数对应着slave配置文件中的recovery.conf 中的primary_conninfo
+</code></pre></li>
+<li><p>配置:pg_hba.conf文件(这个文件主要是用来配置数据库连接权限的)</p>
+
+<pre><code># local      DATABASE  USER  METHOD  [OPTIONS]
+# host       DATABASE  USER  ADDRESS  METHOD  [OPTIONS]
+# hostssl    DATABASE  USER  ADDRESS  METHOD  [OPTIONS]
+# hostnossl  DATABASE  USER  ADDRESS  METHOD  [OPTIONS]
+#第一列是指定能够连接数据库的类型，local是本地连接，host是远程的主机。
+#第二列是指能够连接那些数据库
+#第三列是哪个用户能够连接数据库
+#第四列是地址
+#第五列是认证的方式
+local   all             postgres                                trust
+local   all             all                                     peer
+host    all             all             0.0.0.0/0               md5
+host    replication     all             0.0.0.0/0               trust
+host    all             all             ::1/128                 md5
+</code></pre>
+
+<p>配置说明：</p>
+
+<ol>
+<li>允许本地的postgres连接</li>
+<li>允许所有的本地连接认证方式是获取本地的操作系统的用户名。</li>
+</ol></li>
+</ol></li>
+<li><p>Slave 配置：</p>
+
+<ol>
+<li><p>配置:postgresql.conf 文件</p>
+
+<pre><code>listen_addresses = &#39;*&#39;          # what IP address(es) to listen on;
+wal_level = hot_standby
+max_connections = 1000
+hot_standby = on
+hot_standby_feedback = on
+</code></pre></li>
+<li><p>配置:pg_hba.conf文件(这个文件主要是用来配置数据库连接权限的)</p>
+
+<pre><code>local   all             postgres                                trust
+local   all             all                                     peer
+host    all             all             0.0.0.0/0               md5
+host    replication     all             0.0.0.0/0               trust
+host    all             all             ::1/128                 md5
+</code></pre></li>
+<li><p>配置: recovery.conf文件</p>
+
+<pre><code>primary_conninfo = &#39;host=x.x.x.x user=test password=123 port=5432&#39;
+EOF
+</code></pre></li>
+</ol></li>
+<li><p>过程如下：</p>
+
+<ol>
+<li><p>Master</p>
+
+<ol>
+<li>启动Mater节点（没有任何的主从配置过程）</li>
+<li><p>修改postgres的密码, 创建主从同步需要的账号</p>
+
+<pre><code>su postgres
+psql -c &quot;ALTER USER postgres WITH PASSWORD &#39;123&#39;;&quot;
+psql -c &quot; CREATE ROLE repluser REPLICATION LOGIN PASSWORD &#39;123&#39;;&quot;
+</code></pre></li>
+<li><p>然后修改配置成如上的配置。</p></li>
+<li><p>重启Master</p></li>
+</ol></li>
+<li><p>Master打开备份状态：</p>
+
+<pre><code>```
+psql -U postgres -c &quot;select pg_start_backup(&#39;initial_backup&#39;);&quot;
+```
+</code></pre>
+
+<ol>
+<li><p>将内容拷贝到远程的slave节点。</p>
+
+<pre><code>rsync -cva --inplace --exclude=*pg_xlog* /var/lib/pgsql/9.5/data/ slave_ipaddress:/var/lib/pgsql/9.5/data/
+</code></pre></li>
+<li><p>退出备份状态</p>
+
+<pre><code>psql -U postgres -c &quot;select pg_stop_backup();&quot;
+</code></pre></li>
+</ol></li>
+</ol></li>
+<li><p>Slave</p>
+
+<ol>
+<li>修改成如上的slave配置</li>
+<li><p>注意一下/var/lib/pgsql/9.5/data/目录的权限问题，尤其是recovery.conf</p>
+
+<pre><code>chown -R postgres.postgres /var/lib/pgsql/9.5/data/
+</code></pre></li>
+</ol></li>
+</ol></li>
+<li><p>检验方式：<br/>
+    输入一下命令：</p>
+
+<pre><code>```
+select * from pg_stat_replication;
+```
+
+可以从输出的信息中看到是否同步成功。
+</code></pre></li>
 </ol>
 
                         
@@ -139,10 +274,10 @@
                 <div class="read-more clearfix">
                   <div class="more-left left">
                   
-                    <span class="date">2016/8/23 18:10 PM</span>
+                    <span class="date">2016/8/23 19:17 PM</span>
                     <span>posted in&nbsp;</span> 
           				  
-          					    <span class="posted-in"><a href='Nginx.html'>Nginx</a></span>
+          					    <span class="posted-in"><a href='%E6%95%B0%E6%8D%AE%E5%BA%93.html'>数据库</a></span>
           				   
                   </div>
                   <div class="more-right right">
@@ -207,7 +342,7 @@
 
       	<p class="cat-list">
         
-            <a href="%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80.html"><strong>编程语言</strong></a>
+            <a href="Golang.html"><strong>Golang</strong></a>
         
             <a href="%E5%AE%B9%E5%99%A8%E7%9B%B8%E5%85%B3.html"><strong>容器相关</strong></a>
         
@@ -234,6 +369,24 @@
 	      
 		      
 			      <li class="post">
+			        <a href="14727913418128.html">Golang 并发问题：</a>
+			      </li>
+		     
+		  
+		      
+			      <li class="post">
+			        <a href="14727911561394.html">Golang 反射问题</a>
+			      </li>
+		     
+		  
+		      
+			      <li class="post">
+			        <a href="14727906220786.html">Golang指针问题</a>
+			      </li>
+		     
+		  
+		      
+			      <li class="post">
 			        <a href="14727777201831.html">技术类博客收集</a>
 			      </li>
 		     
@@ -245,22 +398,10 @@
 		     
 		  
 		      
-			      <li class="post">
-			        <a href="14726074871676.html">Golang 基础类型</a>
-			      </li>
-		     
 		  
 		      
-			      <li class="post">
-			        <a href="14724588246571.html">PostgreSql语句集锦</a>
-			      </li>
-		     
 		  
 		      
-			      <li class="post">
-			        <a href="14724369503027.html">Postgresql 备份与恢复</a>
-			      </li>
-		     
 		  
 		      
 		  

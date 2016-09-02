@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
     
-  PostgreSql语句集锦 - 重剑无锋，大巧不工。
+  Golang 反射问题 - 重剑无锋，大巧不工。
   
   </title>
   
@@ -109,14 +109,14 @@
       <div class="markdown-body article-wrap">
        <div class="article">
           
-          <h1>PostgreSql语句集锦</h1>
+          <h1>Golang 反射问题</h1>
      
         <div class="read-more clearfix">
-          <span class="date">2016/8/29 16:20 PM</span>
+          <span class="date">2016/9/2 12:39 PM</span>
 
           <span>posted in&nbsp;</span> 
           
-              <span class="posted-in"><a href='%E6%95%B0%E6%8D%AE%E5%BA%93.html'>数据库</a></span>
+              <span class="posted-in"><a href='Golang.html'>Golang</a></span>
            
          
           <span class="comments">
@@ -130,17 +130,43 @@
 
       <div class="article-content">
       <ol>
-<li><p>更正Jsonb中数据：</p>
+<li><p>指针的反射</p>
 
-<ol>
-<li><img src="media/14724588246571/14724588641183.jpg" alt=""/></li>
-</ol>
+<pre><code>func test6() {
+        type User struct {
+            Username string
+        }
+        type Admin struct {
+            User
+            title string
+        }
+        u := new(Admin)
+        t := reflect.TypeOf(u)
+        if t.Kind() == reflect.Ptr {
+            t = t.Elem()
+        }
+}
+</code></pre></li>
+<li><p>结构体的反射</p>
 
-<p>将其中不合法的数据改成:[&quot;镭射祛斑&quot;,&quot;c10&quot;, &quot;白瓷娃娃&quot;, &quot;黄雀斑&quot;, &quot;雀斑&quot;, &quot;色斑&quot;,&quot;微整形&quot;]<br/>
-语句：<br/>
-其中的问题：多个字段在一个双引号中，其中是中文的逗号。</p>
-
-<pre><code>UPDATE table_name SET tags=to_jsonb(string_to_array(jsonb_array_elements_text(tags),&#39;，&#39;)) WHERE tags!=&#39;null&#39;;
+<pre><code>// 反射结构体内容
+func test5() {
+        type User struct {
+                Username string
+        }
+        type Admin struct {
+                User
+                title string
+       }
+       func() {
+                var u Admin
+                t := reflect.TypeOf(u)
+                for i, n := 0, t.NumField(); i &lt; n; i++ {
+                    f := t.Field(i)
+                    fmt.Println(f.Name, f.Type)
+                }
+       }()
+  }
 </code></pre></li>
 </ol>
 
@@ -153,16 +179,16 @@
         <div class="large-6 columns">
         <p class="text-left" style="padding:15px 0px;">
       
-          <a href="14726074871676.html" 
-          title="Previous Post: Golang 基础类型">&laquo; Golang 基础类型</a>
+          <a href="14727913418128.html" 
+          title="Previous Post: Golang 并发问题：">&laquo; Golang 并发问题：</a>
       
         </p>
         </div>
         <div class="large-6 columns">
       <p class="text-right" style="padding:15px 0px;">
       
-          <a  href="14724369503027.html" 
-          title="Next Post: Postgresql 备份与恢复">Postgresql 备份与恢复 &raquo;</a>
+          <a  href="14727906220786.html" 
+          title="Next Post: Golang指针问题">Golang指针问题 &raquo;</a>
       
       </p>
         </div>

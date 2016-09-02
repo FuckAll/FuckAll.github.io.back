@@ -76,7 +76,7 @@
     <li><label>Categories</label></li>
 
         
-            <li><a href="%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80.html">编程语言</a></li>
+            <li><a href="Golang.html">Golang</a></li>
         
             <li><a href="%E5%AE%B9%E5%99%A8%E7%9B%B8%E5%85%B3.html">容器相关</a></li>
         
@@ -109,39 +109,26 @@
 		<div class="markdown-body home-categories">
 		
 			<div class="article">
-                <a class="clearlink" href="14723721762973.html">
+                <a class="clearlink" href="14724588246571.html">
                 
-                  <h1>股票线图</h1>
+                  <h1>PostgreSql语句集锦</h1>
                   <div class="a-content">
                       
                       <div class="a-content-text">
                         
                         	<ol>
-<li><p>k线</p>
+<li><p>更正Jsonb中数据：</p>
 
 <ol>
-<li><p>锤子线和上吊线：</p>
+<li><img src="media/14724588246571/14724588641183.jpg" alt=""/></li>
+</ol>
 
-<ol>
-<li><p>定义： 锤子线和上吊线是相对于增长和下跌来说的，如果后市是上涨那么久叫锤子线，如果是下跌，那么就叫上吊线。如图：<br/>
-<img src="media/14723721762973/14723767546699.jpg" alt=""/></p></li>
-<li><p>使用前提： </p>
+<p>将其中不合法的数据改成:[&quot;镭射祛斑&quot;,&quot;c10&quot;, &quot;白瓷娃娃&quot;, &quot;黄雀斑&quot;, &quot;雀斑&quot;, &quot;色斑&quot;,&quot;微整形&quot;]<br/>
+语句：<br/>
+其中的问题：多个字段在一个双引号中，其中是中文的逗号。</p>
 
-<ol>
-<li>长时间的下跌，出现锤子线，或者长时间的上涨出现锤子线(上吊线)</li>
-<li>下影线要是实体的2倍以上。</li>
-<li>一般是没有上影线，如果有也是很短的</li>
-</ol></li>
-<li><p>如何使用：</p>
-
-<ol>
-<li>锤子线的出现时证明着走向有很大的可能进行逆转，当长期下跌，在底部出现锤子线，很可能已经找到支撑位，空头试图拉低，但是被多头拉回，空头的企图没有得逞，这就说明此时多头是占主。</li>
-<li>何时出手，如果是锤子之后上涨趋势，那么第二天高开跳空或者是价位到达前一天锤子线实体的收盘价可出手，如果开始是下降趋势，然后反弹，反弹到前一天锤子线实体的收盘价可出手买入。如果是上吊线，那么最好早抛。 </li>
-</ol></li>
-</ol></li>
-</ol></li>
-<li><p>5日，10日，20日，30日，60日平均线</p></li>
-<li></li>
+<pre><code>UPDATE table_name SET tags=to_jsonb(string_to_array(jsonb_array_elements_text(tags),&#39;，&#39;)) WHERE tags!=&#39;null&#39;;
+</code></pre></li>
 </ol>
 
                         
@@ -151,10 +138,10 @@
                 <div class="read-more clearfix">
                   <div class="more-left left">
                   
-                    <span class="date">2016/8/28 16:16 PM</span>
+                    <span class="date">2016/8/29 16:20 PM</span>
                     <span>posted in&nbsp;</span> 
           				  
-          					    <span class="posted-in"><a href='%E8%82%A1%E7%A5%A8%E5%9F%BA%E7%A1%80.html'>股票基础</a></span>
+          					    <span class="posted-in"><a href='%E6%95%B0%E6%8D%AE%E5%BA%93.html'>数据库</a></span>
           				   
                   </div>
                   <div class="more-right right">
@@ -219,7 +206,7 @@
 
       	<p class="cat-list">
         
-            <a href="%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80.html"><strong>编程语言</strong></a>
+            <a href="Golang.html"><strong>Golang</strong></a>
         
             <a href="%E5%AE%B9%E5%99%A8%E7%9B%B8%E5%85%B3.html"><strong>容器相关</strong></a>
         
@@ -246,6 +233,24 @@
 	      
 		      
 			      <li class="post">
+			        <a href="14727913418128.html">Golang 并发问题：</a>
+			      </li>
+		     
+		  
+		      
+			      <li class="post">
+			        <a href="14727911561394.html">Golang 反射问题</a>
+			      </li>
+		     
+		  
+		      
+			      <li class="post">
+			        <a href="14727906220786.html">Golang指针问题</a>
+			      </li>
+		     
+		  
+		      
+			      <li class="post">
 			        <a href="14727777201831.html">技术类博客收集</a>
 			      </li>
 		     
@@ -257,22 +262,10 @@
 		     
 		  
 		      
-			      <li class="post">
-			        <a href="14726074871676.html">Golang 基础类型</a>
-			      </li>
-		     
 		  
 		      
-			      <li class="post">
-			        <a href="14724588246571.html">PostgreSql语句集锦</a>
-			      </li>
-		     
 		  
 		      
-			      <li class="post">
-			        <a href="14724369503027.html">Postgresql 备份与恢复</a>
-			      </li>
-		     
 		  
 		      
 		  

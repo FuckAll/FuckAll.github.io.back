@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
     
-  PostgreSql语句集锦 - 重剑无锋，大巧不工。
+  重剑无锋，大巧不工。
   
   </title>
   
@@ -100,101 +100,78 @@
        
 
  <script type="text/javascript">
-  $(function(){
-    $('#menu_item_index').addClass('is_active');
-  });
+	$(function(){
+		$('#menu_item_index').addClass('is_active');
+	});
 </script>
 <div class="row">
-  <div class="large-8 medium-8 columns">
-      <div class="markdown-body article-wrap">
-       <div class="article">
-          
-          <h1>PostgreSql语句集锦</h1>
-     
-        <div class="read-more clearfix">
-          <span class="date">2016/8/29 16:20 PM</span>
-
-          <span>posted in&nbsp;</span> 
-          
-              <span class="posted-in"><a href='%E6%95%B0%E6%8D%AE%E5%BA%93.html'>数据库</a></span>
-           
-         
-          <span class="comments">
-            
-
-            
-          </span>
-
-        </div>
-      </div><!-- article -->
-
-      <div class="article-content">
-      <ol>
-<li><p>更正Jsonb中数据：</p>
+	<div class="large-8 medium-8 columns">
+		<div class="markdown-body home-categories">
+		
+			<div class="article">
+                <a class="clearlink" href="14719470176268.html">
+                
+                  <h1>Web 基础</h1>
+                  <div class="a-content">
+                      
+                      <div class="a-content-text">
+                        
+                        	<ol>
+<li><p>服务器响应：</p>
 
 <ol>
-<li><img src="media/14724588246571/14724588641183.jpg" alt=""/></li>
+<li>1xx 提示信息 - 表示请求被成功接收，继续处理</li>
+<li>2xx 成功 - 表示清酒已经被成功接收，理解，接收</li>
+<li>3xx 重定向 - 要完成请求必须要做进一步的处理</li>
+<li>4xx 客户端错误 - 请求有语法错误或者无法实现</li>
+<li>5xx 服务端错误 - 服务端未能实现合法的请求</li>
+</ol></li>
+<li><p>HTTP协议的无状态和Keep-alive的区别：</p>
+
+<p>HTTP是一个无状态的面向连接的协议，无状态不代表HTTP不能保持TCP连接，更不能代表HTTP使用的是UDP协议（面对无连接）。<br/>
+   从HTTP/1.1起，默认都开启了Keep-Alive保持连接特性，简单地说，当一个网页打开完成后，客户端和服务器之间用于传输HTTP数据的TCP连接不会关闭，如果客户端再次访问这个服务器上的网页，会继续使用这一条已经建立的TCP连接。</p></li>
 </ol>
 
-<p>将其中不合法的数据改成:[&quot;镭射祛斑&quot;,&quot;c10&quot;, &quot;白瓷娃娃&quot;, &quot;黄雀斑&quot;, &quot;雀斑&quot;, &quot;色斑&quot;,&quot;微整形&quot;]<br/>
-语句：<br/>
-其中的问题：多个字段在一个双引号中，其中是中文的逗号。</p>
+                        
+                      </div>
+                  </div>
+                </a>
+                <div class="read-more clearfix">
+                  <div class="more-left left">
+                  
+                    <span class="date">2016/8/23 18:10 PM</span>
+                    <span>posted in&nbsp;</span> 
+          				  
+          					    <span class="posted-in"><a href='Nginx.html'>Nginx</a></span>
+          				   
+                  </div>
+                  <div class="more-right right">
+                  <span class="comments">
+                      
 
-<pre><code>UPDATE table_name SET tags=to_jsonb(string_to_array(jsonb_array_elements_text(tags),&#39;，&#39;)) WHERE tags!=&#39;null&#39;;
-</code></pre></li>
-</ol>
-
-
-    
-
-      </div>
-
-      <div class="row">
-        <div class="large-6 columns">
-        <p class="text-left" style="padding:15px 0px;">
-      
-          <a href="14726074871676.html" 
-          title="Previous Post: Golang 基础类型">&laquo; Golang 基础类型</a>
-      
-        </p>
-        </div>
-        <div class="large-6 columns">
-      <p class="text-right" style="padding:15px 0px;">
-      
-          <a  href="14724369503027.html" 
-          title="Next Post: Postgresql 备份与恢复">Postgresql 备份与恢复 &raquo;</a>
-      
-      </p>
-        </div>
-      </div>
-      <div class="comments-wrap">
-        <div class="share-comments">
-          <!-- 多说评论框 start -->
-<!-- 多说评论框 end -->
-<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
-<script type="text/javascript">
-var duoshuoQuery = {short_name:"fuckall"};
-	(function() {
-		var ds = document.createElement('script');
-		ds.type = 'text/javascript';ds.async = true;
-		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
-		ds.charset = 'UTF-8';
-		(document.getElementsByTagName('head')[0] 
-		 || document.getElementsByTagName('body')[0]).appendChild(ds);
-	})();
-	</script>
-<!-- 多说公共JS代码 end -->
-
-          
-
-          
-        </div>
-      </div>
-    </div><!-- article-wrap -->
-  </div><!-- large 8 -->
+                       
+                  </span>
+                  </div>
+                </div>
+              </div><!-- article -->
+        
+              
 
 
-
+			<div class="row">
+			  <div class="large-6 columns">
+			  <p class="text-left" style="padding-top:25px;">
+			   <a href="all_13.html">&laquo; Prev Page</a>  
+			  </p>
+			  </div>
+			  <div class="large-6 columns">
+			<p class="text-right" style="padding-top:25px;">
+			 <a href="all_15.html">&raquo; Next Page</a> 
+			</p>
+			  </div>
+			</div>
+		</div>
+	</div><!-- large 8 -->
 
  <div class="large-4 medium-4 columns">
   <div class="hide-for-small">

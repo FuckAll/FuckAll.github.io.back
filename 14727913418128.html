@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
     
-  PostgreSql语句集锦 - 重剑无锋，大巧不工。
+  Golang 并发问题： - 重剑无锋，大巧不工。
   
   </title>
   
@@ -109,14 +109,14 @@
       <div class="markdown-body article-wrap">
        <div class="article">
           
-          <h1>PostgreSql语句集锦</h1>
+          <h1>Golang 并发问题：</h1>
      
         <div class="read-more clearfix">
-          <span class="date">2016/8/29 16:20 PM</span>
+          <span class="date">2016/9/2 12:42 PM</span>
 
           <span>posted in&nbsp;</span> 
           
-              <span class="posted-in"><a href='%E6%95%B0%E6%8D%AE%E5%BA%93.html'>数据库</a></span>
+              <span class="posted-in"><a href='Golang.html'>Golang</a></span>
            
          
           <span class="comments">
@@ -130,18 +130,174 @@
 
       <div class="article-content">
       <ol>
-<li><p>更正Jsonb中数据：</p>
+<li><p>go关键字带来的并发</p>
+
+<pre><code>func loop() {
+// fmt.Println(&quot;wood&quot;)
+    for i := 0; i &lt; 10; i++ {
+    fmt.Printf(&quot;%d&quot;, i)
+    }
+}
+func test() {
+    loop()
+    go loop()
+    time.Sleep(time.Second)// 如果不等待，test会在goruntine没有开始执行就已经退出了。
+}
+</code></pre></li>
+<li><p>信道带来的goroutine通信</p>
 
 <ol>
-<li><img src="media/14724588246571/14724588641183.jpg" alt=""/></li>
-</ol>
+<li><p>无缓存信道</p>
 
-<p>将其中不合法的数据改成:[&quot;镭射祛斑&quot;,&quot;c10&quot;, &quot;白瓷娃娃&quot;, &quot;黄雀斑&quot;, &quot;雀斑&quot;, &quot;色斑&quot;,&quot;微整形&quot;]<br/>
-语句：<br/>
-其中的问题：多个字段在一个双引号中，其中是中文的逗号。</p>
+<pre><code>func test1() {
+    go func() {
+    fmt.Println(&quot;step 1&quot;)
+    messages &lt;- &quot;step 1&quot;
+    }()
+    fmt.Println(&quot;step 2&quot;)
+    time.Sleep(time.Second)
+}
+</code></pre>
 
-<pre><code>UPDATE table_name SET tags=to_jsonb(string_to_array(jsonb_array_elements_text(tags),&#39;，&#39;)) WHERE tags!=&#39;null&#39;;
+<p>注意：</p>
+
+<ol>
+<li><p>这种情况信道中放入东西，但是没有人取,能够正常退出。</p>
+
+<pre><code>➜  src git:(master) ✗ go run hello.go
+     go run hello.go
+     step 1
+     step 2
 </code></pre></li>
+<li><p>这种情况信道没有人放东西，但是有取得操作。所以会发生死锁。</p>
+
+<pre><code>func test4() {
+    go func() {
+    fmt.Println(&quot;step 1&quot;)
+}()
+&lt;-messages
+}
+</code></pre>
+
+<pre><code>➜  src git:(master) ✗ go run hello.go
+go run hello.go
+step 1
+fatal error: all goroutines are asleep - deadlock!
+</code></pre></li>
+<li><p>通过设置标志位控制执行顺序</p>
+
+<pre><code> func test6() {
+       complete := make(chan int)
+         go func() {
+        for i := 0; i &lt; 10; i++ {
+               fmt.Printf(&quot;%d&quot;, i)
+
+       }
+       complete &lt;- 0
+
+    }()
+    fmt.Println(&quot;step 1&quot;)
+    &lt;-complete
+    fmt.Println(&quot;step 2&quot;)
+}
+</code></pre>
+
+<p><strong>总结：也就是说，无缓存的信道，在存和取得时候都会临时挂起自己的goroutine,等到另外一端准备好之后才够恢复。<br/>
+无缓冲的信道永远不会存储数据，只是负责数据的流通，所以数据要流转起来。</strong></p></li>
+</ol></li>
+</ol></li>
+<li><p>死锁: 线程或者进程在等待资源的时候，一直无法得到所需要的就会陷入一种状态，这种状态就叫做死锁。</p>
+
+<ol>
+<li><p>死锁的几种情况</p>
+
+<ol>
+<li>在单独的gorunitine中操作无缓冲的信道，一定发生死锁。
+<code>
+func main() {
+    ch := make(chan int)
+     ch &lt;- 1 // 1流入信道，堵塞当前线, 没人取走数据信道不会打开
+    fmt.Println(&quot;This line code wont run&quot;) //在此行执行之前Go就会报死锁
+}
+</code></li>
+<li><p>多个无缓冲的信道相互依赖，可能会发生死锁。</p>
+
+<pre><code>func test7() {
+    ch1 := make(chan int)
+    ch2 := make(chan int)
+    go func() {
+        fmt.Println(&quot;wonder&quot;)
+        ch1 &lt;- &lt;-ch2
+    }()
+    &lt;-ch1
+}
+</code></pre></li>
+<li><p>多个无缓冲的信道，部分信道数据不能流动</p>
+
+<pre><code> c, quit := make(chan int), make(chan int)
+ go func() {
+ c &lt;- 1  // c通道的数据没有被其他goroutine读取走，堵塞当前goroutine
+ quit &lt;- 0 // quit始终没有办法写入数据
+ }()
+ &lt;- quit // quit 等待数据的写
+</code></pre></li>
+</ol></li>
+<li><p>解决死锁的方法：</p>
+
+<ol>
+<li><p>把没有放入的数据，赶紧放入，把没有取走的数据，赶紧取走。 </p>
+
+<pre><code>c, quit := make(chan int), make(chan int)
+go func() {
+      c &lt;- 1
+  quit &lt;- 0
+}()
+&lt;- c // 取走c的数据！
+&lt;-quit
+</code></pre></li>
+<li><p>设置缓冲信道,这样信道就可以保存数据了，可以保存的数据长度为信道的长度，并且只有在存储的数据要超出信道的长度的时候，才会挂起，等待第一个数据被其他的goroutine拿走。</p>
+
+<pre><code>func test() {
+          ch := make(chan int, 3)
+  ch &lt;- 1
+  ch &lt;- 2
+  ch &lt;- 3
+  for v := range ch {
+      fmt.Println(v)
+  if len(ch) &lt;= 0 {
+  break
+  }
+  }
+      }
+</code></pre>
+
+<ol>
+<li>上述就是设置了一个缓冲的信道，长度为3，最大能够录入3个，如果大于3个会阻塞，等待有channel被消费。</li>
+<li><p>缓冲的信道是能够用range来遍历的，但是由于range不等到信道关闭是不会结束读取的，所以即使是ch长度为0，range也是会<br/>
+继续去取，所以会报死锁的错误，所以通过判断ch的长度决定退出。(注意，这个如果是在信道存取的时候进行长度判断会出问题的。最好的方法是显示的关闭信道,<br/>
+信道关闭之后，信道是只读的，不能写。)</p>
+
+<pre><code>func test() {
+        ch := make(chan int, 4)
+        ch &lt;- 1
+        ch &lt;- 2
+        ch &lt;- 3
+        close(ch)
+        //ch &lt;- 4 //
+            for v := range ch {
+        fmt.Println(v)
+
+        }
+     }
+</code></pre></li>
+</ol></li>
+</ol></li>
+<li><p>并发 OR 并行</p>
+
+<ol>
+<li>并发区别于并行： 并发的意思是多个goroutine轮流的使用单核CPU，并行是每个goroutine都可以在另外单独的CPU上单独的运行。</li>
+</ol></li>
+</ol></li>
 </ol>
 
 
@@ -153,16 +309,13 @@
         <div class="large-6 columns">
         <p class="text-left" style="padding:15px 0px;">
       
-          <a href="14726074871676.html" 
-          title="Previous Post: Golang 基础类型">&laquo; Golang 基础类型</a>
-      
         </p>
         </div>
         <div class="large-6 columns">
       <p class="text-right" style="padding:15px 0px;">
       
-          <a  href="14724369503027.html" 
-          title="Next Post: Postgresql 备份与恢复">Postgresql 备份与恢复 &raquo;</a>
+          <a  href="14727911561394.html" 
+          title="Next Post: Golang 反射问题">Golang 反射问题 &raquo;</a>
       
       </p>
         </div>

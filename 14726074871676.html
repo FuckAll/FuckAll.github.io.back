@@ -76,7 +76,7 @@
     <li><label>Categories</label></li>
 
         
-            <li><a href="%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80.html">编程语言</a></li>
+            <li><a href="Golang.html">Golang</a></li>
         
             <li><a href="%E5%AE%B9%E5%99%A8%E7%9B%B8%E5%85%B3.html">容器相关</a></li>
         
@@ -116,7 +116,7 @@
 
           <span>posted in&nbsp;</span> 
           
-              <span class="posted-in"><a href='%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80.html'>编程语言</a></span>
+              <span class="posted-in"><a href='Golang.html'>Golang</a></span>
            
          
           <span class="comments">
@@ -287,6 +287,117 @@ string([]byte) -&gt; string </li>
 </ol></li>
 </ol>
 
+<h2 id="toc_2">数组问题</h2>
+
+<ol>
+<li><p>声明Golang数组有两种方式</p>
+
+<pre><code>var arr1 = new([5]int)
+var arr2 [5]int
+</code></pre>
+
+<ol>
+<li>Golang认为数组是一种值类型，但new的时候返回的是数组的指针。</li>
+<li>第一种返回的是一个指针，传递的时候是不进行内存拷贝的。</li>
+<li>第二种方式返回的是数组本身，传递的时候是进行内存拷贝的。</li>
+</ol>
+
+<pre><code>package main
+import (
+  &quot;fmt&quot;
+)
+func main() {
+        var arr1 = new([5]int)
+        var arr2 [5]int
+        fmt.Println(arr1)
+        fmt.Println(arr2)
+        test := arr1
+        test[0] = 123
+        fmt.Println(test)
+        fmt.Println(arr1)
+        test2 := arr2
+        test2[0] = 345
+        fmt.Println(test2)
+        fmt.Println(arr2)
+}
+   $输出结果：
+        &amp;[0 0 0 0 0]
+        [0 0 0 0 0]
+        &amp;[123 0 0 0 0]
+        &amp;[123 0 0 0 0]
+        [345 0 0 0 0]
+        [0 0 0 0 0]
+</code></pre></li>
+<li><p>切片问题<br/>
+    <strong>切片在进行传递的时候也是指针传递</strong></p>
+
+<pre><code>    package main
+
+    import (
+        &quot;fmt&quot;
+    )
+
+    func f(a []int) {
+        fmt.Println(a)
+        a[0] = 123
+    }
+    func fp(a *[3]int) {
+        fmt.Println(a)
+        a[0] = 456
+    }
+
+    func main() {
+        var ar [3]int
+        f(ar[1:2])
+        fp(&amp;ar)
+        fmt.Println(ar)
+    }
+      $输出结果：
+            &amp;[0 0 0 0 0]
+            [0 0 0 0 0]
+            &amp;[123 0 0 0 0]
+            &amp;[123 0 0 0 0]
+            [345 0 0 0 0]
+            [0 0 0 0 0]
+</code></pre></li>
+</ol>
+
+<p><strong>初始化数组的时候如果是不定长的数组初始化，那么这个数组也会是一个切片</strong></p>
+
+<pre><code>```
+    package main
+
+    import (
+        &quot;fmt&quot;
+    )
+
+    func test(a []int) {
+        a[1] = 4
+    }
+    func main() {
+        var arrlazy = []int{5, 6, 6, 7}
+        fmt.Println(arrlazy)
+        test(arrlazy)
+        fmt.Println(arrlazy)
+    }
+       $输出结果：
+           [5 6 6 7]
+           [5 4 6 7]
+```
+</code></pre>
+
+<p><strong>总结：除了数组本身，切片和new一个都是指针的形式，数组本身是值类型，其余两种情况得到的嗾使指针，如果想要在传递的时候不进行拷贝操作，那么两种方式，一种就是直接传指针，另外一种的直接传切片。</strong></p>
+
+<pre><code>    1. new() 和 make() 的关系：
+        1. new() 是为变量分配内存，然后就将分配好的地址的首地址返回，并且也是进行初始化
+        2. make() 这个是用来直接初始化，然后将变量直接返回。
+    2. 关于效率问题：
+        1. 字符串的拼凑应该直接使用bytes的buffer进行操作，会快一些。
+    3. 数组和切片问题：
+        1. 数组一旦定义好，就固定长度即len == cap
+        2. 数组想要扩容或者是缩容可以转换成切片进行使用,即先要make一个切片，然后将数组中的数据放入其中。
+</code></pre>
+
 
     
 
@@ -373,7 +484,7 @@ var duoshuoQuery = {short_name:"fuckall"};
 
       	<p class="cat-list">
         
-            <a href="%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80.html"><strong>编程语言</strong></a>
+            <a href="Golang.html"><strong>Golang</strong></a>
         
             <a href="%E5%AE%B9%E5%99%A8%E7%9B%B8%E5%85%B3.html"><strong>容器相关</strong></a>
         
@@ -400,6 +511,24 @@ var duoshuoQuery = {short_name:"fuckall"};
 	      
 		      
 			      <li class="post">
+			        <a href="14727913418128.html">Golang 并发问题：</a>
+			      </li>
+		     
+		  
+		      
+			      <li class="post">
+			        <a href="14727911561394.html">Golang 反射问题</a>
+			      </li>
+		     
+		  
+		      
+			      <li class="post">
+			        <a href="14727906220786.html">Golang指针问题</a>
+			      </li>
+		     
+		  
+		      
+			      <li class="post">
 			        <a href="14727777201831.html">技术类博客收集</a>
 			      </li>
 		     
@@ -411,22 +540,10 @@ var duoshuoQuery = {short_name:"fuckall"};
 		     
 		  
 		      
-			      <li class="post">
-			        <a href="14726074871676.html">Golang 基础类型</a>
-			      </li>
-		     
 		  
 		      
-			      <li class="post">
-			        <a href="14724588246571.html">PostgreSql语句集锦</a>
-			      </li>
-		     
 		  
 		      
-			      <li class="post">
-			        <a href="14724369503027.html">Postgresql 备份与恢复</a>
-			      </li>
-		     
 		  
 		      
 		  
