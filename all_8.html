@@ -109,147 +109,46 @@
 		<div class="markdown-body home-categories">
 		
 			<div class="article">
-                <a class="clearlink" href="14724369503027.html">
+                <a class="clearlink" href="14723863067284.html">
                 
-                  <h1>Postgresql 备份与恢复</h1>
+                  <h1>选股模型</h1>
                   <div class="a-content">
                       
                       <div class="a-content-text">
                         
-                        	<h2 id="toc_0">备份和定时备份</h2>
+                        	<pre><code>1. 长阳重炮
+    2. 在低位温和放量之后出现了一根带量长阳（或涨停），同时成交量为上叉阳量托，马上直扑追涨。
 
-<ol>
-<li><p>备份命令</p>
 
-<pre><code>pg_dump -h host_ip -p host_port -U datebase_user -d database_name -vF c -C -c -f test1.bkp test1 
--a 为只输出数据库中的数据（此处没有用）
--v 打出执行信息
--F 输出为指定的格式 c 为custom
--c dump的时候将drop database xxx 语句放入到dump的内容中
--C dump的时候将Create database xxx 语句放入到dump的内容中
--f 指定输出dump的名称
-最后一个为数据库的名字
-</code></pre></li>
-<li><p>定时命令：</p>
-
-<ol>
-<li>脚本内容backup_db.sh(全量导出，这里导出的是自定义格式，只能够被全量恢复和部分恢复)</li>
-</ol>
-
-<pre><code>#/bin/bash
-DATE=`date +&quot;%Y_%m_%d&quot;`
-/usr/bin/pg_dump -U postgres -vF c -C -c -f /share/meidb_$DATE.bak meidb
-## 备份到香港阿里云（这里要把key加好）
-##chmod 777 /share/meidb_$DATE.bak
-/usr/bin/scp -P hostPort -i /root/.ssh/id_rsa /share/meidb_$DATE.bak
-root@Hostname:/backup/ &gt;&gt; /share/scp.log 2&gt;&amp;1
-</code></pre></li>
-</ol>
-
-<h2 id="toc_1">如何恢复数据</h2>
-
-<ol>
-<li><p>全量数据恢复方法</p>
-
-<ol>
-<li><p>如果需要将原先的库进行删除并且重建</p>
-
-<ol>
-<li>执行命令：</li>
-</ol>
-
-<pre><code>pg_restore -h host_ip -p host_port -U postgres -d postgres -v -C  -c test1.bkp
-</code></pre></li>
-</ol></li>
-<li><p>部分恢复的方法：</p>
-
-<ol>
-<li><p>创建恢复表的目录批量恢复方法：</p>
-
-<ol>
-<li>执行命创建恢复目录：</li>
-</ol>
-
-<pre><code>pg_restore -l test1db_2016_18_29.bkp -f table.lst
- -l, --list print summarized TOC of the archive
- -f, --file=FILENAME output file name
+    3. 量五日线2北，大阳线，实体的上沿可以做多，止损放到下沿
+2. 吞并翻转
+    3. 第一个交易日长阴（跌停）， 第二个交易日涨停，包容第一个交易日长阴。可以在第二个交易日涨停的刹那追涨买入
+3. 螺旋桨
+    4. 均线多头排列： 10日线在5日线以上至少
+    5. 影线长度8%
+    6. 量站上5日均量线
+4. 牛熊不败
+5. 三外有三
+6. 喜鹊闹梅
+    7. 
+7. 切割线
+    8. 一阳穿四线
+    9. 量站上5日线
+    10. 量比大于3%几率非常大
+8. 故地重游
+9. 开闸放水
+10. 强势牛回头
+11. 倒挂金钩
+    12. 均线多头排列
+    13. 高开3%左右
+    14. 5日线附近可以开买
+12. 蹄子线
+13. 金字塔
+14. 三步选股
+15. 双锤筑底
+16. 三只天鹅
+17. 攻击线
 </code></pre>
-
-<ol>
-<li><p>修改恢复表目录：</p>
-
-<ol>
-<li><p>修改前内容例如：</p>
-
-<pre><code>; Archive created at 2016-08-29 11:16:17 CST
-;     dbname: meidb
-;     TOC Entries: 65
-;     Compression: -1
-;     Dump Version: 1.12-0
-;     Format: CUSTOM
-;     Integer: 4 bytes
-;     Offset: 8 bytes
-;     Dumped from database version: 9.5.3
-;     Dumped by pg_dump version: 9.5.3
-;
-;
-; Selected TOC Entries:
-;
-4168; 0 18518 TABLE DATA public account_items postgres
-4169; 0 18530 TABLE DATA public accounts postgres
-4170; 0 18551 TABLE DATA public activities postgres
-4235; 0 0 SEQUENCE SET public activities_num_seq postgres
-4172; 0 18564 TABLE DATA public activity_enrolls postgres
-4173; 0 18576 TABLE DATA public balance_changes postgres
-
-</code></pre></li>
-<li><p>将其余的注释，然后只留下需要恢复的表明即可：<br/>
-    小技巧：vim替换模式:（:16,78s#<sup>4#;4#g）</sup><br/>
-    修改后内容如下(例如要恢复表accounts)：</p>
-
-<pre><code>;     Archive created at 2016-08-29 11:16:17 CST
-;     dbname: meidb
-;     TOC Entries: 65
-;     Compression: -1
-;     Dump Version: 1.12-0
-;     Format: CUSTOM
-;     Integer: 4 bytes
-;     Offset: 8 bytes
-;     Dumped from database version: 9.5.3
-;     Dumped by pg_dump version: 9.5.3
-;
-;
-; Selected TOC Entries:
-;
-;4168; 0 18518 TABLE DATA public account_items postgres
-4169; 0 18530 TABLE DATA public accounts postgres
-;4170; 0 18551 TABLE DATA public activities postgres
-;4235; 0 0 SEQUENCE SET public activities_num_seq postgres
-;4172; 0 18564 TABLE DATA public activity_enrolls postgres
-;4173; 0 18576 TABLE DATA public balance_changes postgres
-
-</code></pre></li>
-<li><p>恢复命令：</p>
-
-<pre><code>pg_restore -U postgres -h hostname -p port -vaxd database_name -L table.lst test1
-</code></pre></li>
-</ol></li>
-</ol></li>
-<li><p>指定恢复表的方式</p>
-
-<ol>
-<li><p>恢复命令</p>
-
-<pre><code>pg_restore -U postgres  -v -c -d meidb -t account test1.bkp
-</code></pre>
-
-<p><strong>多个文件恢复</strong></p>
-
-<pre><code>pg_restore -U postgres  -v -c -d meidb -t account -t account_items  test.bkp
-</code></pre></li>
-</ol></li>
-</ol></li>
-</ol>
 
                         
                       </div>
@@ -258,10 +157,10 @@ root@Hostname:/backup/ &gt;&gt; /share/scp.log 2&gt;&amp;1
                 <div class="read-more clearfix">
                   <div class="more-left left">
                   
-                    <span class="date">2016/8/29 10:15 AM</span>
+                    <span class="date">2016/8/28 20:11 PM</span>
                     <span>posted in&nbsp;</span> 
           				  
-          					    <span class="posted-in"><a href='%E6%95%B0%E6%8D%AE%E5%BA%93.html'>数据库</a></span>
+          					    <span class="posted-in"><a href='%E8%82%A1%E7%A5%A8%E5%9F%BA%E7%A1%80.html'>股票基础</a></span>
           				   
                   </div>
                   <div class="more-right right">
@@ -353,12 +252,6 @@ root@Hostname:/backup/ &gt;&gt; /share/scp.log 2&gt;&amp;1
 	      
 		      
 			      <li class="post">
-			        <a href="14728131436032.html">Ngin Gzip 参数</a>
-			      </li>
-		     
-		  
-		      
-			      <li class="post">
 			        <a href="14727913418128.html">Golang 并发问题：</a>
 			      </li>
 		     
@@ -382,6 +275,10 @@ root@Hostname:/backup/ &gt;&gt; /share/scp.log 2&gt;&amp;1
 		     
 		  
 		      
+			      <li class="post">
+			        <a href="14726120122280.html">容器脚本</a>
+			      </li>
+		     
 		  
 		      
 		  

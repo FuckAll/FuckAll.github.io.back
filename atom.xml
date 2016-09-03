@@ -4,25 +4,13 @@
   <title><![CDATA[重剑无锋，大巧不工。]]></title>
   <link href="http://blog.izgnod.com/atom.xml" rel="self"/>
   <link href="http://blog.izgnod.com/"/>
-  <updated>2016-09-02T14:34:10+08:00</updated>
+  <updated>2016-09-03T10:08:54+08:00</updated>
   <id>http://blog.izgnod.com/</id>
   <author>
     <name><![CDATA[]]></name>
     
   </author>
   <generator uri="http://www.mweb.im/">MWeb</generator>
-  
-  <entry>
-    <title type="html"><![CDATA[Ngin Gzip 参数]]></title>
-    <link href="http://blog.izgnod.com/14728131436032.html"/>
-    <updated>2016-09-02T18:45:43+08:00</updated>
-    <id>http://blog.izgnod.com/14728131436032.html</id>
-    <content type="html"><![CDATA[
-<p><strong>一般情</strong><br/>
-    2. gz</p>
-
-]]></content>
-  </entry>
   
   <entry>
     <title type="html"><![CDATA[Golang 并发问题：]]></title>

@@ -109,52 +109,62 @@
 		<div class="markdown-body home-categories">
 		
 			<div class="article">
-                <a class="clearlink" href="14727911561394.html">
+                <a class="clearlink" href="14727906220786.html">
                 
-                  <h1>Golang 反射问题</h1>
+                  <h1>Golang指针问题</h1>
                   <div class="a-content">
                       
                       <div class="a-content-text">
                         
                         	<ol>
-<li><p>指针的反射</p>
+<li><p>Golang指针<br><br/>
+<strong>除了正常的指针之外，还有以下两种指针，一种是unsafe.Pointer指针，把任何的指针看成一个正常的指针，uintptr是将任何的一个指针都看成一个整数。</strong></p>
 
-<pre><code>func test6() {
-        type User struct {
-            Username string
-        }
-        type Admin struct {
-            User
-            title string
-        }
-        u := new(Admin)
-        t := reflect.TypeOf(u)
-        if t.Kind() == reflect.Ptr {
-            t = t.Elem()
-        }
-}
-</code></pre></li>
-<li><p>结构体的反射</p>
+<ol>
+<li><p>unsafe.Pointer指针</p>
 
-<pre><code>// 反射结构体内容
-func test5() {
-        type User struct {
-                Username string
+<pre><code>// unsafe.Pointer 指针
+    func test4() {
+        type data struct {
+            x [1024 * 100]byte
         }
-        type Admin struct {
-                User
-                title string
-       }
-       func() {
-                var u Admin
-                t := reflect.TypeOf(u)
-                for i, n := 0, t.NumField(); i &lt; n; i++ {
-                    f := t.Field(i)
-                    fmt.Println(f.Name, f.Type)
-                }
-       }()
-  }
+
+        tmp := func() unsafe.Pointer {
+             p := &amp;data{}
+             return unsafe.Pointer(p)
+        }
+
+        const N = 10000
+        cache := new([N]unsafe.Pointer)
+        for i := 0; i &lt; N; i++ {
+             cache[i] = tmp()
+             time.Sleep(time.Millisecond)
+        }
+ }
 </code></pre></li>
+<li><p>uintptr指针(将指针看成一个整数)</p>
+
+<pre><code>// uintptr 指针
+func test3() {
+    type data struct {
+                x [1024 * 100]byte
+    }
+
+    tmp := func() uintptr {
+            p := &amp;data{}
+            return uintptr(unsafe.Pointer(p))
+    }
+
+    const N = 10000
+    cache := new([N]uintptr)
+    fmt.Println(reflect.TypeOf(cache))
+    for i := 0; i &lt; N; i++ {
+                cache[i] = tmp()
+                time.Sleep(time.Millisecond)
+        }
+} 
+</code></pre></li>
+</ol></li>
 </ol>
 
                         
@@ -164,7 +174,7 @@ func test5() {
                 <div class="read-more clearfix">
                   <div class="more-left left">
                   
-                    <span class="date">2016/9/2 12:39 PM</span>
+                    <span class="date">2016/9/2 12:30 PM</span>
                     <span>posted in&nbsp;</span> 
           				  
           					    <span class="posted-in"><a href='Golang.html'>Golang</a></span>
@@ -259,12 +269,6 @@ func test5() {
 	      
 		      
 			      <li class="post">
-			        <a href="14728131436032.html">Ngin Gzip 参数</a>
-			      </li>
-		     
-		  
-		      
-			      <li class="post">
 			        <a href="14727913418128.html">Golang 并发问题：</a>
 			      </li>
 		     
@@ -288,6 +292,10 @@ func test5() {
 		     
 		  
 		      
+			      <li class="post">
+			        <a href="14726120122280.html">容器脚本</a>
+			      </li>
+		     
 		  
 		      
 		  
