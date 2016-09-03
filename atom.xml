@@ -4,13 +4,25 @@
   <title><![CDATA[重剑无锋，大巧不工。]]></title>
   <link href="http://blog.izgnod.com/atom.xml" rel="self"/>
   <link href="http://blog.izgnod.com/"/>
-  <updated>2016-09-02T09:15:38+08:00</updated>
+  <updated>2016-09-02T14:34:10+08:00</updated>
   <id>http://blog.izgnod.com/</id>
   <author>
     <name><![CDATA[]]></name>
     
   </author>
   <generator uri="http://www.mweb.im/">MWeb</generator>
+  
+  <entry>
+    <title type="html"><![CDATA[Ngin Gzip 参数]]></title>
+    <link href="http://blog.izgnod.com/14728131436032.html"/>
+    <updated>2016-09-02T18:45:43+08:00</updated>
+    <id>http://blog.izgnod.com/14728131436032.html</id>
+    <content type="html"><![CDATA[
+<p><strong>一般情</strong><br/>
+    2. gz</p>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Golang 并发问题：]]></title>
@@ -101,14 +113,14 @@ fatal error: all goroutines are asleep - deadlock!
 <li><p>死锁的几种情况</p>
 
 <ol>
-<li>在单独的gorunitine中操作无缓冲的信道，一定发生死锁。
-<code>
-func main() {
+<li><p>在单独的gorunitine中操作无缓冲的信道，一定发生死锁。</p>
+
+<pre><code>func main() {
     ch := make(chan int)
      ch &lt;- 1 // 1流入信道，堵塞当前线, 没人取走数据信道不会打开
     fmt.Println(&quot;This line code wont run&quot;) //在此行执行之前Go就会报死锁
 }
-</code></li>
+</code></pre></li>
 <li><p>多个无缓冲的信道相互依赖，可能会发生死锁。</p>
 
 <pre><code>func test7() {

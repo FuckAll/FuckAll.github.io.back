@@ -199,14 +199,14 @@ fatal error: all goroutines are asleep - deadlock!
 <li><p>死锁的几种情况</p>
 
 <ol>
-<li>在单独的gorunitine中操作无缓冲的信道，一定发生死锁。
-<code>
-func main() {
+<li><p>在单独的gorunitine中操作无缓冲的信道，一定发生死锁。</p>
+
+<pre><code>func main() {
     ch := make(chan int)
      ch &lt;- 1 // 1流入信道，堵塞当前线, 没人取走数据信道不会打开
     fmt.Println(&quot;This line code wont run&quot;) //在此行执行之前Go就会报死锁
 }
-</code></li>
+</code></pre></li>
 <li><p>多个无缓冲的信道相互依赖，可能会发生死锁。</p>
 
 <pre><code>func test7() {
@@ -389,6 +389,12 @@ go func() {
 	      
 		      
 			      <li class="post">
+			        <a href="14728131436032.html">Ngin Gzip 参数</a>
+			      </li>
+		     
+		  
+		      
+			      <li class="post">
 			        <a href="14727913418128.html">Golang 并发问题：</a>
 			      </li>
 		     
@@ -412,10 +418,6 @@ go func() {
 		     
 		  
 		      
-			      <li class="post">
-			        <a href="14726120122280.html">容器脚本</a>
-			      </li>
-		     
 		  
 		      
 		  
