@@ -87,6 +87,8 @@
             <li><a href="%E8%82%A1%E7%A5%A8%E5%9F%BA%E7%A1%80.html">股票基础</a></li>
         
             <li><a href="%E4%B8%AA%E4%BA%BA%E6%94%B6%E9%9B%86.html">个人收集</a></li>
+        
+            <li><a href="%E7%AE%97%E6%B3%95.html">算法</a></li>
          
 
       </ul>
@@ -109,72 +111,53 @@
 		<div class="markdown-body home-categories">
 		
 			<div class="article">
-                <a class="clearlink" href="14726120122280.html">
+                <a class="clearlink" href="14727911561394.html">
                 
-                  <h1>容器脚本</h1>
+                  <h1>Golang 反射问题</h1>
                   <div class="a-content">
                       
                       <div class="a-content-text">
                         
-                        	<h3 id="toc_0">容器清理脚本</h3>
+                        	<ol>
+<li><p>指针的反射</p>
 
-<pre><code>#!/bin/sh
+<pre><code>func test6() {
+        type User struct {
+            Username string
+        }
+        type Admin struct {
+            User
+            title string
+        }
+        u := new(Admin)
+        t := reflect.TypeOf(u)
+        if t.Kind() == reflect.Ptr {
+            t = t.Elem()
+        }
+}
+</code></pre></li>
+<li><p>结构体的反射</p>
 
-&gt;/tmp/run_image_ids.$$
-
-DOCKER_BIN=/usr/bin/docker
-LOG=/var/log/docker-cleanup.log
-
-rm /tmp/run_image_ids.$$
-
-echo &quot;$(date) start-----&quot; &gt;&gt;$LOG
-
-$DOCKER_BIN ps --no-trunc -a -q | while read cid
-do
-  running=$($DOCKER_BIN inspect -f &#39;{{.State.Running}}&#39; $cid )
-  if [ &quot;$running&quot;x = &quot;true&quot;x ]
-  then
-    id=$($DOCKER_BIN inspect -f &#39;{{.Image}}&#39; $cid )
-    echo $id &gt;&gt;/tmp/run_image_ids.$$
-    continue
-  fi 
-  fini=$($DOCKER_BIN inspect -f &#39;{{.State.FinishedAt}}&#39; $cid | awk -F. &#39;{print $1}&#39;)
-  diff=$(expr $(date +&quot;%s&quot;) - $(date --date=&quot;$fini&quot; +&quot;%s&quot;))    
-  #for MacOs 
-  #diff=$(expr $(date +&quot;%s&quot;) - $(date -j -f %Y-%m-%dT%H:%M:%S &quot;$fini&quot; +&quot;%s&quot;))
-  if [ $diff -gt 86400 ]
-  then
-     $DOCKER_BIN rm -v $cid &gt;&gt;$LOG 2&gt;&amp;1
-  fi 
-done
-
-
-$DOCKER_BIN images --no-trunc | grep -v REPOSITORY | while read line
-do
-  repo_tag=$(echo $line | awk &#39;{print $1&quot;:&quot;$2}&#39;)
-  image_id=$(echo $line | awk &#39;{print $3}&#39;)
-  grep -q $image_id /tmp/run_image_ids.$$
-  if [ $? -eq 0 ]
-  then
-    continue
-  fi
-  if [ &quot;$repo_tag&quot;x = &quot;&lt;none&gt;:&lt;none&gt;&quot;x ]
-  then
-    $DOCKER_BIN rmi $image_id &gt;&gt;$LOG 2&gt;&amp;1
-  else
-    $DOCKER_BIN rmi $repo_tag &gt;&gt;$LOG 2&gt;&amp;1
-  fi
-done
-
-rm /tmp/run_image_ids.$$
-
-
-echo &quot;$(date) end-----&quot; &gt;&gt;$LOG
-</code></pre>
-
-<p><strong>清理内容</strong><br/>
-    1. 停止超过一天的容器<br/>
-    2. 一天之内没有运行过容器的镜像</p>
+<pre><code>// 反射结构体内容
+func test5() {
+        type User struct {
+                Username string
+        }
+        type Admin struct {
+                User
+                title string
+       }
+       func() {
+                var u Admin
+                t := reflect.TypeOf(u)
+                for i, n := 0, t.NumField(); i &lt; n; i++ {
+                    f := t.Field(i)
+                    fmt.Println(f.Name, f.Type)
+                }
+       }()
+  }
+</code></pre></li>
+</ol>
 
                         
                       </div>
@@ -183,10 +166,10 @@ echo &quot;$(date) end-----&quot; &gt;&gt;$LOG
                 <div class="read-more clearfix">
                   <div class="more-left left">
                   
-                    <span class="date">2016/8/31 10:53 AM</span>
+                    <span class="date">2016/9/2 12:39 PM</span>
                     <span>posted in&nbsp;</span> 
           				  
-          					    <span class="posted-in"><a href='%E5%AE%B9%E5%99%A8%E7%9B%B8%E5%85%B3.html'>容器相关</a></span>
+          					    <span class="posted-in"><a href='Golang.html'>Golang</a></span>
           				   
                   </div>
                   <div class="more-right right">
@@ -262,6 +245,8 @@ echo &quot;$(date) end-----&quot; &gt;&gt;$LOG
             <a href="%E8%82%A1%E7%A5%A8%E5%9F%BA%E7%A1%80.html"><strong>股票基础</strong></a>
         
             <a href="%E4%B8%AA%E4%BA%BA%E6%94%B6%E9%9B%86.html"><strong>个人收集</strong></a>
+        
+            <a href="%E7%AE%97%E6%B3%95.html"><strong>算法</strong></a>
          
         </p>
 
@@ -278,6 +263,24 @@ echo &quot;$(date) end-----&quot; &gt;&gt;$LOG
 	      
 		      
 			      <li class="post">
+			        <a href="14730511199413.html">Golang Sort排序</a>
+			      </li>
+		     
+		  
+		      
+			      <li class="post">
+			        <a href="14729947807865.html">Golang Label</a>
+			      </li>
+		     
+		  
+		      
+			      <li class="post">
+			        <a href="14728851727641.html">字符串匹配算法</a>
+			      </li>
+		     
+		  
+		      
+			      <li class="post">
 			        <a href="14727913418128.html">Golang 并发问题：</a>
 			      </li>
 		     
@@ -289,22 +292,10 @@ echo &quot;$(date) end-----&quot; &gt;&gt;$LOG
 		     
 		  
 		      
-			      <li class="post">
-			        <a href="14727906220786.html">Golang指针问题</a>
-			      </li>
-		     
 		  
 		      
-			      <li class="post">
-			        <a href="14727777201831.html">技术类博客收集</a>
-			      </li>
-		     
 		  
 		      
-			      <li class="post">
-			        <a href="14726120122280.html">容器脚本</a>
-			      </li>
-		     
 		  
 		      
 		  

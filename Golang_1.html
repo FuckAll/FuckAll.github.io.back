@@ -87,6 +87,8 @@
             <li><a href="%E8%82%A1%E7%A5%A8%E5%9F%BA%E7%A1%80.html">股票基础</a></li>
         
             <li><a href="%E4%B8%AA%E4%BA%BA%E6%94%B6%E9%9B%86.html">个人收集</a></li>
+        
+            <li><a href="%E7%AE%97%E6%B3%95.html">算法</a></li>
          
 
       </ul>
@@ -109,52 +111,114 @@
 		<div class="markdown-body home-categories">
 		
 			<div class="article">
-                <a class="clearlink" href="14727911561394.html">
+                <a class="clearlink" href="14729947807865.html">
                 
-                  <h1>Golang 反射问题</h1>
+                  <h1>Golang Label</h1>
                   <div class="a-content">
                       
                       <div class="a-content-text">
                         
                         	<ol>
-<li><p>指针的反射</p>
+<li><p>Label 使用</p>
 
-<pre><code>func test6() {
-        type User struct {
-            Username string
-        }
-        type Admin struct {
-            User
-            title string
-        }
-        u := new(Admin)
-        t := reflect.TypeOf(u)
-        if t.Kind() == reflect.Ptr {
-            t = t.Elem()
-        }
+<ol>
+<li>Label 只能与 goto break continue 共同使用</li>
+<li><p>使用限制：</p>
+
+<ol>
+<li><table>
+<thead>
+<tr>
+<th>关键字</th>
+<th>使用范围</th>
+<th>效果</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>goto</td>
+<td>没有任何使用限制</td>
+<td>跳转到任何地方</td>
+</tr>
+<tr>
+<td>break </td>
+<td>label只能在循环(for switch)紧挨的上方</td>
+<td>终止循环，不再进入循环</td>
+</tr>
+<tr>
+<td>continue</td>
+<td>label只能在循环(for switch)紧挨的上方</td>
+<td>暂停本轮循环</td>
+</tr>
+</tbody>
+</table></li>
+</ol></li>
+<li><p>例如：</p>
+
+<pre><code>func main() {
+a := 1
+LABEL1:
+
+println(&quot;LABEL1&quot;)
+println(&quot;inc a=&quot;, a)
+a += 1
+
+LABEL2:
+ println(&quot;LABEL1&quot;) // 会报错的
+
+for a &lt; 6 {
+println(a)
+if a == 3 {
+a += 1
+continue LABEL2
+}
+if a == 5 {
+break
+}
+goto LABEL1
+}
+
 }
 </code></pre></li>
-<li><p>结构体的反射</p>
+<li><p>经典用法:<br/>
+平常的循环嵌套：</p>
 
-<pre><code>// 反射结构体内容
-func test5() {
-        type User struct {
-                Username string
-        }
-        type Admin struct {
-                User
-                title string
-       }
-       func() {
-                var u Admin
-                t := reflect.TypeOf(u)
-                for i, n := 0, t.NumField(); i &lt; n; i++ {
-                    f := t.Field(i)
-                    fmt.Println(f.Name, f.Type)
-                }
-       }()
-  }
-</code></pre></li>
+<pre><code>for _, item := range list.Items {
+found := false
+
+for _, reserved := range reserved.Items {
+if reserved.ID == item.ID {
+found = true
+break
+}
+... do some other work ...
+}
+
+if found {
+continue
+}
+
+... do some other work ...
+}
+</code></pre>
+
+<p>使用label的嵌套:</p>
+
+<pre><code>OUTER:
+for _, item := range list.Items {
+for _, reserved := range reserved.Items {
+if reserved.ID == item.ID {
+    continue OUTER
+}
+... do some other work ...
+}
+... do some other work ...
+}
+</code></pre>
+
+<p><strong>Label放在for循环之前是表明跳出到哪一层的循环，不会影响到for循环，并不是每次跳跃之后都要重新执行for循环</strong></p></li>
+</ol></li>
 </ol>
 
                         
@@ -164,7 +228,7 @@ func test5() {
                 <div class="read-more clearfix">
                   <div class="more-left left">
                   
-                    <span class="date">2016/9/2 12:39 PM</span>
+                    <span class="date">2016/9/4 21:13 PM</span>
                     <span>posted in&nbsp;</span> 
           				  
           					    <span class="posted-in"><a href='Golang.html'>Golang</a></span>
@@ -243,6 +307,8 @@ func test5() {
             <a href="%E8%82%A1%E7%A5%A8%E5%9F%BA%E7%A1%80.html"><strong>股票基础</strong></a>
         
             <a href="%E4%B8%AA%E4%BA%BA%E6%94%B6%E9%9B%86.html"><strong>个人收集</strong></a>
+        
+            <a href="%E7%AE%97%E6%B3%95.html"><strong>算法</strong></a>
          
         </p>
 
@@ -259,6 +325,24 @@ func test5() {
 	      
 		      
 			      <li class="post">
+			        <a href="14730511199413.html">Golang Sort排序</a>
+			      </li>
+		     
+		  
+		      
+			      <li class="post">
+			        <a href="14729947807865.html">Golang Label</a>
+			      </li>
+		     
+		  
+		      
+			      <li class="post">
+			        <a href="14728851727641.html">字符串匹配算法</a>
+			      </li>
+		     
+		  
+		      
+			      <li class="post">
 			        <a href="14727913418128.html">Golang 并发问题：</a>
 			      </li>
 		     
@@ -270,22 +354,10 @@ func test5() {
 		     
 		  
 		      
-			      <li class="post">
-			        <a href="14727906220786.html">Golang指针问题</a>
-			      </li>
-		     
 		  
 		      
-			      <li class="post">
-			        <a href="14727777201831.html">技术类博客收集</a>
-			      </li>
-		     
 		  
 		      
-			      <li class="post">
-			        <a href="14726120122280.html">容器脚本</a>
-			      </li>
-		     
 		  
 		      
 		  

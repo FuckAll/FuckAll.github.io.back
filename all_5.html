@@ -87,6 +87,8 @@
             <li><a href="%E8%82%A1%E7%A5%A8%E5%9F%BA%E7%A1%80.html">股票基础</a></li>
         
             <li><a href="%E4%B8%AA%E4%BA%BA%E6%94%B6%E9%9B%86.html">个人收集</a></li>
+        
+            <li><a href="%E7%AE%97%E6%B3%95.html">算法</a></li>
          
 
       </ul>
@@ -109,281 +111,63 @@
 		<div class="markdown-body home-categories">
 		
 			<div class="article">
-                <a class="clearlink" href="14726074871676.html">
+                <a class="clearlink" href="14727906220786.html">
                 
-                  <h1>Golang 基础类型</h1>
+                  <h1>Golang指针问题</h1>
                   <div class="a-content">
                       
                       <div class="a-content-text">
                         
-                        	<h2 id="toc_0">变量声明</h2>
+                        	<ol>
+<li><p>Golang指针<br><br/>
+<strong>除了正常的指针之外，还有以下两种指针，一种是unsafe.Pointer指针，把任何的指针看成一个正常的指针，uintptr是将任何的一个指针都看成一个整数。</strong></p>
 
 <ol>
-<li><p>不同基础类型的零值</p>
+<li><p>unsafe.Pointer指针</p>
 
-<table>
-<thead>
-<tr>
-<th>类型</th>
-<th>零值</th>
-</tr>
-</thead>
+<pre><code>// unsafe.Pointer 指针
+    func test4() {
+        type data struct {
+            x [1024 * 100]byte
+        }
 
-<tbody>
-<tr>
-<td>int</td>
-<td>0</td>
-</tr>
-<tr>
-<td>float</td>
-<td>0</td>
-</tr>
-<tr>
-<td>bool</td>
-<td>false</td>
-</tr>
-<tr>
-<td>string</td>
-<td>&quot;&quot;</td>
-</tr>
-<tr>
-<td>struct</td>
-<td>nil</td>
-</tr>
-<tr>
-<td>array</td>
-<td>nil</td>
-</tr>
-<tr>
-<td>slice</td>
-<td>nil</td>
-</tr>
-<tr>
-<td>map</td>
-<td>nil</td>
-</tr>
-<tr>
-<td>channel</td>
-<td>nil</td>
-</tr>
-</tbody>
-</table></li>
-<li><p>var a int 和 a := 0 的哲学</p>
+        tmp := func() unsafe.Pointer {
+             p := &amp;data{}
+             return unsafe.Pointer(p)
+        }
 
-<ol>
-<li><p>var a int </p>
-
-<p>var a int 可以用来声明局部和全局变量,如果不初始化那么就是对应的零值     var a int = 1 可以进行初始化</p></li>
-<li><p>a := 0</p>
-
-<p>a := 0 可以用来声明局部变量，但是不能够声明全局变量<br/>
-a := 1 显示的进行初始化</p></li>
-<li><p>在局部的变量中 var 等价 : ; var 可以使用零值， : 是必须显示指明初始化值</p></li>
-<li><p>我的使用习惯</p>
-
-<ol>
-<li>全局变量使用 var a int = 0 显示指明初始值</li>
-<li>局部变量使用 a := 0 显示指明初始值</li>
-</ol></li>
-</ol>
-
-<p><strong>注意：</strong><br/>
-    var a int 也可以用做 var a = 0,效果是一样的，但是这里尽量的使用显示的指定类型和初始值</p></li>
-</ol>
-
-<h2 id="toc_1">字符串拼加性能问题</h2>
-
-<ol>
-<li>字符串拼加的三种方式：
-
-<ol>
-<li>+=</li>
-<li>strings.Join()</li>
-<li>bytes.Buffer</li>
-</ol></li>
-<li><p>比较：</p>
-
-<pre><code>package main
-import (
-    &quot;fmt&quot;
-
-    &quot;strings&quot;
-    &quot;time&quot;
-    &quot;bytes&quot;
-)
-
-func main() {
-    var buffer bytes.Buffer
-
-    s := time.Now()
-    for i :=0; i &lt;100000; i++ {
-        buffer.WriteString(&quot;test is here\n&quot;)
-    }
-    buffer.String() // 拼接结果
-    e := time.Now()
-    fmt.Println(&quot;taked time is &quot;, e.Sub(s).Seconds())
-
-    s = time.Now()
-    str := &quot;&quot;
-    for i :=0; i &lt;100000; i++ {
-        str += &quot;test is here\n&quot;
-    }
-    e = time.Now()
-    fmt.Println(&quot;taked time is &quot;, e.Sub(s).Seconds())
-
-    s = time.Now()
-    var sl []string
-    for i :=0; i &lt;100000; i++ {
-        sl = append(sl, &quot;test is here\n&quot;)
-    }
-    strings.Join(sl, &quot;&quot;)
-    e = time.Now()
-    fmt.Println(&quot;taked time is&quot;, e.Sub(s).Seconds())
-}
-</code></pre>
-
-<p><strong>运行结果</strong></p>
-
-<pre><code>taked time is  0.0039795080000000005
-taked time is  13.403575973
-taked time is 0.017540489
+        const N = 10000
+        cache := new([N]unsafe.Pointer)
+        for i := 0; i &lt; N; i++ {
+             cache[i] = tmp()
+             time.Sleep(time.Millisecond)
+        }
+ }
 </code></pre></li>
-<li><p>[]byte 和 string </p>
+<li><p>uintptr指针(将指针看成一个整数)</p>
 
-<ol>
-<li><p>golang 中的[]byte和string可以方便的转换</p>
+<pre><code>// uintptr 指针
+func test3() {
+    type data struct {
+                x [1024 * 100]byte
+    }
 
-<ol>
-<li>[]byte -&gt; string
-string([]byte) -&gt; string </li>
-<li>string -&gt; []byte
-[]byte(string) -&gt; []byte</li>
-</ol>
+    tmp := func() uintptr {
+            p := &amp;data{}
+            return uintptr(unsafe.Pointer(p))
+    }
 
-<p><strong>golang中[]byte和string的方法基本上是一样的</strong></p></li>
-<li><p>byte和string性能问题之buffer</p>
-
-<ol>
-<li>golang 中 bytes包中有Buffer类型以及相关方法
-
-<ol>
-<li>直接声明： var buffer bytes.Buffer</li>
-<li>方法成成：</li>
-</ol></li>
-</ol></li>
-</ol></li>
-</ol>
-
-<h2 id="toc_2">数组问题</h2>
-
-<ol>
-<li><p>声明Golang数组有两种方式</p>
-
-<pre><code>var arr1 = new([5]int)
-var arr2 [5]int
-</code></pre>
-
-<ol>
-<li>Golang认为数组是一种值类型，但new的时候返回的是数组的指针。</li>
-<li>第一种返回的是一个指针，传递的时候是不进行内存拷贝的。</li>
-<li>第二种方式返回的是数组本身，传递的时候是进行内存拷贝的。</li>
-</ol>
-
-<pre><code>package main
-import (
-  &quot;fmt&quot;
-)
-func main() {
-        var arr1 = new([5]int)
-        var arr2 [5]int
-        fmt.Println(arr1)
-        fmt.Println(arr2)
-        test := arr1
-        test[0] = 123
-        fmt.Println(test)
-        fmt.Println(arr1)
-        test2 := arr2
-        test2[0] = 345
-        fmt.Println(test2)
-        fmt.Println(arr2)
-}
-   $输出结果：
-        &amp;[0 0 0 0 0]
-        [0 0 0 0 0]
-        &amp;[123 0 0 0 0]
-        &amp;[123 0 0 0 0]
-        [345 0 0 0 0]
-        [0 0 0 0 0]
+    const N = 10000
+    cache := new([N]uintptr)
+    fmt.Println(reflect.TypeOf(cache))
+    for i := 0; i &lt; N; i++ {
+                cache[i] = tmp()
+                time.Sleep(time.Millisecond)
+        }
+} 
 </code></pre></li>
-<li><p>切片问题<br/>
-    <strong>切片在进行传递的时候也是指针传递</strong></p>
-
-<pre><code>    package main
-
-    import (
-        &quot;fmt&quot;
-    )
-
-    func f(a []int) {
-        fmt.Println(a)
-        a[0] = 123
-    }
-    func fp(a *[3]int) {
-        fmt.Println(a)
-        a[0] = 456
-    }
-
-    func main() {
-        var ar [3]int
-        f(ar[1:2])
-        fp(&amp;ar)
-        fmt.Println(ar)
-    }
-      $输出结果：
-            &amp;[0 0 0 0 0]
-            [0 0 0 0 0]
-            &amp;[123 0 0 0 0]
-            &amp;[123 0 0 0 0]
-            [345 0 0 0 0]
-            [0 0 0 0 0]
-</code></pre></li>
+</ol></li>
 </ol>
-
-<p><strong>初始化数组的时候如果是不定长的数组初始化，那么这个数组也会是一个切片</strong></p>
-
-<pre><code>```
-    package main
-
-    import (
-        &quot;fmt&quot;
-    )
-
-    func test(a []int) {
-        a[1] = 4
-    }
-    func main() {
-        var arrlazy = []int{5, 6, 6, 7}
-        fmt.Println(arrlazy)
-        test(arrlazy)
-        fmt.Println(arrlazy)
-    }
-       $输出结果：
-           [5 6 6 7]
-           [5 4 6 7]
-```
-</code></pre>
-
-<p><strong>总结：除了数组本身，切片和new一个都是指针的形式，数组本身是值类型，其余两种情况得到的嗾使指针，如果想要在传递的时候不进行拷贝操作，那么两种方式，一种就是直接传指针，另外一种的直接传切片。</strong></p>
-
-<pre><code>    1. new() 和 make() 的关系：
-        1. new() 是为变量分配内存，然后就将分配好的地址的首地址返回，并且也是进行初始化
-        2. make() 这个是用来直接初始化，然后将变量直接返回。
-    2. 关于效率问题：
-        1. 字符串的拼凑应该直接使用bytes的buffer进行操作，会快一些。
-    3. 数组和切片问题：
-        1. 数组一旦定义好，就固定长度即len == cap
-        2. 数组想要扩容或者是缩容可以转换成切片进行使用,即先要make一个切片，然后将数组中的数据放入其中。
-</code></pre>
 
                         
                       </div>
@@ -392,7 +176,7 @@ func main() {
                 <div class="read-more clearfix">
                   <div class="more-left left">
                   
-                    <span class="date">2016/8/31 9:38 AM</span>
+                    <span class="date">2016/9/2 12:30 PM</span>
                     <span>posted in&nbsp;</span> 
           				  
           					    <span class="posted-in"><a href='Golang.html'>Golang</a></span>
@@ -471,6 +255,8 @@ func main() {
             <a href="%E8%82%A1%E7%A5%A8%E5%9F%BA%E7%A1%80.html"><strong>股票基础</strong></a>
         
             <a href="%E4%B8%AA%E4%BA%BA%E6%94%B6%E9%9B%86.html"><strong>个人收集</strong></a>
+        
+            <a href="%E7%AE%97%E6%B3%95.html"><strong>算法</strong></a>
          
         </p>
 
@@ -487,6 +273,24 @@ func main() {
 	      
 		      
 			      <li class="post">
+			        <a href="14730511199413.html">Golang Sort排序</a>
+			      </li>
+		     
+		  
+		      
+			      <li class="post">
+			        <a href="14729947807865.html">Golang Label</a>
+			      </li>
+		     
+		  
+		      
+			      <li class="post">
+			        <a href="14728851727641.html">字符串匹配算法</a>
+			      </li>
+		     
+		  
+		      
+			      <li class="post">
 			        <a href="14727913418128.html">Golang 并发问题：</a>
 			      </li>
 		     
@@ -498,22 +302,10 @@ func main() {
 		     
 		  
 		      
-			      <li class="post">
-			        <a href="14727906220786.html">Golang指针问题</a>
-			      </li>
-		     
 		  
 		      
-			      <li class="post">
-			        <a href="14727777201831.html">技术类博客收集</a>
-			      </li>
-		     
 		  
 		      
-			      <li class="post">
-			        <a href="14726120122280.html">容器脚本</a>
-			      </li>
-		     
 		  
 		      
 		  
