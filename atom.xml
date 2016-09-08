@@ -4,13 +4,14 @@
   <title><![CDATA[重剑无锋，大巧不工。]]></title>
   <link href="http://blog.izgnod.com/atom.xml" rel="self"/>
   <link href="http://blog.izgnod.com/"/>
-  <updated>2016-09-03T10:12:36+08:00</updated>
+  <updated>2016-09-05T14:33:25+08:00</updated>
   <id>http://blog.izgnod.com/</id>
   <author>
     <name><![CDATA[]]></name>
     
   </author>
-  <generator uri="http://www.mweb.im/">MWeb</generator>
+  <generator uri="http://www.coderforart.com/">CoderForArt</generator>
+
   
   <entry>
     <title type="html"><![CDATA[Golang Sort排序]]></title>
@@ -750,11 +751,11 @@ echo &quot;$(date) end-----&quot; &gt;&gt;$LOG
 <ol>
 <li><p>var a int </p>
 
-<p>var a int 可以用来声明局部和全局变量,如果不初始化那么就是对应的零值     var a int = 1 可以进行初始化</p></li>
+<p>var a int 可以用来声明局部和全局变量,如果不初始化那么就是对应的零值     var a int = 1 可以声明并且初始化</p></li>
 <li><p>a := 0</p>
 
-<p>a := 0 可以用来声明局部变量，但是不能够声明全局变量<br/>
-a := 1 显示的进行初始化</p></li>
+<p>a := 0 只能用来声明局部变量，不能够声明全局变量<br/>
+a := 1 声明局部变量并且初始化</p></li>
 <li><p>在局部的变量中 var 等价 : ; var 可以使用零值， : 是必须显示指明初始化值</p></li>
 <li><p>我的使用习惯</p>
 
@@ -893,9 +894,11 @@ func main() {
         [0 0 0 0 0]
 </code></pre></li>
 <li><p>切片问题<br/>
+推荐阅读：<a href="http://gold.xitu.io/entry/577bbccf0a2b58005730290d">深入理解 Go 语言的 slice 以及到底什么时候该用 slice</a><br/>
     <strong>切片在进行传递的时候也是指针传递</strong></p>
 
-<pre><code>    package main
+<pre><code>```
+    package main
 
     import (
         &quot;fmt&quot;
@@ -916,39 +919,37 @@ func main() {
         fp(&amp;ar)
         fmt.Println(ar)
     }
-      $输出结果：
-            &amp;[0 0 0 0 0]
-            [0 0 0 0 0]
-            &amp;[123 0 0 0 0]
-            &amp;[123 0 0 0 0]
-            [345 0 0 0 0]
-            [0 0 0 0 0]
+    $输出结果：
+        [0]
+        [0 123 0]
+        &amp;[0 123 0]
+        [456 123 0]
+```
+
+**初始化数组的时候如果是不定长的数组初始化，那么这个数组也会是一个切片**
+
+```
+package main
+
+import (
+&quot;fmt&quot;
+)
+
+func test(a []int) {
+a[1] = 4
+}
+func main() {
+var arrlazy = []int{5, 6, 6, 7}
+fmt.Println(arrlazy)
+test(arrlazy)
+fmt.Println(arrlazy)
+}
+$输出结果：
+[5 6 6 7]
+[5 4 6 7]
+```
 </code></pre></li>
 </ol>
-
-<p><strong>初始化数组的时候如果是不定长的数组初始化，那么这个数组也会是一个切片</strong></p>
-
-<pre><code>```
-    package main
-
-    import (
-        &quot;fmt&quot;
-    )
-
-    func test(a []int) {
-        a[1] = 4
-    }
-    func main() {
-        var arrlazy = []int{5, 6, 6, 7}
-        fmt.Println(arrlazy)
-        test(arrlazy)
-        fmt.Println(arrlazy)
-    }
-       $输出结果：
-           [5 6 6 7]
-           [5 4 6 7]
-```
-</code></pre>
 
 <p><strong>总结：除了数组本身，切片和new一个都是指针的形式，数组本身是值类型，其余两种情况得到的嗾使指针，如果想要在传递的时候不进行拷贝操作，那么两种方式，一种就是直接传指针，另外一种的直接传切片。</strong></p>
 
