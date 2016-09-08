@@ -4,7 +4,7 @@
   <title><![CDATA[重剑无锋，大巧不工。]]></title>
   <link href="http://blog.izgnod.com/atom.xml" rel="self"/>
   <link href="http://blog.izgnod.com/"/>
-  <updated>2016-09-08T10:30:26+08:00</updated>
+  <updated>2016-09-08T10:32:26+08:00</updated>
   <id>http://blog.izgnod.com/</id>
   <author>
     <name><![CDATA[]]></name>
@@ -126,7 +126,7 @@ fmt.Println(sort.SearchInts(s, 3)) //将会输出2
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Golang Label]]></title>
+    <title type="html"><![CDATA[Golang Label妙用]]></title>
     <link href="http://blog.izgnod.com/14729947807865.html"/>
     <updated>2016-09-04T21:13:00+08:00</updated>
     <id>http://blog.izgnod.com/14729947807865.html</id>
