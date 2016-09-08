@@ -4,7 +4,7 @@
   <title><![CDATA[重剑无锋，大巧不工。]]></title>
   <link href="http://blog.izgnod.com/atom.xml" rel="self"/>
   <link href="http://blog.izgnod.com/"/>
-  <updated>2016-09-08T10:32:26+08:00</updated>
+  <updated>2016-09-08T10:36:01+08:00</updated>
   <id>http://blog.izgnod.com/</id>
   <author>
     <name><![CDATA[]]></name>
@@ -266,7 +266,7 @@ if reserved.ID == item.ID {
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Golang 并发问题：]]></title>
+    <title type="html"><![CDATA[Golang 并发问题]]></title>
     <link href="http://blog.izgnod.com/14727913418128.html"/>
     <updated>2016-09-02T12:42:21+08:00</updated>
     <id>http://blog.izgnod.com/14727913418128.html</id>
@@ -496,7 +496,7 @@ func test5() {
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Golang指针问题]]></title>
+    <title type="html"><![CDATA[Golang 指针问题]]></title>
     <link href="http://blog.izgnod.com/14727906220786.html"/>
     <updated>2016-09-02T12:30:22+08:00</updated>
     <id>http://blog.izgnod.com/14727906220786.html</id>
