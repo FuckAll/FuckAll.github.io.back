@@ -113,6 +113,8 @@
         <li><label>个人收集</label></li>
 
           
+            <li><a title="读书" href="14734878748126.html">读书</a></li>
+          
             <li><a title="技术类博客收集" href="14727777201831.html">技术类博客收集</a></li>
           
 
@@ -197,6 +199,8 @@
 
                     
                       <li class="side-title"><span>个人收集</span></li>
+                        
+                          <li><a title="读书" href="14734878748126.html">读书</a></li>
                         
                           <li><a title="技术类博客收集" href="14727777201831.html">技术类博客收集</a></li>
                         
@@ -298,6 +302,39 @@ fatal error: all goroutines are asleep - deadlock!
 <p><strong>总结：也就是说，无缓存的信道，在存和取得时候都会临时挂起自己的goroutine,等到另外一端准备好之后才够恢复。<br/>
 无缓冲的信道永远不会存储数据，只是负责数据的流通，所以数据要流转起来。</strong></p></li>
 </ol></li>
+</ol></li>
+<li><p>channel 类型问题<br/>
+channel的几种类型：chan type , chan&lt;- type , &lt;-chan type</p>
+
+<ol>
+<li><p>chan type 这种类型是可读又可以写的</p>
+
+<pre><code>    package main
+    import &quot;fmt&quot;
+
+    func main() {
+    test := []int{1, 2, 3}
+    good := gen(test...)
+    fmt.Println(&lt;-good)
+    fmt.Println(&lt;-good)
+    fmt.Println(&lt;-good)
+    go func() {
+    good &lt;- 4 // 这个地方必须是routine才可以向good中写入，如果good 类型是&lt;-chan int 是可以写入的，如果是chan&lt;- int只可以写入
+    }()
+    fmt.Println(&lt;-good)
+    }
+
+    func gen(nums ...int) chan int { //&lt;-chan int 只能读，chan&lt;- int 只能写
+    out := make(chan int) // 没有缓存的chan，长度为1
+    go func() {
+    for _, n := range nums {
+    out &lt;- n
+    }
+    // close(out) // 关闭之后则不能写入
+    }()
+    return out
+    }
+</code></pre></li>
 </ol></li>
 <li><p>死锁: 线程或者进程在等待资源的时候，一直无法得到所需要的就会陷入一种状态，这种状态就叫做死锁。</p>
 

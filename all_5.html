@@ -113,6 +113,8 @@
         <li><label>个人收集</label></li>
 
           
+            <li><a title="读书" href="14734878748126.html">读书</a></li>
+          
             <li><a title="技术类博客收集" href="14727777201831.html">技术类博客收集</a></li>
           
 
@@ -198,6 +200,8 @@
                     
                       <li class="side-title"><span>个人收集</span></li>
                         
+                          <li><a title="读书" href="14734878748126.html">读书</a></li>
+                        
                           <li><a title="技术类博客收集" href="14727777201831.html">技术类博客收集</a></li>
                         
 
@@ -220,57 +224,47 @@
 
 	
 		<div class="markdown-body">
-		<h1>Golang 指针问题</h1>
+		<h1>Golang 反射问题</h1>
 
 		<ol>
-<li><p>Golang指针<br><br/>
-<strong>除了正常的指针之外，还有以下两种指针，一种是unsafe.Pointer指针，把任何的指针看成一个正常的指针，uintptr是将任何的一个指针都看成一个整数。</strong></p>
+<li><p>指针的反射</p>
 
-<ol>
-<li><p>unsafe.Pointer指针</p>
-
-<pre><code>// unsafe.Pointer 指针
-    func test4() {
-        type data struct {
-            x [1024 * 100]byte
+<pre><code>func test6() {
+        type User struct {
+            Username string
         }
-
-        tmp := func() unsafe.Pointer {
-             p := &amp;data{}
-             return unsafe.Pointer(p)
+        type Admin struct {
+            User
+            title string
         }
-
-        const N = 10000
-        cache := new([N]unsafe.Pointer)
-        for i := 0; i &lt; N; i++ {
-             cache[i] = tmp()
-             time.Sleep(time.Millisecond)
+        u := new(Admin)
+        t := reflect.TypeOf(u)
+        if t.Kind() == reflect.Ptr {
+            t = t.Elem()
         }
- }
+}
 </code></pre></li>
-<li><p>uintptr指针(将指针看成一个整数)</p>
+<li><p>结构体的反射</p>
 
-<pre><code>// uintptr 指针
-func test3() {
-    type data struct {
-                x [1024 * 100]byte
-    }
-
-    tmp := func() uintptr {
-            p := &amp;data{}
-            return uintptr(unsafe.Pointer(p))
-    }
-
-    const N = 10000
-    cache := new([N]uintptr)
-    fmt.Println(reflect.TypeOf(cache))
-    for i := 0; i &lt; N; i++ {
-                cache[i] = tmp()
-                time.Sleep(time.Millisecond)
+<pre><code>// 反射结构体内容
+func test5() {
+        type User struct {
+                Username string
         }
-} 
+        type Admin struct {
+                User
+                title string
+       }
+       func() {
+                var u Admin
+                t := reflect.TypeOf(u)
+                for i, n := 0, t.NumField(); i &lt; n; i++ {
+                    f := t.Field(i)
+                    fmt.Println(f.Name, f.Type)
+                }
+       }()
+  }
 </code></pre></li>
-</ol></li>
 </ol>
 
 
