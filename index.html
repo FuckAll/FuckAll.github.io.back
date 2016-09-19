@@ -47,6 +47,8 @@
         <li><label>Golang</label></li>
 
           
+            <li><a title="Golang 参数" href="14741728889918.html">Golang 参数</a></li>
+          
             <li><a title="Golang Sort排序" href="14730511199413.html">Golang Sort排序</a></li>
           
             <li><a title="Golang Label妙用" href="14729947807865.html">Golang Label妙用</a></li>
@@ -89,6 +91,8 @@
         <li><label>数据库</label></li>
 
           
+            <li><a title="Golang Postgresql" href="14742795357312.html">Golang Postgresql</a></li>
+          
             <li><a title="PostgreSql语句集锦" href="14724588246571.html">PostgreSql语句集锦</a></li>
           
             <li><a title="Postgresql 备份与恢复" href="14724369503027.html">Postgresql 备份与恢复</a></li>
@@ -127,6 +131,14 @@
           
 
       
+        <li class="divider"></li>
+        <li><label>测试</label></li>
+
+          
+            <li><a title="Curl Http 测试" href="14742597754498.html">Curl Http 测试</a></li>
+          
+
+      
       </ul>
     </aside>
 
@@ -143,6 +155,8 @@
 
                     
                       <li class="side-title"><span>Golang</span></li>
+                        
+                          <li><a title="Golang 参数" href="14741728889918.html">Golang 参数</a></li>
                         
                           <li><a title="Golang Sort排序" href="14730511199413.html">Golang Sort排序</a></li>
                         
@@ -180,6 +194,8 @@
                     
                       <li class="side-title"><span>数据库</span></li>
                         
+                          <li><a title="Golang Postgresql" href="14742795357312.html">Golang Postgresql</a></li>
+                        
                           <li><a title="PostgreSql语句集锦" href="14724588246571.html">PostgreSql语句集锦</a></li>
                         
                           <li><a title="Postgresql 备份与恢复" href="14724369503027.html">Postgresql 备份与恢复</a></li>
@@ -212,6 +228,12 @@
                         
 
                     
+                      <li class="side-title"><span>测试</span></li>
+                        
+                          <li><a title="Curl Http 测试" href="14742597754498.html">Curl Http 测试</a></li>
+                        
+
+                    
                   </ul>
                 </nav>
                 </div>
@@ -224,15 +246,264 @@
 
 	
 		<div class="markdown-body">
-		<h1>读书</h1>
+		<h1>Golang Postgresql</h1>
 
 		<ol>
-<li><a href="https://link.zhihu.com/?target=http%3A//www.quzhuanpan.com/source/search.action%3Fq%3Dkindle%2520%25E7%2594%25B5%25E5%25AD%2590%25E4%25B9%25A6%26currentPage%3D1">百度云资源搜索</a></li>
-<li><a href="https://www.jiumodiary.com/">Jiumo E-Book Search 鸠摩搜书</a></li>
-<li><a href="https://link.zhihu.com/?target=http%3A//readcolor.com">读远：发掘优质电子书资源，提供好书分享、下载与推送。支持mobi/epub/pdf/txt格式。</a></li>
-<li><a href="https://link.zhihu.com/?target=http%3A//gen.lib.rus.ec">Library genesis 英文科学著作</a></li>
-<li><a href="https://link.zhihu.com/?target=http%3A//www.gutenberg.org">Gutenberg 维基古腾堡计划</a></li>
+<li>测试用例：</li>
 </ol>
+
+<pre><code>
+    CREATE TABLE users (
+    id uuid primary key default gen_random_uuid(),
+    mobile text UNIQUE not null
+    );
+    INSERT INTO users (mobile) VALUES (&#39;86-1000000000&#39;)
+
+</code></pre>
+
+<ol>
+<li>全在代码里：</li>
+</ol>
+
+<pre><code>package main
+
+import (
+    &quot;database/sql&quot;
+    &quot;log&quot;
+
+    //&quot;fmt&quot;
+    &quot;fmt&quot;
+    _ &quot;github.com/lib/pq&quot;
+    &quot;time&quot;
+    &quot;github.com/lib/pq&quot;
+)
+
+func main() {
+
+    // 数据库连接
+    db, err := sql.Open(&quot;postgres&quot;, &quot;user=postgres dbname=meidb sslmode=disable&quot;)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    // 连接数
+    db.SetMaxOpenConns(10) // 最大连接数
+    db.SetMaxIdleConns(5)  // 最大空闲数
+
+    for i := 0; i &lt; 10; i++ {
+        go func() {
+            db.Ping()
+        }()
+    }
+    //time.Sleep(10 * time.Second)
+
+    // Exec 执行一次，没有具体值返回
+    a, err := HowToExec(db)
+    if err != nil {
+        log.Fatal(err)
+    }
+    fmt.Println(&quot;Exec Result:&quot;, a)
+
+    // Prepare
+    for i := 0; i &lt; 10; i++ {
+        go func() {
+            p, err := HowToPrepare(db)
+            if err != nil {
+                log.Fatal(err)
+            }
+            fmt.Println(&quot;Prepare Result:&quot;, p)
+        }()
+    }
+    time.Sleep(20 * time.Second)
+
+    // QueryRow
+    result, err := HowToQueryRow(db)
+    if err != nil {
+        log.Fatal(err)
+    }
+    fmt.Println(&quot;QueryRow Result:&quot;, result)
+
+    // Query
+    total, results := HowToQuery(db)
+    fmt.Println(&quot;Query Result:&quot;, total, results)
+
+
+    // Begin
+    HowToBegin(db)
+
+    // 关闭连接
+    defer db.Close()
+
+}
+
+func HowToExec(db *sql.DB) (int64, error) {
+    m := &quot;86-1000000000&quot;
+    q := &quot;UPDATE users SET mobile=$1 WHERE mobile=$1;&quot;
+    ret, err := db.Exec(q, m)
+    if err != nil {
+        return 0, err
+    }
+    r, err := ret.RowsAffected()
+    ret.LastInsertId()
+    if err != nil {
+        return 0, err
+    }
+    return r, nil
+}
+
+func HowToPrepare(db *sql.DB) ([]string, error) {
+    m := &quot;86-1000000000&quot;
+    q := &quot;SELECT id FROM users WHERE mobile=$1&quot;
+    sm, err := db.Prepare(q)
+    defer sm.Close()
+    if err != nil {
+        return []string{}, err
+    }
+    exec, err := sm.Exec(m)
+    if err != nil {
+        log.Println(err)
+        return []string{}, nil
+    }
+    ret, err := exec.RowsAffected()
+    if err != nil {
+        log.Println(err)
+        return []string{}, nil
+    }
+    fmt.Println(&quot;Prepare Exec Result:&quot;, ret)
+
+    var queryTemp string
+    query := sm.QueryRow(m)
+    err = query.Scan(&amp;queryTemp)
+    if err != nil {
+        log.Println(err)
+        return []string{}, nil
+    }
+    fmt.Println(&quot;Prepare QueryRow Result:&quot;, queryTemp)
+
+    sq, err := sm.Query(m)
+    defer sq.Close()
+    var re []string
+    for sq.Next() {
+        var tmp string
+        err := sq.Scan(&amp;tmp)
+        if err != nil {
+            log.Println(err)
+            return []string{}, nil
+        }
+        re = append(re, tmp)
+    }
+    fmt.Println(&quot;Prepare Query Result:&quot;, re)
+
+    return re, nil
+}
+
+func HowToQueryRow(db *sql.DB) (string, error) {
+    m := &quot;86-1000000000&quot;
+    var temp string
+    row := db.QueryRow(&quot;SELECT id FROM users WHERE mobile=$1&quot;, m)
+    err := row.Scan(&amp;temp)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            // 没有查询到结果的返回,可以进行日志输出
+            return temp, nil
+        }
+        // 出错，但是不是查询结果的问题
+        return temp, err
+    }
+    return temp, nil
+}
+
+func HowToQuery(db *sql.DB) (total int, result []string) {
+    q := &quot;SELECT id FROM users WHERE mobile=$1 ORDER BY id DESC OFFSET $2 LIMIT $3;&quot;
+    qa := &quot;SELECT count(*) FROM users WHERE mobile=$1;&quot;
+    m := &quot;86-1000000000&quot;
+    var temp string
+
+    // 查询总数
+    row := db.QueryRow(qa, m)
+    err := row.Scan(&amp;total)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            return 0, []string{}
+        }
+        log.Fatal(err)
+    }
+
+    // 结果查询
+    rows, err := db.Query(q, m, 0, 20)
+    defer rows.Close() // 将query关闭之后才能将连接放回连接池
+    if err != nil {
+        log.Fatal(err)
+    }
+    // 依次的准备好每一条查出的数据
+    for rows.Next() {
+        err := rows.Scan(&amp;temp)
+        if err != nil {
+            log.Fatal(err)
+
+        }
+        result = append(result, temp)
+    }
+    return total, result
+}
+
+func HowToBegin(db *sql.DB) {
+    m := &quot;86-1000000001&quot;
+    cm := &quot;86-1000000002&quot;
+    txn, err := db.Begin()
+    if err != nil {
+        log.Println(err)
+        return
+    }
+
+    stmt, err := txn.Prepare(pq.CopyIn(&quot;users&quot;, &quot;mobile&quot;))
+    defer stmt.Close()
+
+    if err != nil {
+        log.Println(err)
+        return
+    }
+    for i := 0; i &lt; 10; i++{
+        _ , err :=stmt.Exec(m)
+        if err != nil{
+            log.Println(err)
+            return
+        }
+    }
+
+    _, err = stmt.Exec()
+    if err != nil {
+        log.Println(err)
+        return
+    }
+    _, err = txn.Exec(&quot;UPDATE users SET mobile=$1&quot;,cm)
+    if err != nil {
+        log.Println(err)
+        return
+    }
+    var id string
+    var mob string
+    err = txn.QueryRow(&quot;SELECT id, mobile FROM users WHERE mobile=$1&quot;, cm).Scan(&amp;id, &amp;mob)
+    if err != nil {
+        log.Println(err)
+        return
+    }
+    fmt.Println(id, mob)
+
+    // 事物提交
+    err = txn.Commit()
+    if err!= nil {
+        log.Fatal()
+    }
+
+    //回滚
+    //err = txn.Rollback()
+    //if err!= nil {
+    //  log.Fatal()
+    //}
+
+}
+</code></pre>
 
 
 		</div>

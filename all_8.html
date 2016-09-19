@@ -47,6 +47,8 @@
         <li><label>Golang</label></li>
 
           
+            <li><a title="Golang 参数" href="14741728889918.html">Golang 参数</a></li>
+          
             <li><a title="Golang Sort排序" href="14730511199413.html">Golang Sort排序</a></li>
           
             <li><a title="Golang Label妙用" href="14729947807865.html">Golang Label妙用</a></li>
@@ -89,6 +91,8 @@
         <li><label>数据库</label></li>
 
           
+            <li><a title="Golang Postgresql" href="14742795357312.html">Golang Postgresql</a></li>
+          
             <li><a title="PostgreSql语句集锦" href="14724588246571.html">PostgreSql语句集锦</a></li>
           
             <li><a title="Postgresql 备份与恢复" href="14724369503027.html">Postgresql 备份与恢复</a></li>
@@ -127,6 +131,14 @@
           
 
       
+        <li class="divider"></li>
+        <li><label>测试</label></li>
+
+          
+            <li><a title="Curl Http 测试" href="14742597754498.html">Curl Http 测试</a></li>
+          
+
+      
       </ul>
     </aside>
 
@@ -143,6 +155,8 @@
 
                     
                       <li class="side-title"><span>Golang</span></li>
+                        
+                          <li><a title="Golang 参数" href="14741728889918.html">Golang 参数</a></li>
                         
                           <li><a title="Golang Sort排序" href="14730511199413.html">Golang Sort排序</a></li>
                         
@@ -180,6 +194,8 @@
                     
                       <li class="side-title"><span>数据库</span></li>
                         
+                          <li><a title="Golang Postgresql" href="14742795357312.html">Golang Postgresql</a></li>
+                        
                           <li><a title="PostgreSql语句集锦" href="14724588246571.html">PostgreSql语句集锦</a></li>
                         
                           <li><a title="Postgresql 备份与恢复" href="14724369503027.html">Postgresql 备份与恢复</a></li>
@@ -212,6 +228,12 @@
                         
 
                     
+                      <li class="side-title"><span>测试</span></li>
+                        
+                          <li><a title="Curl Http 测试" href="14742597754498.html">Curl Http 测试</a></li>
+                        
+
+                    
                   </ul>
                 </nav>
                 </div>
@@ -224,67 +246,48 @@
 
 	
 		<div class="markdown-body">
-		<h1>容器脚本</h1>
+		<h1>Golang 反射问题</h1>
 
-		<h3 id="toc_0">容器清理脚本</h3>
+		<ol>
+<li><p>指针的反射</p>
 
-<pre><code>#!/bin/sh
+<pre><code>func test6() {
+        type User struct {
+            Username string
+        }
+        type Admin struct {
+            User
+            title string
+        }
+        u := new(Admin)
+        t := reflect.TypeOf(u)
+        if t.Kind() == reflect.Ptr {
+            t = t.Elem()
+        }
+}
+</code></pre></li>
+<li><p>结构体的反射</p>
 
-&gt;/tmp/run_image_ids.$$
-
-DOCKER_BIN=/usr/bin/docker
-LOG=/var/log/docker-cleanup.log
-
-rm /tmp/run_image_ids.$$
-
-echo &quot;$(date) start-----&quot; &gt;&gt;$LOG
-
-$DOCKER_BIN ps --no-trunc -a -q | while read cid
-do
-  running=$($DOCKER_BIN inspect -f &#39;{{.State.Running}}&#39; $cid )
-  if [ &quot;$running&quot;x = &quot;true&quot;x ]
-  then
-    id=$($DOCKER_BIN inspect -f &#39;{{.Image}}&#39; $cid )
-    echo $id &gt;&gt;/tmp/run_image_ids.$$
-    continue
-  fi 
-  fini=$($DOCKER_BIN inspect -f &#39;{{.State.FinishedAt}}&#39; $cid | awk -F. &#39;{print $1}&#39;)
-  diff=$(expr $(date +&quot;%s&quot;) - $(date --date=&quot;$fini&quot; +&quot;%s&quot;))    
-  #for MacOs 
-  #diff=$(expr $(date +&quot;%s&quot;) - $(date -j -f %Y-%m-%dT%H:%M:%S &quot;$fini&quot; +&quot;%s&quot;))
-  if [ $diff -gt 86400 ]
-  then
-     $DOCKER_BIN rm -v $cid &gt;&gt;$LOG 2&gt;&amp;1
-  fi 
-done
-
-
-$DOCKER_BIN images --no-trunc | grep -v REPOSITORY | while read line
-do
-  repo_tag=$(echo $line | awk &#39;{print $1&quot;:&quot;$2}&#39;)
-  image_id=$(echo $line | awk &#39;{print $3}&#39;)
-  grep -q $image_id /tmp/run_image_ids.$$
-  if [ $? -eq 0 ]
-  then
-    continue
-  fi
-  if [ &quot;$repo_tag&quot;x = &quot;&lt;none&gt;:&lt;none&gt;&quot;x ]
-  then
-    $DOCKER_BIN rmi $image_id &gt;&gt;$LOG 2&gt;&amp;1
-  else
-    $DOCKER_BIN rmi $repo_tag &gt;&gt;$LOG 2&gt;&amp;1
-  fi
-done
-
-rm /tmp/run_image_ids.$$
-
-
-echo &quot;$(date) end-----&quot; &gt;&gt;$LOG
-</code></pre>
-
-<p><strong>清理内容</strong><br/>
-    1. 停止超过一天的容器<br/>
-    2. 一天之内没有运行过容器的镜像</p>
+<pre><code>// 反射结构体内容
+func test5() {
+        type User struct {
+                Username string
+        }
+        type Admin struct {
+                User
+                title string
+       }
+       func() {
+                var u Admin
+                t := reflect.TypeOf(u)
+                for i, n := 0, t.NumField(); i &lt; n; i++ {
+                    f := t.Field(i)
+                    fmt.Println(f.Name, f.Type)
+                }
+       }()
+  }
+</code></pre></li>
+</ol>
 
 
 		</div>

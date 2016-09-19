@@ -47,6 +47,8 @@
         <li><label>Golang</label></li>
 
           
+            <li><a title="Golang 参数" href="14741728889918.html">Golang 参数</a></li>
+          
             <li><a title="Golang Sort排序" href="14730511199413.html">Golang Sort排序</a></li>
           
             <li><a title="Golang Label妙用" href="14729947807865.html">Golang Label妙用</a></li>
@@ -89,6 +91,8 @@
         <li><label>数据库</label></li>
 
           
+            <li><a title="Golang Postgresql" href="14742795357312.html">Golang Postgresql</a></li>
+          
             <li><a title="PostgreSql语句集锦" href="14724588246571.html">PostgreSql语句集锦</a></li>
           
             <li><a title="Postgresql 备份与恢复" href="14724369503027.html">Postgresql 备份与恢复</a></li>
@@ -127,6 +131,14 @@
           
 
       
+        <li class="divider"></li>
+        <li><label>测试</label></li>
+
+          
+            <li><a title="Curl Http 测试" href="14742597754498.html">Curl Http 测试</a></li>
+          
+
+      
       </ul>
     </aside>
 
@@ -143,6 +155,8 @@
 
                     
                       <li class="side-title"><span>Golang</span></li>
+                        
+                          <li><a title="Golang 参数" href="14741728889918.html">Golang 参数</a></li>
                         
                           <li><a title="Golang Sort排序" href="14730511199413.html">Golang Sort排序</a></li>
                         
@@ -180,6 +194,8 @@
                     
                       <li class="side-title"><span>数据库</span></li>
                         
+                          <li><a title="Golang Postgresql" href="14742795357312.html">Golang Postgresql</a></li>
+                        
                           <li><a title="PostgreSql语句集锦" href="14724588246571.html">PostgreSql语句集锦</a></li>
                         
                           <li><a title="Postgresql 备份与恢复" href="14724369503027.html">Postgresql 备份与恢复</a></li>
@@ -212,6 +228,12 @@
                         
 
                     
+                      <li class="side-title"><span>测试</span></li>
+                        
+                          <li><a title="Curl Http 测试" href="14742597754498.html">Curl Http 测试</a></li>
+                        
+
+                    
                   </ul>
                 </nav>
                 </div>
@@ -224,88 +246,35 @@
 
 	
 		<div class="markdown-body">
-		<h1>Nginx HTTP2.0</h1>
+		<h1>股票线图</h1>
 
-		<p>Nginx 从1.9.5已经能够支持HTTP2.0，但是对Openssl版本有要求，下面是过程：</p>
+		<ol>
+<li><p>k线</p>
 
-<h2 id="toc_0">环境准备：</h2>
+<ol>
+<li><p>锤子线和上吊线：</p>
 
-<pre><code>$yum install gcc gcc-c++ autoconf automake zlib zlib-devel pcre-devel
-</code></pre>
+<ol>
+<li><p>定义： 锤子线和上吊线是相对于增长和下跌来说的，如果后市是上涨那么久叫锤子线，如果是下跌，那么就叫上吊线。如图：<br/>
+<img src="media/14723721762973/14723767546699.jpg" alt=""/></p></li>
+<li><p>使用前提： </p>
 
-<h2 id="toc_1">编译Nginx版本：</h2>
+<ol>
+<li>长时间的下跌，出现锤子线，或者长时间的上涨出现锤子线(上吊线)</li>
+<li>下影线要是实体的2倍以上。</li>
+<li>一般是没有上影线，如果有也是很短的</li>
+</ol></li>
+<li><p>如何使用：</p>
 
-<pre><code>$wget http://nginx.org/download/nginx-1.11.1.tar.gz
-$tar xf /nginx-1.10.0.tar.gz
-$./configure \
---prefix=/etc/nginx\
---sbin-path=/usr/sbin/nginx \
---conf-path=/etc/nginx/nginx.conf \
---error-log-path=/var/log/nginx/error.log \
---http-log-path=/var/log/nginx/access.log \
---pid-path=/var/run/nginx.pid \
---lock-path=/var/run/nginx.lock \
---http-client-body-temp-path=/var/cache/nginx/client_temp \
---http-proxy-temp-path=/var/cache/nginx/proxy_temp \
---http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
---http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp \
---http-scgi-temp-path=/var/cache/nginx/scgi_temp \
---user=nginx \
---group=nginx \
---with-openssl=/usr/src/openssl-1.0.2h \
---with-http_ssl_module \
---with-http_realip_module \
---with-http_addition_module \
---with-http_sub_module \
---with-http_dav_module \
---with-http_flv_module \
---with-http_mp4_module \
---with-http_gunzip_module \
---with-http_gzip_static_module \
---with-http_random_index_module \
---with-http_secure_link_module \
---with-http_stub_status_module \
---with-http_auth_request_module \
---with-mail \
---with-debug \
---with-mail_ssl_module \
---with-file-aio \
---with-ipv6 \
---with-threads \
---with-stream \
---with-stream_ssl_module \
---with-http_slice_module \
---with-http_v2_module
-$make &amp;&amp; make install 
-</code></pre>
-
-<h2 id="toc_2">修改配置并且运行</h2>
-
-<p>1) 修改配置：</p>
-
-<pre><code>$修改配置文件：
-添加：listen 443 ssl http2;
-server_name x.17mei.cn;
-#ssl on;
-ssl_certificate /etc/cert1.pem;
-ssl_certificate_key /etc/privkey1.pem;
-</code></pre>
-
-<p>2) 运行：<br/>
-    1. 可执行文件在objs 目录下，直接可以使用。<br/>
-    2. 运行过程例如：</p>
-
-<pre><code>    ```
-    $./nginx -c /etc/nginx/nginx.conf
-    ```
-</code></pre>
-
-<h2 id="toc_3">效果：</h2>
-
-<pre><code>能够在浏览器审核中，看到Network-&gt;Protocol中有h2等关键字，说明http2已经成功。
-</code></pre>
-
-<p><img src="http://o9l83saod.bkt.clouddn.com/http2.0.png" alt="Kubernets 架构图 v1"/></p>
+<ol>
+<li>锤子线的出现时证明着走向有很大的可能进行逆转，当长期下跌，在底部出现锤子线，很可能已经找到支撑位，空头试图拉低，但是被多头拉回，空头的企图没有得逞，这就说明此时多头是占主。</li>
+<li>何时出手，如果是锤子之后上涨趋势，那么第二天高开跳空或者是价位到达前一天锤子线实体的收盘价可出手，如果开始是下降趋势，然后反弹，反弹到前一天锤子线实体的收盘价可出手买入。如果是上吊线，那么最好早抛。 </li>
+</ol></li>
+</ol></li>
+</ol></li>
+<li><p>5日，10日，20日，30日，60日平均线</p></li>
+<li></li>
+</ol>
 
 
 		</div>

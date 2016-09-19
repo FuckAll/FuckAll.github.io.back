@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
     
-  重剑无锋，大巧不工。
+  数据库 - 重剑无锋，大巧不工。
   
   </title>
  <meta name="description" content="">
@@ -246,109 +246,157 @@
 
 	
 		<div class="markdown-body">
-		<h1>Golang Label妙用</h1>
+		<h1>PostgreSql主从配置</h1>
 
-		<ol>
-<li><p>Label 使用</p>
-
-<ol>
-<li>Label 只能与 goto break continue 共同使用</li>
-<li><p>使用限制：</p>
+		<h2 id="toc_0">PostgreSql主从配置</h2>
 
 <ol>
-<li><table>
-<thead>
-<tr>
-<th>关键字</th>
-<th>使用范围</th>
-<th>效果</th>
-</tr>
-</thead>
+<li><p>PostgreSql安装：</p>
 
-<tbody>
-<tr>
-<td>goto</td>
-<td>没有任何使用限制</td>
-<td>跳转到任何地方</td>
-</tr>
-<tr>
-<td>break </td>
-<td>label只能在循环(for switch)紧挨的上方</td>
-<td>终止循环，不再进入循环</td>
-</tr>
-<tr>
-<td>continue</td>
-<td>label只能在循环(for switch)紧挨的上方</td>
-<td>暂停本轮循环</td>
-</tr>
-</tbody>
-</table></li>
-</ol></li>
-<li><p>例如：</p>
+<ol>
+<li><p>导入PostgreSql 9.5 源</p>
 
-<pre><code>func main() {
-a := 1
-LABEL1:
-
-println(&quot;LABEL1&quot;)
-println(&quot;inc a=&quot;, a)
-a += 1
-
-LABEL2:
- println(&quot;LABEL1&quot;) // 会报错的
-
-for a &lt; 6 {
-println(a)
-if a == 3 {
-a += 1
-continue LABEL2
-}
-if a == 5 {
-break
-}
-goto LABEL1
-}
-
-}
+<pre><code>$rpm -Uvh http://yum.postgresql.org/9.5/redhat/rhel-7-x86_64/pgdg-centos95-9.5-2.noarch.rpm
 </code></pre></li>
-<li><p>经典用法:<br/>
-平常的循环嵌套：</p>
+<li><p>安装Postgresql</p>
 
-<pre><code>for _, item := range list.Items {
-found := false
+<pre><code>  $yum install postgresql95-server postgresql95 # 这里一般是会安装最新的9.5稳定版，如果用到Postgresql插件，需要安装扩展，建议安装方式： yum install postgresql95*
+</code></pre></li>
+<li><p>初始化目录结构</p>
 
-for _, reserved := range reserved.Items {
-if reserved.ID == item.ID {
-found = true
-break
-}
-... do some other work ...
-}
+<pre><code>  $/usr/pgsql-9.5/bin/postgresql95-setup initdb #这里是Centos7 的目录位置
+</code></pre></li>
+<li><p>启动（这个可以在后面的主从配置完成之后进行启动）</p>
 
-if found {
-continue
-}
-
-... do some other work ...
-}
-</code></pre>
-
-<p>使用label的嵌套:</p>
-
-<pre><code>OUTER:
-for _, item := range list.Items {
-for _, reserved := range reserved.Items {
-if reserved.ID == item.ID {
-    continue OUTER
-}
-... do some other work ...
-}
-... do some other work ...
-}
-</code></pre>
-
-<p><strong>Label放在for循环之前是表明跳出到哪一层的循环，不会影响到for循环，并不是每次跳跃之后都要重新执行for循环</strong></p></li>
+<pre><code>  $service  postgresql-9.5 start
+  $chkconfig postgresql-9.5 on #设置开机启动
+</code></pre></li>
 </ol></li>
+<li><p>PostgreSql 主从配置意义：</p>
+
+<ol>
+<li><p>主从配置能够在一台主机宕机的情况下立马切换到另外一台主机上，减少损失</p></li>
+<li><p>主从配置能够在读写分离，减轻数据库的压力,主库进行写，从库进行读。</p></li>
+<li><p>主从配置能够保证多数据库中的数据一致性。</p></li>
+</ol></li>
+<li><p>主从配置流程：<br/>
+注意：这里使用的是Postgresql 9.5.3进行。由于Postgresql版本之间会有细微的差别。</p>
+
+<ol>
+<li><p>Master 配置：</p>
+
+<ol>
+<li><p>配置:postgresql.conf 文件</p>
+
+<pre><code>listen_addresses = &#39;*&#39;          # what IP address(es) to listen on;
+wal_level = hot_standby         # wal 日志的级别
+max_wal_senders = 5             # 控制主库最多可以有多少个并发的standby数据库；
+wal_keep_segments = 64          # 16M为单位，wal日志生成的单位，尽量的设置较大，防止日志没有来得及到standby就被循环覆盖了，这个如果数据量大的时候要慎重。
+synchronous_standby_names = &#39;*&#39; #synchronous_standby_names 这个参数对应着slave配置文件中的recovery.conf 中的primary_conninfo
+</code></pre></li>
+<li><p>配置:pg_hba.conf文件(这个文件主要是用来配置数据库连接权限的)</p>
+
+<pre><code># local      DATABASE  USER  METHOD  [OPTIONS]
+# host       DATABASE  USER  ADDRESS  METHOD  [OPTIONS]
+# hostssl    DATABASE  USER  ADDRESS  METHOD  [OPTIONS]
+# hostnossl  DATABASE  USER  ADDRESS  METHOD  [OPTIONS]
+#第一列是指定能够连接数据库的类型，local是本地连接，host是远程的主机。
+#第二列是指能够连接那些数据库
+#第三列是哪个用户能够连接数据库
+#第四列是地址
+#第五列是认证的方式
+local   all             postgres                                trust
+local   all             all                                     peer
+host    all             all             0.0.0.0/0               md5
+host    replication     all             0.0.0.0/0               trust
+host    all             all             ::1/128                 md5
+</code></pre>
+
+<p>配置说明：</p>
+
+<ol>
+<li>允许本地的postgres连接</li>
+<li>允许所有的本地连接认证方式是获取本地的操作系统的用户名。</li>
+</ol></li>
+</ol></li>
+<li><p>Slave 配置：</p>
+
+<ol>
+<li><p>配置:postgresql.conf 文件</p>
+
+<pre><code>listen_addresses = &#39;*&#39;          # what IP address(es) to listen on;
+wal_level = hot_standby
+max_connections = 1000
+hot_standby = on
+hot_standby_feedback = on
+</code></pre></li>
+<li><p>配置:pg_hba.conf文件(这个文件主要是用来配置数据库连接权限的)</p>
+
+<pre><code>local   all             postgres                                trust
+local   all             all                                     peer
+host    all             all             0.0.0.0/0               md5
+host    replication     all             0.0.0.0/0               trust
+host    all             all             ::1/128                 md5
+</code></pre></li>
+<li><p>配置: recovery.conf文件</p>
+
+<pre><code>primary_conninfo = &#39;host=x.x.x.x user=test password=123 port=5432&#39;
+EOF
+</code></pre></li>
+</ol></li>
+<li><p>过程如下：</p>
+
+<ol>
+<li><p>Master</p>
+
+<ol>
+<li>启动Mater节点（没有任何的主从配置过程）</li>
+<li><p>修改postgres的密码, 创建主从同步需要的账号</p>
+
+<pre><code>su postgres
+psql -c &quot;ALTER USER postgres WITH PASSWORD &#39;123&#39;;&quot;
+psql -c &quot; CREATE ROLE repluser REPLICATION LOGIN PASSWORD &#39;123&#39;;&quot;
+</code></pre></li>
+<li><p>然后修改配置成如上的配置。</p></li>
+<li><p>重启Master</p></li>
+</ol></li>
+<li><p>Master打开备份状态：</p>
+
+<pre><code>```
+psql -U postgres -c &quot;select pg_start_backup(&#39;initial_backup&#39;);&quot;
+```
+</code></pre>
+
+<ol>
+<li><p>将内容拷贝到远程的slave节点。</p>
+
+<pre><code>rsync -cva --inplace --exclude=*pg_xlog* /var/lib/pgsql/9.5/data/ slave_ipaddress:/var/lib/pgsql/9.5/data/
+</code></pre></li>
+<li><p>退出备份状态</p>
+
+<pre><code>psql -U postgres -c &quot;select pg_stop_backup();&quot;
+</code></pre></li>
+</ol></li>
+</ol></li>
+<li><p>Slave</p>
+
+<ol>
+<li>修改成如上的slave配置</li>
+<li><p>注意一下/var/lib/pgsql/9.5/data/目录的权限问题，尤其是recovery.conf</p>
+
+<pre><code>chown -R postgres.postgres /var/lib/pgsql/9.5/data/
+</code></pre></li>
+</ol></li>
+</ol></li>
+<li><p>检验方式：<br/>
+    输入一下命令：</p>
+
+<pre><code>```
+select * from pg_stat_replication;
+```
+
+可以从输出的信息中看到是否同步成功。
+</code></pre></li>
 </ol>
 
 
