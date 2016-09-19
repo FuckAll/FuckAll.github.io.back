@@ -4,7 +4,7 @@
   <title><![CDATA[重剑无锋，大巧不工。]]></title>
   <link href="http://blog.izgnod.com/atom.xml" rel="self"/>
   <link href="http://blog.izgnod.com/"/>
-  <updated>2016-09-19T18:11:24+08:00</updated>
+  <updated>2016-09-19T18:13:53+08:00</updated>
   <id>http://blog.izgnod.com/</id>
   <author>
     <name><![CDATA[]]></name>
@@ -23,12 +23,11 @@
 <li>测试用例：</li>
 </ol>
 
-<pre><code>
-    CREATE TABLE users (
-    id uuid primary key default gen_random_uuid(),
-    mobile text UNIQUE not null
-    );
-    INSERT INTO users (mobile) VALUES (&#39;86-1000000000&#39;)
+<pre><code>CREATE TABLE users (
+id uuid primary key default gen_random_uuid(),
+mobile text UNIQUE not null
+);
+INSERT INTO users (mobile) VALUES (&#39;86-1000000000&#39;)
 
 </code></pre>
 

@@ -252,12 +252,11 @@
 <li>测试用例：</li>
 </ol>
 
-<pre><code>
-    CREATE TABLE users (
-    id uuid primary key default gen_random_uuid(),
-    mobile text UNIQUE not null
-    );
-    INSERT INTO users (mobile) VALUES (&#39;86-1000000000&#39;)
+<pre><code>CREATE TABLE users (
+id uuid primary key default gen_random_uuid(),
+mobile text UNIQUE not null
+);
+INSERT INTO users (mobile) VALUES (&#39;86-1000000000&#39;)
 
 </code></pre>
 
