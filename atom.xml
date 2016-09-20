@@ -4,7 +4,7 @@
   <title><![CDATA[重剑无锋，大巧不工。]]></title>
   <link href="http://blog.izgnod.com/atom.xml" rel="self"/>
   <link href="http://blog.izgnod.com/"/>
-  <updated>2016-09-19T18:13:53+08:00</updated>
+  <updated>2016-09-19T18:17:04+08:00</updated>
   <id>http://blog.izgnod.com/</id>
   <author>
     <name><![CDATA[]]></name>
@@ -373,7 +373,7 @@ curl -X DELETE &quot;http://www.baidu.com/&quot;
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Golang 参数]]></title>
+    <title type="html"><![CDATA[Golang 小技巧]]></title>
     <link href="http://blog.izgnod.com/14741728889918.html"/>
     <updated>2016-09-18T12:28:08+08:00</updated>
     <id>http://blog.izgnod.com/14741728889918.html</id>
@@ -387,6 +387,25 @@ curl -X DELETE &quot;http://www.baidu.com/&quot;
 <li>如果是包含sysnc.Mutex的struct，则需要传指针，避免对象的复制</li>
 <li>如果是大的array，struct，传指针比较好，如何评判是否够大，例如：比方法的对象还大。</li>
 </ul>
+
+<h2 id="toc_1">数组常见操作：</h2>
+
+<ul>
+<li>如何高效（不涉及到内存重新的分配）将数组向前移动：</li>
+</ul>
+
+<pre><code>    方法一：
+    tmp := []int64{1,2,3}
+    fmt.Printf(&quot;Befor :%p\n&quot;,&amp;tmp)
+    copy(tmp, tmp[1:])
+    tmp = tmp[:len(tmp)-1]
+    fmt.Printf(&quot;After :%p\n&quot;,&amp;tmp)
+    方法二：
+    tmp1 := []int64{1,2,3}
+    fmt.Printf(&quot;Befor :%p\n&quot;,&amp;tmp1)
+    tmp1 = tmp1[1:len(tmp1)-1]
+    fmt.Printf(&quot;After :%p\n&quot;,&amp;tmp1)
+</code></pre>
 
 ]]></content>
   </entry>
