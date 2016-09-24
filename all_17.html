@@ -47,6 +47,10 @@
         <li><label>Golang</label></li>
 
           
+            <li><a title="Golang Context" href="14746196382822.html">Golang Context</a></li>
+          
+            <li><a title="Golang 控制routine" href="14745112452162.html">Golang 控制routine</a></li>
+          
             <li><a title="Golang 小技巧" href="14741728889918.html">Golang 小技巧</a></li>
           
             <li><a title="Golang Sort排序" href="14730511199413.html">Golang Sort排序</a></li>
@@ -117,6 +121,8 @@
         <li><label>个人收集</label></li>
 
           
+            <li><a title="git 常用方法" href="14745419664301.html">git 常用方法</a></li>
+          
             <li><a title="读书" href="14734878748126.html">读书</a></li>
           
             <li><a title="技术类博客收集" href="14727777201831.html">技术类博客收集</a></li>
@@ -155,6 +161,10 @@
 
                     
                       <li class="side-title"><span>Golang</span></li>
+                        
+                          <li><a title="Golang Context" href="14746196382822.html">Golang Context</a></li>
+                        
+                          <li><a title="Golang 控制routine" href="14745112452162.html">Golang 控制routine</a></li>
                         
                           <li><a title="Golang 小技巧" href="14741728889918.html">Golang 小技巧</a></li>
                         
@@ -216,6 +226,8 @@
                     
                       <li class="side-title"><span>个人收集</span></li>
                         
+                          <li><a title="git 常用方法" href="14745419664301.html">git 常用方法</a></li>
+                        
                           <li><a title="读书" href="14734878748126.html">读书</a></li>
                         
                           <li><a title="技术类博客收集" href="14727777201831.html">技术类博客收集</a></li>
@@ -246,63 +258,142 @@
 
 	
 		<div class="markdown-body">
-		<h1>股票量价比</h1>
+		<h1>Postgresql 备份与恢复</h1>
 
-		<ol>
-<li>价增量升
-
-<ol>
-<li>定义：股价随着股票的成交量上涨。</li>
-<li>信号：一般来说这是股票上涨的信号</li>
-</ol></li>
-<li>价增量减
+		<h2 id="toc_0">备份和定时备份</h2>
 
 <ol>
-<li>定义： 价格上涨，成交量反跌。</li>
-<li>信号： 股票下跌信号，多头占主力，但是由于成交量的低迷，多头无法长时间维持，最终下跌。</li>
-</ol></li>
-<li>价减量减
+<li><p>备份命令</p>
+
+<pre><code>pg_dump -h host_ip -p host_port -U datebase_user -d database_name -vF c -C -c -f test1.bkp test1 
+-a 为只输出数据库中的数据（此处没有用）
+-v 打出执行信息
+-F 输出为指定的格式 c 为custom
+-c dump的时候将drop database xxx 语句放入到dump的内容中
+-C dump的时候将Create database xxx 语句放入到dump的内容中
+-f 指定输出dump的名称
+最后一个为数据库的名字
+</code></pre></li>
+<li><p>定时命令：</p>
 
 <ol>
-<li>定义： 价格下降，成交量减少。</li>
-<li>信号： 股票上涨信号， 卖方是主力，并且持股坚定，不轻易出，卖方看向高位，等待拉高。</li>
-</ol></li>
-<li>价减量升：
-
-<ol>
-<li>定义：价格下降，成交量升高。</li>
-<li>信号： 股票下跌信号，空头占优，不坚定的卖方出货，空头打压。</li>
-</ol></li>
+<li>脚本内容backup_db.sh(全量导出，这里导出的是自定义格式，只能够被全量恢复和部分恢复)</li>
 </ol>
 
-<p><strong>总结：价格和成交量保持一致的增长，降低态势，说明多头占主力，反之空头占主力，这也就影响到了股票的趋势。</strong></p>
-
-<ol>
-<li><p>天量天价</p>
-
-<ol>
-<li>股价上行应该是一个渐进的过程，成交量的方法</li>
-<li><p>要有一段时间的上涨<br/>
-放量滞涨，天量天价的一个特征，廊坊发展，国中水务。<br/>
-天量天价不要再买入了，是卖出的信号。</p>
-
-<p>上证指数8天结构的调整,第9天是一个变盘的，跌破20日线是向下，但是目前是5日线和20日线震荡，8 + 5 = 13天的结构，回落，再反弹，再选择方向，大概方向是偏好的。突破5日线或者跌破20日线。</p>
-
-<ol>
-<li>脉冲式建仓，回落0.382，买入</li>
-<li>回落式建仓</li>
-<li>回落反拉式建仓</li>
-</ol></li>
-</ol></li>
-<li><p>地量地价<br/>
-放量不是买点，放量之后再缩量就是买点</p></li>
-<li><p>底部放量</p></li>
+<pre><code>#/bin/bash
+DATE=`date +&quot;%Y_%m_%d&quot;`
+/usr/bin/pg_dump -U postgres -vF c -C -c -f /share/meidb_$DATE.bak meidb
+## 备份到香港阿里云（这里要把key加好）
+##chmod 777 /share/meidb_$DATE.bak
+/usr/bin/scp -P hostPort -i /root/.ssh/id_rsa /share/meidb_$DATE.bak
+root@Hostname:/backup/ &gt;&gt; /share/scp.log 2&gt;&amp;1
+</code></pre></li>
 </ol>
 
-<p>蹄子线： 就是涨跌不超过百分之三，大部分情况是庄家吸筹</p>
+<h2 id="toc_1">如何恢复数据</h2>
 
-<p>买阴线，卖阳线<br/>
-买缩量，卖放量</p>
+<ol>
+<li><p>全量数据恢复方法</p>
+
+<ol>
+<li><p>如果需要将原先的库进行删除并且重建</p>
+
+<ol>
+<li>执行命令：</li>
+</ol>
+
+<pre><code>pg_restore -h host_ip -p host_port -U postgres -d postgres -v -C  -c test1.bkp
+</code></pre></li>
+</ol></li>
+<li><p>部分恢复的方法：</p>
+
+<ol>
+<li><p>创建恢复表的目录批量恢复方法：</p>
+
+<ol>
+<li>执行命创建恢复目录：</li>
+</ol>
+
+<pre><code>pg_restore -l test1db_2016_18_29.bkp -f table.lst
+ -l, --list print summarized TOC of the archive
+ -f, --file=FILENAME output file name
+</code></pre>
+
+<ol>
+<li><p>修改恢复表目录：</p>
+
+<ol>
+<li><p>修改前内容例如：</p>
+
+<pre><code>; Archive created at 2016-08-29 11:16:17 CST
+;     dbname: meidb
+;     TOC Entries: 65
+;     Compression: -1
+;     Dump Version: 1.12-0
+;     Format: CUSTOM
+;     Integer: 4 bytes
+;     Offset: 8 bytes
+;     Dumped from database version: 9.5.3
+;     Dumped by pg_dump version: 9.5.3
+;
+;
+; Selected TOC Entries:
+;
+4168; 0 18518 TABLE DATA public account_items postgres
+4169; 0 18530 TABLE DATA public accounts postgres
+4170; 0 18551 TABLE DATA public activities postgres
+4235; 0 0 SEQUENCE SET public activities_num_seq postgres
+4172; 0 18564 TABLE DATA public activity_enrolls postgres
+4173; 0 18576 TABLE DATA public balance_changes postgres
+
+</code></pre></li>
+<li><p>将其余的注释，然后只留下需要恢复的表明即可：<br/>
+    小技巧：vim替换模式:（:16,78s#<sup>4#;4#g）</sup><br/>
+    修改后内容如下(例如要恢复表accounts)：</p>
+
+<pre><code>;     Archive created at 2016-08-29 11:16:17 CST
+;     dbname: meidb
+;     TOC Entries: 65
+;     Compression: -1
+;     Dump Version: 1.12-0
+;     Format: CUSTOM
+;     Integer: 4 bytes
+;     Offset: 8 bytes
+;     Dumped from database version: 9.5.3
+;     Dumped by pg_dump version: 9.5.3
+;
+;
+; Selected TOC Entries:
+;
+;4168; 0 18518 TABLE DATA public account_items postgres
+4169; 0 18530 TABLE DATA public accounts postgres
+;4170; 0 18551 TABLE DATA public activities postgres
+;4235; 0 0 SEQUENCE SET public activities_num_seq postgres
+;4172; 0 18564 TABLE DATA public activity_enrolls postgres
+;4173; 0 18576 TABLE DATA public balance_changes postgres
+
+</code></pre></li>
+<li><p>恢复命令：</p>
+
+<pre><code>pg_restore -U postgres -h hostname -p port -vaxd database_name -L table.lst test1
+</code></pre></li>
+</ol></li>
+</ol></li>
+<li><p>指定恢复表的方式</p>
+
+<ol>
+<li><p>恢复命令</p>
+
+<pre><code>pg_restore -U postgres  -v -c -d meidb -t account test1.bkp
+</code></pre>
+
+<p><strong>多个文件恢复</strong></p>
+
+<pre><code>pg_restore -U postgres  -v -c -d meidb -t account -t account_items  test.bkp
+</code></pre></li>
+</ol></li>
+</ol></li>
+</ol>
 
 
 		</div>

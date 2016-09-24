@@ -47,6 +47,10 @@
         <li><label>Golang</label></li>
 
           
+            <li><a title="Golang Context" href="14746196382822.html">Golang Context</a></li>
+          
+            <li><a title="Golang 控制routine" href="14745112452162.html">Golang 控制routine</a></li>
+          
             <li><a title="Golang 小技巧" href="14741728889918.html">Golang 小技巧</a></li>
           
             <li><a title="Golang Sort排序" href="14730511199413.html">Golang Sort排序</a></li>
@@ -117,6 +121,8 @@
         <li><label>个人收集</label></li>
 
           
+            <li><a title="git 常用方法" href="14745419664301.html">git 常用方法</a></li>
+          
             <li><a title="读书" href="14734878748126.html">读书</a></li>
           
             <li><a title="技术类博客收集" href="14727777201831.html">技术类博客收集</a></li>
@@ -155,6 +161,10 @@
 
                     
                       <li class="side-title"><span>Golang</span></li>
+                        
+                          <li><a title="Golang Context" href="14746196382822.html">Golang Context</a></li>
+                        
+                          <li><a title="Golang 控制routine" href="14745112452162.html">Golang 控制routine</a></li>
                         
                           <li><a title="Golang 小技巧" href="14741728889918.html">Golang 小技巧</a></li>
                         
@@ -216,6 +226,8 @@
                     
                       <li class="side-title"><span>个人收集</span></li>
                         
+                          <li><a title="git 常用方法" href="14745419664301.html">git 常用方法</a></li>
+                        
                           <li><a title="读书" href="14734878748126.html">读书</a></li>
                         
                           <li><a title="技术类博客收集" href="14727777201831.html">技术类博客收集</a></li>
@@ -246,110 +258,53 @@
 
 	
 		<div class="markdown-body">
-		<h1>Golang Sort排序</h1>
+		<h1>Golang 控制routine</h1>
 
 		<ol>
-<li><p>Golang Sort 使用方法：</p>
-
-<ol>
-<li><p>实现Sort Interface 的三个方法</p>
-
-<pre><code>Len()
-Less(i, j int) bool
-Swap(i, j int) 
-</code></pre>
-
-<pre><code>package main
-
-import (
-    &quot;fmt&quot;
-    &quot;sort&quot;
-)
-
-//学生成绩结构体
-type StuScore struct {
-    //姓名
-    name  string
-    //成绩
-    score int
-}
-
-type StuScores []StuScore
-
-//Len()
-func (s StuScores) Len() int {
-    return len(s)
-}
-
-//Less():成绩将有低到高排序
-func (s StuScores) Less(i, j int) bool {
-    return s[i].score  &lt; s[j].score
-}
-
-//Swap()
-func (s StuScores) Swap(i, j int) {
-    s[i], s[j] = s[j], s[i]
-}
-
-func main() {
-    stus := StuScores{
-        {&quot;alan&quot;, 95},
-        {&quot;hikerell&quot;, 91},
-        {&quot;acmfly&quot;, 96},
-        {&quot;leao&quot;, 90}}
-
-    fmt.Println(&quot;Default:&quot;)
-    //原始顺序
-    for _, v := range stus {
-        fmt.Println(v.name, &quot;:&quot;, v.score)
-    }
-    fmt.Println()
-    //StuScores已经实现了sort.Interface接口
-    sort.Sort(stus)
-
-    fmt.Println(&quot;Sorted:&quot;)
-    //排好序后的结构
-    for _, v := range stus {
-        fmt.Println(v.name, &quot;:&quot;, v.score)
-    }
-
-    //判断是否已经排好顺序，将会打印true
-    fmt.Println(&quot;IS Sorted?&quot;, sort.IsSorted(stus))
-
-    fmt.Println()
-    // 排序翻转
-    sort.Sort(sort.Reverse(stus))
-    for _, v := range stus {
-        fmt.Println(v.name, &quot;:&quot;, v.score)
-        }
-    }
-</code></pre></li>
-</ol></li>
-<li><p>内部数据类型排序</p>
-
-<ol>
-<li><p>IntSlice, Float64Slice, StringSlice<br/>
-举例：</p>
-
-<pre><code>```
-// 升序
-s := []int{5,3,6,7,4}
-sort.Ints(s)
-fmt.Println(s) //将会输出[3 4 5 6 7]
-
-// 降序
-s := []int{5, 2, 6, 3, 1, 4} // 未排序的切片数据
-sort.Sort(sort.Reverse(sort.IntSlice(s)))
-fmt.Println(s) //将会输出[6 5 4 3 2 1]
-
-// 查找排序之后大于等于指定数字的位置
-s := []int{5, 2, 6, 3, 1, 4} // 未排序的切片数据
-sort.Ints(s) //排序后的s为[1 2 3 4 5 6]
-fmt.Println(sort.SearchInts(s, 3)) //将会输出2
-```
-</code></pre></li>
-</ol></li>
+<li>select 控制routine</li>
 </ol>
+
+<pre><code>    func main() {
+        // 这个地方要make，否则无法分配内存
+        ch1 := make(chan bool, 1)
+        ch2 := make(chan bool, 1)
+        
+        go test(ch1)
+        time.Sleep(time.Second * 2)
+        
+        ch2 &lt;- false
+        ch1 &lt;- false
+        time.Sleep(time.Second * 2)
+        
+        ch1 &lt;- true
+        time.Sleep(time.Second * 10)
+    }
+
+    func test(ch1 chan bool) {
+        for {
+            //fmt.Println(&quot;wonderful&quot;)
+            //if &lt;-ch1 {
+            //  fmt.Println(&quot;exit&quot;)
+            //  return
+            //}else {
+            //  fmt.Println(&quot;else&quot;)
+            //}
+            select {
+            case a := &lt;-ch1:
+            if a {
+            fmt.Println(&quot;exit&quot;)
+            return
+            } else {
+            fmt.Println(&quot;nothing&quot;)
+            }
+            //default:
+            //  fmt.Println(&quot;default&quot;)
+            
+            }
+        }
+
+ }
+</code></pre>
 
 
 		</div>

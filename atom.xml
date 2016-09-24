@@ -4,7 +4,7 @@
   <title><![CDATA[重剑无锋，大巧不工。]]></title>
   <link href="http://blog.izgnod.com/atom.xml" rel="self"/>
   <link href="http://blog.izgnod.com/"/>
-  <updated>2016-09-19T18:17:04+08:00</updated>
+  <updated>2016-09-20T19:19:52+08:00</updated>
   <id>http://blog.izgnod.com/</id>
   <author>
     <name><![CDATA[]]></name>
@@ -12,6 +12,321 @@
   </author>
   <generator uri="http://www.mweb.im">MWeb</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Golang Context]]></title>
+    <link href="http://blog.izgnod.com/14746196382822.html"/>
+    <updated>2016-09-23T16:33:58+08:00</updated>
+    <id>http://blog.izgnod.com/14746196382822.html</id>
+    <content type="html"><![CDATA[
+<ol>
+<li>WithCancel</li>
+</ol>
+
+<pre><code>package main
+
+import (
+    &quot;fmt&quot;
+    //&quot;context&quot;
+    &quot;context&quot;
+    &quot;time&quot;
+)
+
+type otherContext struct {
+    context.Context
+    other string
+}
+
+func main() {
+    // Background 声称一个context的根，是空的，但不是nil，根context是不能够Cancel的
+    bkc := context.Background()
+    // 生成一个Child Context ，带有Cancel，
+    c1, cancel := context.WithCancel(bkc)
+
+    // context 实现了String方法可以被Sprint格式化
+    if got, want := fmt.Sprint(c1), &quot;context.Background.WithCancel&quot;; got != want {
+        fmt.Errorf(&quot;c1.String() = %q want %q&quot;, got, want)
+    }
+
+    // 所有包含Context接口的数据类型都能够当做Context接口类型使用
+    o := otherContext{c1, &quot;wonder&quot;}
+    //o := otherContext{context.Background(), &quot;wonder&quot;}
+    c2, _ := context.WithCancel(o)
+    contexts := []context.Context{c1, o, c2}
+
+    /*
+            关系图
+                bkc
+                /
+              c1(o)
+              /
+             c2
+    */
+
+    for i, c := range contexts {
+        //Done返回值是一个 &lt;-chan struct{}， 返回nil说明这个Context是不能够用关闭的例如：Background生成的Context
+        if d := c.Done(); d == nil {
+            fmt.Errorf(&quot;c[%d].Done() == %v want non-nil&quot;, i, d)
+        }
+        // context关闭的原因，如果没有则返回nil， context 关闭之后会返回指定的内容
+        if e := c.Err(); e != nil {
+            fmt.Errorf(&quot;c[%d].Err() == %v want nil&quot;, i, e)
+        }
+        // c1和o是同一个context,所以前两个打印出来的内容一样
+        tm := c.Done()
+        fmt.Println(tm)
+
+        select {
+        //此处被block住，执行default，因为context并没有关闭
+        case x := &lt;-c.Done():
+            fmt.Errorf(&quot;&lt;-c.Done() == %v want nothing (it should block)&quot;, x)
+        default:
+        }
+    }
+    // 关闭c1,也就是关闭了o，那么c2也就被关闭了，关闭之后Done所返回的channel 也就关闭了， 关闭之后的channel能够一直取出值
+    cancel()
+    time.Sleep(100 * time.Millisecond) // let cancelation propagate
+
+    //前面已经Done之后，再次执行Done
+    for i, c := range contexts {
+        select {
+        // 关闭之后c.Done就不再是空
+        case &lt;-c.Done():
+        default:
+            fmt.Errorf(&quot;&lt;-c[%d].Done() blocked, but shouldn&#39;t have&quot;, i)
+        }
+        if e := c.Err(); e != context.Canceled {
+            fmt.Errorf(&quot;c[%d].Err() == %v want %v&quot;, i, e, context.Canceled)
+        }
+    }
+
+}
+
+</code></pre>
+
+<ol>
+<li>TimeOut &amp;&amp; DeadLine</li>
+</ol>
+
+<pre><code>    package main
+
+import (
+    &quot;fmt&quot;
+    //&quot;context&quot;
+    &quot;context&quot;
+    &quot;strings&quot;
+    &quot;time&quot;
+)
+
+type otherContext struct {
+    context.Context
+}
+
+func main() {
+
+    // 50 millisecond 之后自动关闭
+    c, _ := context.WithDeadline(context.Background(), time.Now().Add(50*time.Millisecond))
+    if got, prefix := fmt.Sprint(c), &quot;context.Background.WithDeadline(&quot;; !strings.HasPrefix(got, prefix) {
+        fmt.Errorf(&quot;c.String() = %q want prefix %q&quot;, got, prefix)
+    }
+    testDeadline(c, &quot;WithDeadline&quot;, time.Second)
+
+    // 继承context的类型使用WithDeadline
+    c, _ = context.WithDeadline(context.Background(), time.Now().Add(50*time.Millisecond))
+    o := otherContext{c}
+    testDeadline(o, &quot;WithDeadline+otherContext&quot;, time.Second)
+
+    // Parent Context 超时时间比 Child Context 超时时间短
+    c, _ = context.WithDeadline(context.Background(), time.Now().Add(50*time.Millisecond))
+    o = otherContext{c}
+    c, _ = context.WithDeadline(o, time.Now().Add(4*time.Second))
+    // 结果为：Parent Context 超时
+    testDeadline(c, &quot;WithDeadline+otherContext+WithDeadline&quot;, 2*time.Second)
+
+    // 超时时间是负数，直接超时
+    c, _ = context.WithDeadline(context.Background(), time.Now().Add(-time.Millisecond))
+    testDeadline(c, &quot;WithDeadline+inthepast&quot;, time.Second)
+
+    // 超时时间是现在时间，直接超时
+    c, _ = context.WithDeadline(context.Background(), time.Now())
+    testDeadline(c, &quot;WithDeadline+now&quot;, time.Second)
+
+    // WithTimeout
+
+    c, _ = context.WithTimeout(context.Background(), 50*time.Millisecond)
+    if got, prefix := fmt.Sprint(c), &quot;context.Background.WithDeadline(&quot;; !strings.HasPrefix(got, prefix) {
+        fmt.Errorf(&quot;c.String() = %q want prefix %q&quot;, got, prefix)
+    }
+    testDeadline(c, &quot;WithTimeout&quot;, time.Second)
+
+    c, _ = context.WithTimeout(context.Background(), 50*time.Millisecond)
+    o = otherContext{c}
+    testDeadline(o, &quot;WithTimeout+otherContext&quot;, time.Second)
+
+    c, _ = context.WithTimeout(context.Background(), 50*time.Millisecond)
+    o = otherContext{c}
+    c, _ = context.WithTimeout(o, 3*time.Second)
+    testDeadline(c, &quot;WithTimeout+otherContext+WithTimeout&quot;, 2*time.Second)
+
+    // Cancel TimeOut
+    // Cancel 能够立马生效
+    c, _ = context.WithTimeout(context.Background(), time.Second)
+    o = otherContext{c}
+    c, cancel := context.WithTimeout(o, 2*time.Second)
+    cancel()
+    time.Sleep(100 * time.Millisecond) // let cancelation propagate
+    select {
+    case &lt;-c.Done():
+    default:
+        fmt.Errorf(&quot;&lt;-c.Done() blocked, but shouldn&#39;t have&quot;)
+    }
+    if e := c.Err(); e != context.Canceled {
+        fmt.Errorf(&quot;c.Err() == %v want %v&quot;, e, context.Canceled)
+    }
+
+}
+
+func testDeadline(c context.Context, name string, failAfter time.Duration) {
+    select {
+    case &lt;-time.After(failAfter):
+        fmt.Errorf(&quot;%s: context should have timed out&quot;, name)
+    case &lt;-c.Done():
+        // context closed
+    }
+    if e := c.Err(); e != context.DeadlineExceeded {
+        fmt.Errorf(&quot;%s: c.Err() == %v; want %v&quot;, name, e, context.DeadlineExceeded)
+    }
+}
+
+</code></pre>
+
+<ol>
+<li>WithValue</li>
+</ol>
+
+<pre><code>package main
+
+import (
+    &quot;fmt&quot;
+    &quot;context&quot;
+)
+
+type otherContext struct {
+    context.Context
+}
+
+type Key struct {
+    name string
+    age  int
+}
+
+func main() {
+
+    sKey := Key{&quot;izgnod&quot;, 18}
+    c0 := context.Background()
+    fmt.Println(c0)
+
+    c1 := context.WithValue(c0, &quot;k1&quot;, &quot;value1&quot;)
+    fmt.Printf(&quot;key: k1 value:%s\n&quot;, c1.Value(&quot;k1&quot;))
+
+    c2 := context.WithValue(c1, &quot;k2&quot;, sKey)
+    switch t := c2.Value(&quot;k2&quot;).(type) {
+    case Key:
+        fmt.Printf(&quot;key: k2 value:Key{name:%s,age:%d}\n&quot;, t.name, t.age)
+    default:
+        fmt.Println(&quot;unknow&quot;)
+
+    }
+    fmt.Println(c2.Value(&quot;k1&quot;))
+
+}
+</code></pre>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[git 常用方法]]></title>
+    <link href="http://blog.izgnod.com/14745419664301.html"/>
+    <updated>2016-09-22T18:59:26+08:00</updated>
+    <id>http://blog.izgnod.com/14745419664301.html</id>
+    <content type="html"><![CDATA[
+<p>进入git 目录，是工作目录(Working Directory)</p>
+
+<p>git add 将文件加入到缓存区 ( Staged Snapshot ) <br/>
+git commit 将文件加入到历史中 ( Commit History)</p>
+
+<p>git reset --soft 将缓存区的文件，同步到指定的commit.<br/>
+git reset --mixed 将工作目录同步到指定的commit，默认的是mixed.<br/>
+git reset --hard 将工作目录和缓存区全部到指定的commit</p>
+
+<p>常用操作：<br/>
+git reset --mixed HEAD 将你当前的改动从缓存区中移除，但是这些改动还留在工作目录中<br/>
+git reset --hard HEAD 舍弃所有的提交改动</p>
+
+<p>git checkout commit_id 可以快速的切换到指定的commit </p>
+
+<p>git revert 撤销已经提交的更改</p>
+
+<p><a href="https://github.com/geeeeeeeeek/git-recipes/wiki">https://github.com/geeeeeeeeek/git-recipes/wiki</a></p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Golang 控制routine]]></title>
+    <link href="http://blog.izgnod.com/14745112452162.html"/>
+    <updated>2016-09-22T10:27:25+08:00</updated>
+    <id>http://blog.izgnod.com/14745112452162.html</id>
+    <content type="html"><![CDATA[
+<ol>
+<li>select 控制routine</li>
+</ol>
+
+<pre><code>    func main() {
+        // 这个地方要make，否则无法分配内存
+        ch1 := make(chan bool, 1)
+        ch2 := make(chan bool, 1)
+        
+        go test(ch1)
+        time.Sleep(time.Second * 2)
+        
+        ch2 &lt;- false
+        ch1 &lt;- false
+        time.Sleep(time.Second * 2)
+        
+        ch1 &lt;- true
+        time.Sleep(time.Second * 10)
+    }
+
+    func test(ch1 chan bool) {
+        for {
+            //fmt.Println(&quot;wonderful&quot;)
+            //if &lt;-ch1 {
+            //  fmt.Println(&quot;exit&quot;)
+            //  return
+            //}else {
+            //  fmt.Println(&quot;else&quot;)
+            //}
+            select {
+            case a := &lt;-ch1:
+            if a {
+            fmt.Println(&quot;exit&quot;)
+            return
+            } else {
+            fmt.Println(&quot;nothing&quot;)
+            }
+            //default:
+            //  fmt.Println(&quot;default&quot;)
+            
+            }
+        }
+
+ }
+</code></pre>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Golang Postgresql]]></title>
@@ -1657,321 +1972,6 @@ root@Hostname:/backup/ &gt;&gt; /share/scp.log 2&gt;&amp;1
 <li><p>5日，10日，20日，30日，60日平均线</p></li>
 <li></li>
 </ol>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[股票量价比]]></title>
-    <link href="http://blog.izgnod.com/14723615341044.html"/>
-    <updated>2016-08-28T13:18:54+08:00</updated>
-    <id>http://blog.izgnod.com/14723615341044.html</id>
-    <content type="html"><![CDATA[
-<ol>
-<li>价增量升
-
-<ol>
-<li>定义：股价随着股票的成交量上涨。</li>
-<li>信号：一般来说这是股票上涨的信号</li>
-</ol></li>
-<li>价增量减
-
-<ol>
-<li>定义： 价格上涨，成交量反跌。</li>
-<li>信号： 股票下跌信号，多头占主力，但是由于成交量的低迷，多头无法长时间维持，最终下跌。</li>
-</ol></li>
-<li>价减量减
-
-<ol>
-<li>定义： 价格下降，成交量减少。</li>
-<li>信号： 股票上涨信号， 卖方是主力，并且持股坚定，不轻易出，卖方看向高位，等待拉高。</li>
-</ol></li>
-<li>价减量升：
-
-<ol>
-<li>定义：价格下降，成交量升高。</li>
-<li>信号： 股票下跌信号，空头占优，不坚定的卖方出货，空头打压。</li>
-</ol></li>
-</ol>
-
-<p><strong>总结：价格和成交量保持一致的增长，降低态势，说明多头占主力，反之空头占主力，这也就影响到了股票的趋势。</strong></p>
-
-<ol>
-<li><p>天量天价</p>
-
-<ol>
-<li>股价上行应该是一个渐进的过程，成交量的方法</li>
-<li><p>要有一段时间的上涨<br/>
-放量滞涨，天量天价的一个特征，廊坊发展，国中水务。<br/>
-天量天价不要再买入了，是卖出的信号。</p>
-
-<p>上证指数8天结构的调整,第9天是一个变盘的，跌破20日线是向下，但是目前是5日线和20日线震荡，8 + 5 = 13天的结构，回落，再反弹，再选择方向，大概方向是偏好的。突破5日线或者跌破20日线。</p>
-
-<ol>
-<li>脉冲式建仓，回落0.382，买入</li>
-<li>回落式建仓</li>
-<li>回落反拉式建仓</li>
-</ol></li>
-</ol></li>
-<li><p>地量地价<br/>
-放量不是买点，放量之后再缩量就是买点</p></li>
-<li><p>底部放量</p></li>
-</ol>
-
-<p>蹄子线： 就是涨跌不超过百分之三，大部分情况是庄家吸筹</p>
-
-<p>买阴线，卖阳线<br/>
-买缩量，卖放量</p>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[PostgreSql主从配置]]></title>
-    <link href="http://blog.izgnod.com/14719510431478.html"/>
-    <updated>2016-08-23T19:17:23+08:00</updated>
-    <id>http://blog.izgnod.com/14719510431478.html</id>
-    <content type="html"><![CDATA[
-<h2 id="toc_0">PostgreSql主从配置</h2>
-
-<ol>
-<li><p>PostgreSql安装：</p>
-
-<ol>
-<li><p>导入PostgreSql 9.5 源</p>
-
-<pre><code>$rpm -Uvh http://yum.postgresql.org/9.5/redhat/rhel-7-x86_64/pgdg-centos95-9.5-2.noarch.rpm
-</code></pre></li>
-<li><p>安装Postgresql</p>
-
-<pre><code>  $yum install postgresql95-server postgresql95 # 这里一般是会安装最新的9.5稳定版，如果用到Postgresql插件，需要安装扩展，建议安装方式： yum install postgresql95*
-</code></pre></li>
-<li><p>初始化目录结构</p>
-
-<pre><code>  $/usr/pgsql-9.5/bin/postgresql95-setup initdb #这里是Centos7 的目录位置
-</code></pre></li>
-<li><p>启动（这个可以在后面的主从配置完成之后进行启动）</p>
-
-<pre><code>  $service  postgresql-9.5 start
-  $chkconfig postgresql-9.5 on #设置开机启动
-</code></pre></li>
-</ol></li>
-<li><p>PostgreSql 主从配置意义：</p>
-
-<ol>
-<li><p>主从配置能够在一台主机宕机的情况下立马切换到另外一台主机上，减少损失</p></li>
-<li><p>主从配置能够在读写分离，减轻数据库的压力,主库进行写，从库进行读。</p></li>
-<li><p>主从配置能够保证多数据库中的数据一致性。</p></li>
-</ol></li>
-<li><p>主从配置流程：<br/>
-注意：这里使用的是Postgresql 9.5.3进行。由于Postgresql版本之间会有细微的差别。</p>
-
-<ol>
-<li><p>Master 配置：</p>
-
-<ol>
-<li><p>配置:postgresql.conf 文件</p>
-
-<pre><code>listen_addresses = &#39;*&#39;          # what IP address(es) to listen on;
-wal_level = hot_standby         # wal 日志的级别
-max_wal_senders = 5             # 控制主库最多可以有多少个并发的standby数据库；
-wal_keep_segments = 64          # 16M为单位，wal日志生成的单位，尽量的设置较大，防止日志没有来得及到standby就被循环覆盖了，这个如果数据量大的时候要慎重。
-synchronous_standby_names = &#39;*&#39; #synchronous_standby_names 这个参数对应着slave配置文件中的recovery.conf 中的primary_conninfo
-</code></pre></li>
-<li><p>配置:pg_hba.conf文件(这个文件主要是用来配置数据库连接权限的)</p>
-
-<pre><code># local      DATABASE  USER  METHOD  [OPTIONS]
-# host       DATABASE  USER  ADDRESS  METHOD  [OPTIONS]
-# hostssl    DATABASE  USER  ADDRESS  METHOD  [OPTIONS]
-# hostnossl  DATABASE  USER  ADDRESS  METHOD  [OPTIONS]
-#第一列是指定能够连接数据库的类型，local是本地连接，host是远程的主机。
-#第二列是指能够连接那些数据库
-#第三列是哪个用户能够连接数据库
-#第四列是地址
-#第五列是认证的方式
-local   all             postgres                                trust
-local   all             all                                     peer
-host    all             all             0.0.0.0/0               md5
-host    replication     all             0.0.0.0/0               trust
-host    all             all             ::1/128                 md5
-</code></pre>
-
-<p>配置说明：</p>
-
-<ol>
-<li>允许本地的postgres连接</li>
-<li>允许所有的本地连接认证方式是获取本地的操作系统的用户名。</li>
-</ol></li>
-</ol></li>
-<li><p>Slave 配置：</p>
-
-<ol>
-<li><p>配置:postgresql.conf 文件</p>
-
-<pre><code>listen_addresses = &#39;*&#39;          # what IP address(es) to listen on;
-wal_level = hot_standby
-max_connections = 1000
-hot_standby = on
-hot_standby_feedback = on
-</code></pre></li>
-<li><p>配置:pg_hba.conf文件(这个文件主要是用来配置数据库连接权限的)</p>
-
-<pre><code>local   all             postgres                                trust
-local   all             all                                     peer
-host    all             all             0.0.0.0/0               md5
-host    replication     all             0.0.0.0/0               trust
-host    all             all             ::1/128                 md5
-</code></pre></li>
-<li><p>配置: recovery.conf文件</p>
-
-<pre><code>primary_conninfo = &#39;host=x.x.x.x user=test password=123 port=5432&#39;
-EOF
-</code></pre></li>
-</ol></li>
-<li><p>过程如下：</p>
-
-<ol>
-<li><p>Master</p>
-
-<ol>
-<li>启动Mater节点（没有任何的主从配置过程）</li>
-<li><p>修改postgres的密码, 创建主从同步需要的账号</p>
-
-<pre><code>su postgres
-psql -c &quot;ALTER USER postgres WITH PASSWORD &#39;123&#39;;&quot;
-psql -c &quot; CREATE ROLE repluser REPLICATION LOGIN PASSWORD &#39;123&#39;;&quot;
-</code></pre></li>
-<li><p>然后修改配置成如上的配置。</p></li>
-<li><p>重启Master</p></li>
-</ol></li>
-<li><p>Master打开备份状态：</p>
-
-<pre><code>```
-psql -U postgres -c &quot;select pg_start_backup(&#39;initial_backup&#39;);&quot;
-```
-</code></pre>
-
-<ol>
-<li><p>将内容拷贝到远程的slave节点。</p>
-
-<pre><code>rsync -cva --inplace --exclude=*pg_xlog* /var/lib/pgsql/9.5/data/ slave_ipaddress:/var/lib/pgsql/9.5/data/
-</code></pre></li>
-<li><p>退出备份状态</p>
-
-<pre><code>psql -U postgres -c &quot;select pg_stop_backup();&quot;
-</code></pre></li>
-</ol></li>
-</ol></li>
-<li><p>Slave</p>
-
-<ol>
-<li>修改成如上的slave配置</li>
-<li><p>注意一下/var/lib/pgsql/9.5/data/目录的权限问题，尤其是recovery.conf</p>
-
-<pre><code>chown -R postgres.postgres /var/lib/pgsql/9.5/data/
-</code></pre></li>
-</ol></li>
-</ol></li>
-<li><p>检验方式：<br/>
-    输入一下命令：</p>
-
-<pre><code>```
-select * from pg_stat_replication;
-```
-
-可以从输出的信息中看到是否同步成功。
-</code></pre></li>
-</ol>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Nginx HTTP2.0]]></title>
-    <link href="http://blog.izgnod.com/14719476150773.html"/>
-    <updated>2016-08-23T18:20:15+08:00</updated>
-    <id>http://blog.izgnod.com/14719476150773.html</id>
-    <content type="html"><![CDATA[
-<p>Nginx 从1.9.5已经能够支持HTTP2.0，但是对Openssl版本有要求，下面是过程：</p>
-
-<h2 id="toc_0">环境准备：</h2>
-
-<pre><code>$yum install gcc gcc-c++ autoconf automake zlib zlib-devel pcre-devel
-</code></pre>
-
-<h2 id="toc_1">编译Nginx版本：</h2>
-
-<pre><code>$wget http://nginx.org/download/nginx-1.11.1.tar.gz
-$tar xf /nginx-1.10.0.tar.gz
-$./configure \
---prefix=/etc/nginx\
---sbin-path=/usr/sbin/nginx \
---conf-path=/etc/nginx/nginx.conf \
---error-log-path=/var/log/nginx/error.log \
---http-log-path=/var/log/nginx/access.log \
---pid-path=/var/run/nginx.pid \
---lock-path=/var/run/nginx.lock \
---http-client-body-temp-path=/var/cache/nginx/client_temp \
---http-proxy-temp-path=/var/cache/nginx/proxy_temp \
---http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
---http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp \
---http-scgi-temp-path=/var/cache/nginx/scgi_temp \
---user=nginx \
---group=nginx \
---with-openssl=/usr/src/openssl-1.0.2h \
---with-http_ssl_module \
---with-http_realip_module \
---with-http_addition_module \
---with-http_sub_module \
---with-http_dav_module \
---with-http_flv_module \
---with-http_mp4_module \
---with-http_gunzip_module \
---with-http_gzip_static_module \
---with-http_random_index_module \
---with-http_secure_link_module \
---with-http_stub_status_module \
---with-http_auth_request_module \
---with-mail \
---with-debug \
---with-mail_ssl_module \
---with-file-aio \
---with-ipv6 \
---with-threads \
---with-stream \
---with-stream_ssl_module \
---with-http_slice_module \
---with-http_v2_module
-$make &amp;&amp; make install 
-</code></pre>
-
-<h2 id="toc_2">修改配置并且运行</h2>
-
-<p>1) 修改配置：</p>
-
-<pre><code>$修改配置文件：
-添加：listen 443 ssl http2;
-server_name x.17mei.cn;
-#ssl on;
-ssl_certificate /etc/cert1.pem;
-ssl_certificate_key /etc/privkey1.pem;
-</code></pre>
-
-<p>2) 运行：<br/>
-    1. 可执行文件在objs 目录下，直接可以使用。<br/>
-    2. 运行过程例如：</p>
-
-<pre><code>    ```
-    $./nginx -c /etc/nginx/nginx.conf
-    ```
-</code></pre>
-
-<h2 id="toc_3">效果：</h2>
-
-<pre><code>能够在浏览器审核中，看到Network-&gt;Protocol中有h2等关键字，说明http2已经成功。
-</code></pre>
-
-<p><img src="http://o9l83saod.bkt.clouddn.com/http2.0.png" alt="Kubernets 架构图 v1"/></p>
 
 ]]></content>
   </entry>

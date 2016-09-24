@@ -47,6 +47,10 @@
         <li><label>Golang</label></li>
 
           
+            <li><a title="Golang Context" href="14746196382822.html">Golang Context</a></li>
+          
+            <li><a title="Golang 控制routine" href="14745112452162.html">Golang 控制routine</a></li>
+          
             <li><a title="Golang 小技巧" href="14741728889918.html">Golang 小技巧</a></li>
           
             <li><a title="Golang Sort排序" href="14730511199413.html">Golang Sort排序</a></li>
@@ -117,6 +121,8 @@
         <li><label>个人收集</label></li>
 
           
+            <li><a title="git 常用方法" href="14745419664301.html">git 常用方法</a></li>
+          
             <li><a title="读书" href="14734878748126.html">读书</a></li>
           
             <li><a title="技术类博客收集" href="14727777201831.html">技术类博客收集</a></li>
@@ -155,6 +161,10 @@
 
                     
                       <li class="side-title"><span>Golang</span></li>
+                        
+                          <li><a title="Golang Context" href="14746196382822.html">Golang Context</a></li>
+                        
+                          <li><a title="Golang 控制routine" href="14745112452162.html">Golang 控制routine</a></li>
                         
                           <li><a title="Golang 小技巧" href="14741728889918.html">Golang 小技巧</a></li>
                         
@@ -216,6 +226,8 @@
                     
                       <li class="side-title"><span>个人收集</span></li>
                         
+                          <li><a title="git 常用方法" href="14745419664301.html">git 常用方法</a></li>
+                        
                           <li><a title="读书" href="14734878748126.html">读书</a></li>
                         
                           <li><a title="技术类博客收集" href="14727777201831.html">技术类博客收集</a></li>
@@ -246,15 +258,26 @@
 
 	
 		<div class="markdown-body">
-		<h1>读书</h1>
+		<h1>git 常用方法</h1>
 
-		<ol>
-<li><a href="https://link.zhihu.com/?target=http%3A//www.quzhuanpan.com/source/search.action%3Fq%3Dkindle%2520%25E7%2594%25B5%25E5%25AD%2590%25E4%25B9%25A6%26currentPage%3D1">百度云资源搜索</a></li>
-<li><a href="https://www.jiumodiary.com/">Jiumo E-Book Search 鸠摩搜书</a></li>
-<li><a href="https://link.zhihu.com/?target=http%3A//readcolor.com">读远：发掘优质电子书资源，提供好书分享、下载与推送。支持mobi/epub/pdf/txt格式。</a></li>
-<li><a href="https://link.zhihu.com/?target=http%3A//gen.lib.rus.ec">Library genesis 英文科学著作</a></li>
-<li><a href="https://link.zhihu.com/?target=http%3A//www.gutenberg.org">Gutenberg 维基古腾堡计划</a></li>
-</ol>
+		<p>进入git 目录，是工作目录(Working Directory)</p>
+
+<p>git add 将文件加入到缓存区 ( Staged Snapshot ) <br/>
+git commit 将文件加入到历史中 ( Commit History)</p>
+
+<p>git reset --soft 将缓存区的文件，同步到指定的commit.<br/>
+git reset --mixed 将工作目录同步到指定的commit，默认的是mixed.<br/>
+git reset --hard 将工作目录和缓存区全部到指定的commit</p>
+
+<p>常用操作：<br/>
+git reset --mixed HEAD 将你当前的改动从缓存区中移除，但是这些改动还留在工作目录中<br/>
+git reset --hard HEAD 舍弃所有的提交改动</p>
+
+<p>git checkout commit_id 可以快速的切换到指定的commit </p>
+
+<p>git revert 撤销已经提交的更改</p>
+
+<p><a href="https://github.com/geeeeeeeeek/git-recipes/wiki">https://github.com/geeeeeeeeek/git-recipes/wiki</a></p>
 
 
 		</div>

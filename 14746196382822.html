@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
     
-  Golang - 重剑无锋，大巧不工。
+  Golang Context - 重剑无锋，大巧不工。
   
   </title>
  <meta name="description" content="">
@@ -253,122 +253,283 @@
             </div>
             <div class="large-9 medium-9 columns">
 
- 
-
-
-	
-		<div class="markdown-body">
-		<h1>Golang Sort排序</h1>
-
-		<ol>
-<li><p>Golang Sort 使用方法：</p>
+ <div class="markdown-body">
+<h1>Golang Context</h1>
 
 <ol>
-<li><p>实现Sort Interface 的三个方法</p>
-
-<pre><code>Len()
-Less(i, j int) bool
-Swap(i, j int) 
-</code></pre>
+<li>WithCancel</li>
+</ol>
 
 <pre><code>package main
 
 import (
     &quot;fmt&quot;
-    &quot;sort&quot;
+    //&quot;context&quot;
+    &quot;context&quot;
+    &quot;time&quot;
 )
 
-//学生成绩结构体
-type StuScore struct {
-    //姓名
-    name  string
-    //成绩
-    score int
-}
-
-type StuScores []StuScore
-
-//Len()
-func (s StuScores) Len() int {
-    return len(s)
-}
-
-//Less():成绩将有低到高排序
-func (s StuScores) Less(i, j int) bool {
-    return s[i].score  &lt; s[j].score
-}
-
-//Swap()
-func (s StuScores) Swap(i, j int) {
-    s[i], s[j] = s[j], s[i]
+type otherContext struct {
+    context.Context
+    other string
 }
 
 func main() {
-    stus := StuScores{
-        {&quot;alan&quot;, 95},
-        {&quot;hikerell&quot;, 91},
-        {&quot;acmfly&quot;, 96},
-        {&quot;leao&quot;, 90}}
+    // Background 声称一个context的根，是空的，但不是nil，根context是不能够Cancel的
+    bkc := context.Background()
+    // 生成一个Child Context ，带有Cancel，
+    c1, cancel := context.WithCancel(bkc)
 
-    fmt.Println(&quot;Default:&quot;)
-    //原始顺序
-    for _, v := range stus {
-        fmt.Println(v.name, &quot;:&quot;, v.score)
-    }
-    fmt.Println()
-    //StuScores已经实现了sort.Interface接口
-    sort.Sort(stus)
-
-    fmt.Println(&quot;Sorted:&quot;)
-    //排好序后的结构
-    for _, v := range stus {
-        fmt.Println(v.name, &quot;:&quot;, v.score)
+    // context 实现了String方法可以被Sprint格式化
+    if got, want := fmt.Sprint(c1), &quot;context.Background.WithCancel&quot;; got != want {
+        fmt.Errorf(&quot;c1.String() = %q want %q&quot;, got, want)
     }
 
-    //判断是否已经排好顺序，将会打印true
-    fmt.Println(&quot;IS Sorted?&quot;, sort.IsSorted(stus))
+    // 所有包含Context接口的数据类型都能够当做Context接口类型使用
+    o := otherContext{c1, &quot;wonder&quot;}
+    //o := otherContext{context.Background(), &quot;wonder&quot;}
+    c2, _ := context.WithCancel(o)
+    contexts := []context.Context{c1, o, c2}
 
-    fmt.Println()
-    // 排序翻转
-    sort.Sort(sort.Reverse(stus))
-    for _, v := range stus {
-        fmt.Println(v.name, &quot;:&quot;, v.score)
+    /*
+            关系图
+                bkc
+                /
+              c1(o)
+              /
+             c2
+    */
+
+    for i, c := range contexts {
+        //Done返回值是一个 &lt;-chan struct{}， 返回nil说明这个Context是不能够用关闭的例如：Background生成的Context
+        if d := c.Done(); d == nil {
+            fmt.Errorf(&quot;c[%d].Done() == %v want non-nil&quot;, i, d)
+        }
+        // context关闭的原因，如果没有则返回nil， context 关闭之后会返回指定的内容
+        if e := c.Err(); e != nil {
+            fmt.Errorf(&quot;c[%d].Err() == %v want nil&quot;, i, e)
+        }
+        // c1和o是同一个context,所以前两个打印出来的内容一样
+        tm := c.Done()
+        fmt.Println(tm)
+
+        select {
+        //此处被block住，执行default，因为context并没有关闭
+        case x := &lt;-c.Done():
+            fmt.Errorf(&quot;&lt;-c.Done() == %v want nothing (it should block)&quot;, x)
+        default:
         }
     }
-</code></pre></li>
-</ol></li>
-<li><p>内部数据类型排序</p>
+    // 关闭c1,也就是关闭了o，那么c2也就被关闭了，关闭之后Done所返回的channel 也就关闭了， 关闭之后的channel能够一直取出值
+    cancel()
+    time.Sleep(100 * time.Millisecond) // let cancelation propagate
+
+    //前面已经Done之后，再次执行Done
+    for i, c := range contexts {
+        select {
+        // 关闭之后c.Done就不再是空
+        case &lt;-c.Done():
+        default:
+            fmt.Errorf(&quot;&lt;-c[%d].Done() blocked, but shouldn&#39;t have&quot;, i)
+        }
+        if e := c.Err(); e != context.Canceled {
+            fmt.Errorf(&quot;c[%d].Err() == %v want %v&quot;, i, e, context.Canceled)
+        }
+    }
+
+}
+
+</code></pre>
 
 <ol>
-<li><p>IntSlice, Float64Slice, StringSlice<br/>
-举例：</p>
-
-<pre><code>```
-// 升序
-s := []int{5,3,6,7,4}
-sort.Ints(s)
-fmt.Println(s) //将会输出[3 4 5 6 7]
-
-// 降序
-s := []int{5, 2, 6, 3, 1, 4} // 未排序的切片数据
-sort.Sort(sort.Reverse(sort.IntSlice(s)))
-fmt.Println(s) //将会输出[6 5 4 3 2 1]
-
-// 查找排序之后大于等于指定数字的位置
-s := []int{5, 2, 6, 3, 1, 4} // 未排序的切片数据
-sort.Ints(s) //排序后的s为[1 2 3 4 5 6]
-fmt.Println(sort.SearchInts(s, 3)) //将会输出2
-```
-</code></pre></li>
-</ol></li>
+<li>TimeOut &amp;&amp; DeadLine</li>
 </ol>
 
+<pre><code>    package main
 
-		</div>
-	
+import (
+    &quot;fmt&quot;
+    //&quot;context&quot;
+    &quot;context&quot;
+    &quot;strings&quot;
+    &quot;time&quot;
+)
 
-  
-  
+type otherContext struct {
+    context.Context
+}
+
+func main() {
+
+    // 50 millisecond 之后自动关闭
+    c, _ := context.WithDeadline(context.Background(), time.Now().Add(50*time.Millisecond))
+    if got, prefix := fmt.Sprint(c), &quot;context.Background.WithDeadline(&quot;; !strings.HasPrefix(got, prefix) {
+        fmt.Errorf(&quot;c.String() = %q want prefix %q&quot;, got, prefix)
+    }
+    testDeadline(c, &quot;WithDeadline&quot;, time.Second)
+
+    // 继承context的类型使用WithDeadline
+    c, _ = context.WithDeadline(context.Background(), time.Now().Add(50*time.Millisecond))
+    o := otherContext{c}
+    testDeadline(o, &quot;WithDeadline+otherContext&quot;, time.Second)
+
+    // Parent Context 超时时间比 Child Context 超时时间短
+    c, _ = context.WithDeadline(context.Background(), time.Now().Add(50*time.Millisecond))
+    o = otherContext{c}
+    c, _ = context.WithDeadline(o, time.Now().Add(4*time.Second))
+    // 结果为：Parent Context 超时
+    testDeadline(c, &quot;WithDeadline+otherContext+WithDeadline&quot;, 2*time.Second)
+
+    // 超时时间是负数，直接超时
+    c, _ = context.WithDeadline(context.Background(), time.Now().Add(-time.Millisecond))
+    testDeadline(c, &quot;WithDeadline+inthepast&quot;, time.Second)
+
+    // 超时时间是现在时间，直接超时
+    c, _ = context.WithDeadline(context.Background(), time.Now())
+    testDeadline(c, &quot;WithDeadline+now&quot;, time.Second)
+
+    // WithTimeout
+
+    c, _ = context.WithTimeout(context.Background(), 50*time.Millisecond)
+    if got, prefix := fmt.Sprint(c), &quot;context.Background.WithDeadline(&quot;; !strings.HasPrefix(got, prefix) {
+        fmt.Errorf(&quot;c.String() = %q want prefix %q&quot;, got, prefix)
+    }
+    testDeadline(c, &quot;WithTimeout&quot;, time.Second)
+
+    c, _ = context.WithTimeout(context.Background(), 50*time.Millisecond)
+    o = otherContext{c}
+    testDeadline(o, &quot;WithTimeout+otherContext&quot;, time.Second)
+
+    c, _ = context.WithTimeout(context.Background(), 50*time.Millisecond)
+    o = otherContext{c}
+    c, _ = context.WithTimeout(o, 3*time.Second)
+    testDeadline(c, &quot;WithTimeout+otherContext+WithTimeout&quot;, 2*time.Second)
+
+    // Cancel TimeOut
+    // Cancel 能够立马生效
+    c, _ = context.WithTimeout(context.Background(), time.Second)
+    o = otherContext{c}
+    c, cancel := context.WithTimeout(o, 2*time.Second)
+    cancel()
+    time.Sleep(100 * time.Millisecond) // let cancelation propagate
+    select {
+    case &lt;-c.Done():
+    default:
+        fmt.Errorf(&quot;&lt;-c.Done() blocked, but shouldn&#39;t have&quot;)
+    }
+    if e := c.Err(); e != context.Canceled {
+        fmt.Errorf(&quot;c.Err() == %v want %v&quot;, e, context.Canceled)
+    }
+
+}
+
+func testDeadline(c context.Context, name string, failAfter time.Duration) {
+    select {
+    case &lt;-time.After(failAfter):
+        fmt.Errorf(&quot;%s: context should have timed out&quot;, name)
+    case &lt;-c.Done():
+        // context closed
+    }
+    if e := c.Err(); e != context.DeadlineExceeded {
+        fmt.Errorf(&quot;%s: c.Err() == %v; want %v&quot;, name, e, context.DeadlineExceeded)
+    }
+}
+
+</code></pre>
+
+<ol>
+<li>WithValue</li>
+</ol>
+
+<pre><code>package main
+
+import (
+    &quot;fmt&quot;
+    &quot;context&quot;
+)
+
+type otherContext struct {
+    context.Context
+}
+
+type Key struct {
+    name string
+    age  int
+}
+
+func main() {
+
+    sKey := Key{&quot;izgnod&quot;, 18}
+    c0 := context.Background()
+    fmt.Println(c0)
+
+    c1 := context.WithValue(c0, &quot;k1&quot;, &quot;value1&quot;)
+    fmt.Printf(&quot;key: k1 value:%s\n&quot;, c1.Value(&quot;k1&quot;))
+
+    c2 := context.WithValue(c1, &quot;k2&quot;, sKey)
+    switch t := c2.Value(&quot;k2&quot;).(type) {
+    case Key:
+        fmt.Printf(&quot;key: k2 value:Key{name:%s,age:%d}\n&quot;, t.name, t.age)
+    default:
+        fmt.Println(&quot;unknow&quot;)
+
+    }
+    fmt.Println(c2.Value(&quot;k1&quot;))
+
+}
+</code></pre>
+
+
+</div>
+
+<br /><br />
+<hr />
+
+<div class="row clearfix">
+  <div class="large-6 columns">
+	<div class="text-left" style="padding:15px 0px;">
+		
+	</div>
+  </div>
+  <div class="large-6 columns">
+	<div class="text-right" style="padding:15px 0px;">
+		
+	        <a href="14745419664301.html" 
+	        title="Next Post: git 常用方法">git 常用方法 &raquo;</a>
+	    
+	</div>
+  </div>
+</div>
+
+<div class="row">
+<div style="padding:0px 0.93em;" class="share-comments">
+<!-- 多说评论框 start -->
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"fuckall"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- 多说公共JS代码 end -->
+</div>
+</div>
+<script type="text/javascript">
+	$(function(){
+		var currentURL = '14746196382822.html';
+		$('#side-nav a').each(function(){
+			if($(this).attr('href') == currentURL){
+				$(this).parent().addClass('active');
+			}
+		});
+	});
+</script>  
 </div></div>
 
 

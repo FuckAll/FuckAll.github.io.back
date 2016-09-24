@@ -258,107 +258,55 @@
 
 	
 		<div class="markdown-body">
-		<h1>Golang Sort排序</h1>
+		<h1>Golang 指针问题</h1>
 
 		<ol>
-<li><p>Golang Sort 使用方法：</p>
+<li><p>Golang指针<br><br/>
+<strong>除了正常的指针之外，还有以下两种指针，一种是unsafe.Pointer指针，把任何的指针看成一个正常的指针，uintptr是将任何的一个指针都看成一个整数。</strong></p>
 
 <ol>
-<li><p>实现Sort Interface 的三个方法</p>
+<li><p>unsafe.Pointer指针</p>
 
-<pre><code>Len()
-Less(i, j int) bool
-Swap(i, j int) 
-</code></pre>
-
-<pre><code>package main
-
-import (
-    &quot;fmt&quot;
-    &quot;sort&quot;
-)
-
-//学生成绩结构体
-type StuScore struct {
-    //姓名
-    name  string
-    //成绩
-    score int
-}
-
-type StuScores []StuScore
-
-//Len()
-func (s StuScores) Len() int {
-    return len(s)
-}
-
-//Less():成绩将有低到高排序
-func (s StuScores) Less(i, j int) bool {
-    return s[i].score  &lt; s[j].score
-}
-
-//Swap()
-func (s StuScores) Swap(i, j int) {
-    s[i], s[j] = s[j], s[i]
-}
-
-func main() {
-    stus := StuScores{
-        {&quot;alan&quot;, 95},
-        {&quot;hikerell&quot;, 91},
-        {&quot;acmfly&quot;, 96},
-        {&quot;leao&quot;, 90}}
-
-    fmt.Println(&quot;Default:&quot;)
-    //原始顺序
-    for _, v := range stus {
-        fmt.Println(v.name, &quot;:&quot;, v.score)
-    }
-    fmt.Println()
-    //StuScores已经实现了sort.Interface接口
-    sort.Sort(stus)
-
-    fmt.Println(&quot;Sorted:&quot;)
-    //排好序后的结构
-    for _, v := range stus {
-        fmt.Println(v.name, &quot;:&quot;, v.score)
-    }
-
-    //判断是否已经排好顺序，将会打印true
-    fmt.Println(&quot;IS Sorted?&quot;, sort.IsSorted(stus))
-
-    fmt.Println()
-    // 排序翻转
-    sort.Sort(sort.Reverse(stus))
-    for _, v := range stus {
-        fmt.Println(v.name, &quot;:&quot;, v.score)
+<pre><code>// unsafe.Pointer 指针
+    func test4() {
+        type data struct {
+            x [1024 * 100]byte
         }
-    }
+
+        tmp := func() unsafe.Pointer {
+             p := &amp;data{}
+             return unsafe.Pointer(p)
+        }
+
+        const N = 10000
+        cache := new([N]unsafe.Pointer)
+        for i := 0; i &lt; N; i++ {
+             cache[i] = tmp()
+             time.Sleep(time.Millisecond)
+        }
+ }
 </code></pre></li>
-</ol></li>
-<li><p>内部数据类型排序</p>
+<li><p>uintptr指针(将指针看成一个整数)</p>
 
-<ol>
-<li><p>IntSlice, Float64Slice, StringSlice<br/>
-举例：</p>
+<pre><code>// uintptr 指针
+func test3() {
+    type data struct {
+                x [1024 * 100]byte
+    }
 
-<pre><code>```
-// 升序
-s := []int{5,3,6,7,4}
-sort.Ints(s)
-fmt.Println(s) //将会输出[3 4 5 6 7]
+    tmp := func() uintptr {
+            p := &amp;data{}
+            return uintptr(unsafe.Pointer(p))
+    }
 
-// 降序
-s := []int{5, 2, 6, 3, 1, 4} // 未排序的切片数据
-sort.Sort(sort.Reverse(sort.IntSlice(s)))
-fmt.Println(s) //将会输出[6 5 4 3 2 1]
-
-// 查找排序之后大于等于指定数字的位置
-s := []int{5, 2, 6, 3, 1, 4} // 未排序的切片数据
-sort.Ints(s) //排序后的s为[1 2 3 4 5 6]
-fmt.Println(sort.SearchInts(s, 3)) //将会输出2
-```
+    const N = 10000
+    cache := new([N]uintptr)
+    fmt.Println(reflect.TypeOf(cache))
+    for i := 0; i &lt; N; i++ {
+                cache[i] = tmp()
+                time.Sleep(time.Millisecond)
+        }
+} 
 </code></pre></li>
 </ol></li>
 </ol>

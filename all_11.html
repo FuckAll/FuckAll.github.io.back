@@ -47,6 +47,10 @@
         <li><label>Golang</label></li>
 
           
+            <li><a title="Golang Context" href="14746196382822.html">Golang Context</a></li>
+          
+            <li><a title="Golang 控制routine" href="14745112452162.html">Golang 控制routine</a></li>
+          
             <li><a title="Golang 小技巧" href="14741728889918.html">Golang 小技巧</a></li>
           
             <li><a title="Golang Sort排序" href="14730511199413.html">Golang Sort排序</a></li>
@@ -117,6 +121,8 @@
         <li><label>个人收集</label></li>
 
           
+            <li><a title="git 常用方法" href="14745419664301.html">git 常用方法</a></li>
+          
             <li><a title="读书" href="14734878748126.html">读书</a></li>
           
             <li><a title="技术类博客收集" href="14727777201831.html">技术类博客收集</a></li>
@@ -155,6 +161,10 @@
 
                     
                       <li class="side-title"><span>Golang</span></li>
+                        
+                          <li><a title="Golang Context" href="14746196382822.html">Golang Context</a></li>
+                        
+                          <li><a title="Golang 控制routine" href="14745112452162.html">Golang 控制routine</a></li>
                         
                           <li><a title="Golang 小技巧" href="14741728889918.html">Golang 小技巧</a></li>
                         
@@ -216,6 +226,8 @@
                     
                       <li class="side-title"><span>个人收集</span></li>
                         
+                          <li><a title="git 常用方法" href="14745419664301.html">git 常用方法</a></li>
+                        
                           <li><a title="读书" href="14734878748126.html">读书</a></li>
                         
                           <li><a title="技术类博客收集" href="14727777201831.html">技术类博客收集</a></li>
@@ -246,67 +258,48 @@
 
 	
 		<div class="markdown-body">
-		<h1>容器脚本</h1>
+		<h1>Golang 反射问题</h1>
 
-		<h3 id="toc_0">容器清理脚本</h3>
+		<ol>
+<li><p>指针的反射</p>
 
-<pre><code>#!/bin/sh
+<pre><code>func test6() {
+        type User struct {
+            Username string
+        }
+        type Admin struct {
+            User
+            title string
+        }
+        u := new(Admin)
+        t := reflect.TypeOf(u)
+        if t.Kind() == reflect.Ptr {
+            t = t.Elem()
+        }
+}
+</code></pre></li>
+<li><p>结构体的反射</p>
 
-&gt;/tmp/run_image_ids.$$
-
-DOCKER_BIN=/usr/bin/docker
-LOG=/var/log/docker-cleanup.log
-
-rm /tmp/run_image_ids.$$
-
-echo &quot;$(date) start-----&quot; &gt;&gt;$LOG
-
-$DOCKER_BIN ps --no-trunc -a -q | while read cid
-do
-  running=$($DOCKER_BIN inspect -f &#39;{{.State.Running}}&#39; $cid )
-  if [ &quot;$running&quot;x = &quot;true&quot;x ]
-  then
-    id=$($DOCKER_BIN inspect -f &#39;{{.Image}}&#39; $cid )
-    echo $id &gt;&gt;/tmp/run_image_ids.$$
-    continue
-  fi 
-  fini=$($DOCKER_BIN inspect -f &#39;{{.State.FinishedAt}}&#39; $cid | awk -F. &#39;{print $1}&#39;)
-  diff=$(expr $(date +&quot;%s&quot;) - $(date --date=&quot;$fini&quot; +&quot;%s&quot;))    
-  #for MacOs 
-  #diff=$(expr $(date +&quot;%s&quot;) - $(date -j -f %Y-%m-%dT%H:%M:%S &quot;$fini&quot; +&quot;%s&quot;))
-  if [ $diff -gt 86400 ]
-  then
-     $DOCKER_BIN rm -v $cid &gt;&gt;$LOG 2&gt;&amp;1
-  fi 
-done
-
-
-$DOCKER_BIN images --no-trunc | grep -v REPOSITORY | while read line
-do
-  repo_tag=$(echo $line | awk &#39;{print $1&quot;:&quot;$2}&#39;)
-  image_id=$(echo $line | awk &#39;{print $3}&#39;)
-  grep -q $image_id /tmp/run_image_ids.$$
-  if [ $? -eq 0 ]
-  then
-    continue
-  fi
-  if [ &quot;$repo_tag&quot;x = &quot;&lt;none&gt;:&lt;none&gt;&quot;x ]
-  then
-    $DOCKER_BIN rmi $image_id &gt;&gt;$LOG 2&gt;&amp;1
-  else
-    $DOCKER_BIN rmi $repo_tag &gt;&gt;$LOG 2&gt;&amp;1
-  fi
-done
-
-rm /tmp/run_image_ids.$$
-
-
-echo &quot;$(date) end-----&quot; &gt;&gt;$LOG
-</code></pre>
-
-<p><strong>清理内容</strong><br/>
-    1. 停止超过一天的容器<br/>
-    2. 一天之内没有运行过容器的镜像</p>
+<pre><code>// 反射结构体内容
+func test5() {
+        type User struct {
+                Username string
+        }
+        type Admin struct {
+                User
+                title string
+       }
+       func() {
+                var u Admin
+                t := reflect.TypeOf(u)
+                for i, n := 0, t.NumField(); i &lt; n; i++ {
+                    f := t.Field(i)
+                    fmt.Println(f.Name, f.Type)
+                }
+       }()
+  }
+</code></pre></li>
+</ol>
 
 
 		</div>

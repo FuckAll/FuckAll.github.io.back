@@ -47,6 +47,10 @@
         <li><label>Golang</label></li>
 
           
+            <li><a title="Golang Context" href="14746196382822.html">Golang Context</a></li>
+          
+            <li><a title="Golang 控制routine" href="14745112452162.html">Golang 控制routine</a></li>
+          
             <li><a title="Golang 小技巧" href="14741728889918.html">Golang 小技巧</a></li>
           
             <li><a title="Golang Sort排序" href="14730511199413.html">Golang Sort排序</a></li>
@@ -117,6 +121,8 @@
         <li><label>个人收集</label></li>
 
           
+            <li><a title="git 常用方法" href="14745419664301.html">git 常用方法</a></li>
+          
             <li><a title="读书" href="14734878748126.html">读书</a></li>
           
             <li><a title="技术类博客收集" href="14727777201831.html">技术类博客收集</a></li>
@@ -155,6 +161,10 @@
 
                     
                       <li class="side-title"><span>Golang</span></li>
+                        
+                          <li><a title="Golang Context" href="14746196382822.html">Golang Context</a></li>
+                        
+                          <li><a title="Golang 控制routine" href="14745112452162.html">Golang 控制routine</a></li>
                         
                           <li><a title="Golang 小技巧" href="14741728889918.html">Golang 小技巧</a></li>
                         
@@ -216,6 +226,8 @@
                     
                       <li class="side-title"><span>个人收集</span></li>
                         
+                          <li><a title="git 常用方法" href="14745419664301.html">git 常用方法</a></li>
+                        
                           <li><a title="读书" href="14734878748126.html">读书</a></li>
                         
                           <li><a title="技术类博客收集" href="14727777201831.html">技术类博客收集</a></li>
@@ -246,158 +258,41 @@
 
 	
 		<div class="markdown-body">
-		<h1>PostgreSql主从配置</h1>
+		<h1>选股模型</h1>
 
-		<h2 id="toc_0">PostgreSql主从配置</h2>
+		<pre><code>1. 长阳重炮
+    2. 在低位温和放量之后出现了一根带量长阳（或涨停），同时成交量为上叉阳量托，马上直扑追涨。
 
-<ol>
-<li><p>PostgreSql安装：</p>
 
-<ol>
-<li><p>导入PostgreSql 9.5 源</p>
-
-<pre><code>$rpm -Uvh http://yum.postgresql.org/9.5/redhat/rhel-7-x86_64/pgdg-centos95-9.5-2.noarch.rpm
-</code></pre></li>
-<li><p>安装Postgresql</p>
-
-<pre><code>  $yum install postgresql95-server postgresql95 # 这里一般是会安装最新的9.5稳定版，如果用到Postgresql插件，需要安装扩展，建议安装方式： yum install postgresql95*
-</code></pre></li>
-<li><p>初始化目录结构</p>
-
-<pre><code>  $/usr/pgsql-9.5/bin/postgresql95-setup initdb #这里是Centos7 的目录位置
-</code></pre></li>
-<li><p>启动（这个可以在后面的主从配置完成之后进行启动）</p>
-
-<pre><code>  $service  postgresql-9.5 start
-  $chkconfig postgresql-9.5 on #设置开机启动
-</code></pre></li>
-</ol></li>
-<li><p>PostgreSql 主从配置意义：</p>
-
-<ol>
-<li><p>主从配置能够在一台主机宕机的情况下立马切换到另外一台主机上，减少损失</p></li>
-<li><p>主从配置能够在读写分离，减轻数据库的压力,主库进行写，从库进行读。</p></li>
-<li><p>主从配置能够保证多数据库中的数据一致性。</p></li>
-</ol></li>
-<li><p>主从配置流程：<br/>
-注意：这里使用的是Postgresql 9.5.3进行。由于Postgresql版本之间会有细微的差别。</p>
-
-<ol>
-<li><p>Master 配置：</p>
-
-<ol>
-<li><p>配置:postgresql.conf 文件</p>
-
-<pre><code>listen_addresses = &#39;*&#39;          # what IP address(es) to listen on;
-wal_level = hot_standby         # wal 日志的级别
-max_wal_senders = 5             # 控制主库最多可以有多少个并发的standby数据库；
-wal_keep_segments = 64          # 16M为单位，wal日志生成的单位，尽量的设置较大，防止日志没有来得及到standby就被循环覆盖了，这个如果数据量大的时候要慎重。
-synchronous_standby_names = &#39;*&#39; #synchronous_standby_names 这个参数对应着slave配置文件中的recovery.conf 中的primary_conninfo
-</code></pre></li>
-<li><p>配置:pg_hba.conf文件(这个文件主要是用来配置数据库连接权限的)</p>
-
-<pre><code># local      DATABASE  USER  METHOD  [OPTIONS]
-# host       DATABASE  USER  ADDRESS  METHOD  [OPTIONS]
-# hostssl    DATABASE  USER  ADDRESS  METHOD  [OPTIONS]
-# hostnossl  DATABASE  USER  ADDRESS  METHOD  [OPTIONS]
-#第一列是指定能够连接数据库的类型，local是本地连接，host是远程的主机。
-#第二列是指能够连接那些数据库
-#第三列是哪个用户能够连接数据库
-#第四列是地址
-#第五列是认证的方式
-local   all             postgres                                trust
-local   all             all                                     peer
-host    all             all             0.0.0.0/0               md5
-host    replication     all             0.0.0.0/0               trust
-host    all             all             ::1/128                 md5
+    3. 量五日线2北，大阳线，实体的上沿可以做多，止损放到下沿
+2. 吞并翻转
+    3. 第一个交易日长阴（跌停）， 第二个交易日涨停，包容第一个交易日长阴。可以在第二个交易日涨停的刹那追涨买入
+3. 螺旋桨
+    4. 均线多头排列： 10日线在5日线以上至少
+    5. 影线长度8%
+    6. 量站上5日均量线
+4. 牛熊不败
+5. 三外有三
+6. 喜鹊闹梅
+    7. 
+7. 切割线
+    8. 一阳穿四线
+    9. 量站上5日线
+    10. 量比大于3%几率非常大
+8. 故地重游
+9. 开闸放水
+10. 强势牛回头
+11. 倒挂金钩
+    12. 均线多头排列
+    13. 高开3%左右
+    14. 5日线附近可以开买
+12. 蹄子线
+13. 金字塔
+14. 三步选股
+15. 双锤筑底
+16. 三只天鹅
+17. 攻击线
 </code></pre>
-
-<p>配置说明：</p>
-
-<ol>
-<li>允许本地的postgres连接</li>
-<li>允许所有的本地连接认证方式是获取本地的操作系统的用户名。</li>
-</ol></li>
-</ol></li>
-<li><p>Slave 配置：</p>
-
-<ol>
-<li><p>配置:postgresql.conf 文件</p>
-
-<pre><code>listen_addresses = &#39;*&#39;          # what IP address(es) to listen on;
-wal_level = hot_standby
-max_connections = 1000
-hot_standby = on
-hot_standby_feedback = on
-</code></pre></li>
-<li><p>配置:pg_hba.conf文件(这个文件主要是用来配置数据库连接权限的)</p>
-
-<pre><code>local   all             postgres                                trust
-local   all             all                                     peer
-host    all             all             0.0.0.0/0               md5
-host    replication     all             0.0.0.0/0               trust
-host    all             all             ::1/128                 md5
-</code></pre></li>
-<li><p>配置: recovery.conf文件</p>
-
-<pre><code>primary_conninfo = &#39;host=x.x.x.x user=test password=123 port=5432&#39;
-EOF
-</code></pre></li>
-</ol></li>
-<li><p>过程如下：</p>
-
-<ol>
-<li><p>Master</p>
-
-<ol>
-<li>启动Mater节点（没有任何的主从配置过程）</li>
-<li><p>修改postgres的密码, 创建主从同步需要的账号</p>
-
-<pre><code>su postgres
-psql -c &quot;ALTER USER postgres WITH PASSWORD &#39;123&#39;;&quot;
-psql -c &quot; CREATE ROLE repluser REPLICATION LOGIN PASSWORD &#39;123&#39;;&quot;
-</code></pre></li>
-<li><p>然后修改配置成如上的配置。</p></li>
-<li><p>重启Master</p></li>
-</ol></li>
-<li><p>Master打开备份状态：</p>
-
-<pre><code>```
-psql -U postgres -c &quot;select pg_start_backup(&#39;initial_backup&#39;);&quot;
-```
-</code></pre>
-
-<ol>
-<li><p>将内容拷贝到远程的slave节点。</p>
-
-<pre><code>rsync -cva --inplace --exclude=*pg_xlog* /var/lib/pgsql/9.5/data/ slave_ipaddress:/var/lib/pgsql/9.5/data/
-</code></pre></li>
-<li><p>退出备份状态</p>
-
-<pre><code>psql -U postgres -c &quot;select pg_stop_backup();&quot;
-</code></pre></li>
-</ol></li>
-</ol></li>
-<li><p>Slave</p>
-
-<ol>
-<li>修改成如上的slave配置</li>
-<li><p>注意一下/var/lib/pgsql/9.5/data/目录的权限问题，尤其是recovery.conf</p>
-
-<pre><code>chown -R postgres.postgres /var/lib/pgsql/9.5/data/
-</code></pre></li>
-</ol></li>
-</ol></li>
-<li><p>检验方式：<br/>
-    输入一下命令：</p>
-
-<pre><code>```
-select * from pg_stat_replication;
-```
-
-可以从输出的信息中看到是否同步成功。
-</code></pre></li>
-</ol>
 
 
 		</div>

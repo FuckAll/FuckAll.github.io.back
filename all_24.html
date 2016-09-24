@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
     
-  Golang - 重剑无锋，大巧不工。
+  重剑无锋，大巧不工。
   
   </title>
  <meta name="description" content="">
@@ -258,109 +258,22 @@
 
 	
 		<div class="markdown-body">
-		<h1>Golang Sort排序</h1>
+		<h1>Web 基础</h1>
 
 		<ol>
-<li><p>Golang Sort 使用方法：</p>
+<li><p>服务器响应：</p>
 
 <ol>
-<li><p>实现Sort Interface 的三个方法</p>
-
-<pre><code>Len()
-Less(i, j int) bool
-Swap(i, j int) 
-</code></pre>
-
-<pre><code>package main
-
-import (
-    &quot;fmt&quot;
-    &quot;sort&quot;
-)
-
-//学生成绩结构体
-type StuScore struct {
-    //姓名
-    name  string
-    //成绩
-    score int
-}
-
-type StuScores []StuScore
-
-//Len()
-func (s StuScores) Len() int {
-    return len(s)
-}
-
-//Less():成绩将有低到高排序
-func (s StuScores) Less(i, j int) bool {
-    return s[i].score  &lt; s[j].score
-}
-
-//Swap()
-func (s StuScores) Swap(i, j int) {
-    s[i], s[j] = s[j], s[i]
-}
-
-func main() {
-    stus := StuScores{
-        {&quot;alan&quot;, 95},
-        {&quot;hikerell&quot;, 91},
-        {&quot;acmfly&quot;, 96},
-        {&quot;leao&quot;, 90}}
-
-    fmt.Println(&quot;Default:&quot;)
-    //原始顺序
-    for _, v := range stus {
-        fmt.Println(v.name, &quot;:&quot;, v.score)
-    }
-    fmt.Println()
-    //StuScores已经实现了sort.Interface接口
-    sort.Sort(stus)
-
-    fmt.Println(&quot;Sorted:&quot;)
-    //排好序后的结构
-    for _, v := range stus {
-        fmt.Println(v.name, &quot;:&quot;, v.score)
-    }
-
-    //判断是否已经排好顺序，将会打印true
-    fmt.Println(&quot;IS Sorted?&quot;, sort.IsSorted(stus))
-
-    fmt.Println()
-    // 排序翻转
-    sort.Sort(sort.Reverse(stus))
-    for _, v := range stus {
-        fmt.Println(v.name, &quot;:&quot;, v.score)
-        }
-    }
-</code></pre></li>
+<li>1xx 提示信息 - 表示请求被成功接收，继续处理</li>
+<li>2xx 成功 - 表示清酒已经被成功接收，理解，接收</li>
+<li>3xx 重定向 - 要完成请求必须要做进一步的处理</li>
+<li>4xx 客户端错误 - 请求有语法错误或者无法实现</li>
+<li>5xx 服务端错误 - 服务端未能实现合法的请求</li>
 </ol></li>
-<li><p>内部数据类型排序</p>
+<li><p>HTTP协议的无状态和Keep-alive的区别：</p>
 
-<ol>
-<li><p>IntSlice, Float64Slice, StringSlice<br/>
-举例：</p>
-
-<pre><code>```
-// 升序
-s := []int{5,3,6,7,4}
-sort.Ints(s)
-fmt.Println(s) //将会输出[3 4 5 6 7]
-
-// 降序
-s := []int{5, 2, 6, 3, 1, 4} // 未排序的切片数据
-sort.Sort(sort.Reverse(sort.IntSlice(s)))
-fmt.Println(s) //将会输出[6 5 4 3 2 1]
-
-// 查找排序之后大于等于指定数字的位置
-s := []int{5, 2, 6, 3, 1, 4} // 未排序的切片数据
-sort.Ints(s) //排序后的s为[1 2 3 4 5 6]
-fmt.Println(sort.SearchInts(s, 3)) //将会输出2
-```
-</code></pre></li>
-</ol></li>
+<p>HTTP是一个无状态的面向连接的协议，无状态不代表HTTP不能保持TCP连接，更不能代表HTTP使用的是UDP协议（面对无连接）。<br/>
+   从HTTP/1.1起，默认都开启了Keep-Alive保持连接特性，简单地说，当一个网页打开完成后，客户端和服务器之间用于传输HTTP数据的TCP连接不会关闭，如果客户端再次访问这个服务器上的网页，会继续使用这一条已经建立的TCP连接。</p></li>
 </ol>
 
 

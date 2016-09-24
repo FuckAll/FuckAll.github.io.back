@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
     
-  Golang - 重剑无锋，大巧不工。
+  重剑无锋，大巧不工。
   
   </title>
  <meta name="description" content="">
@@ -258,110 +258,96 @@
 
 	
 		<div class="markdown-body">
-		<h1>Golang Sort排序</h1>
+		<h1>Docker Registry</h1>
 
 		<ol>
-<li><p>Golang Sort 使用方法：</p>
+<li>安全问题：能够在不泄露公司代码的情况下，存储镜像</li>
+<li>可用性： 不依赖其他的第三方的docker仓库</li>
+<li>Ci： 公司部署方式的改变，Docker Registry成为不可或缺的一部分。</li>
+</ol>
+
+<h2 id="toc_0">搭建准备：</h2>
 
 <ol>
-<li><p>实现Sort Interface 的三个方法</p>
+<li>镜像：registry:2</li>
+<li>镜像存储的目录：例如：/DockerRegistry/</li>
+<li>证书,安全证书</li>
+</ol>
 
-<pre><code>Len()
-Less(i, j int) bool
-Swap(i, j int) 
+<h2 id="toc_1">搭建过程：</h2>
+
+<ol>
+<li>首先拉取Docker Registry镜像(由于国内墙的问题,使用DaoCloud镜像)<br/></li>
+</ol>
+
+<pre><code>docker pull daocloud.io/library/registry:2.4.1
 </code></pre>
 
-<pre><code>package main
+<ol>
+<li>创建镜像存储目录：</li>
+</ol>
 
-import (
-    &quot;fmt&quot;
-    &quot;sort&quot;
-)
-
-//学生成绩结构体
-type StuScore struct {
-    //姓名
-    name  string
-    //成绩
-    score int
-}
-
-type StuScores []StuScore
-
-//Len()
-func (s StuScores) Len() int {
-    return len(s)
-}
-
-//Less():成绩将有低到高排序
-func (s StuScores) Less(i, j int) bool {
-    return s[i].score  &lt; s[j].score
-}
-
-//Swap()
-func (s StuScores) Swap(i, j int) {
-    s[i], s[j] = s[j], s[i]
-}
-
-func main() {
-    stus := StuScores{
-        {&quot;alan&quot;, 95},
-        {&quot;hikerell&quot;, 91},
-        {&quot;acmfly&quot;, 96},
-        {&quot;leao&quot;, 90}}
-
-    fmt.Println(&quot;Default:&quot;)
-    //原始顺序
-    for _, v := range stus {
-        fmt.Println(v.name, &quot;:&quot;, v.score)
-    }
-    fmt.Println()
-    //StuScores已经实现了sort.Interface接口
-    sort.Sort(stus)
-
-    fmt.Println(&quot;Sorted:&quot;)
-    //排好序后的结构
-    for _, v := range stus {
-        fmt.Println(v.name, &quot;:&quot;, v.score)
-    }
-
-    //判断是否已经排好顺序，将会打印true
-    fmt.Println(&quot;IS Sorted?&quot;, sort.IsSorted(stus))
-
-    fmt.Println()
-    // 排序翻转
-    sort.Sort(sort.Reverse(stus))
-    for _, v := range stus {
-        fmt.Println(v.name, &quot;:&quot;, v.score)
-        }
-    }
-</code></pre></li>
-</ol></li>
-<li><p>内部数据类型排序</p>
+<pre><code>$mkdir /DockerRegistry/
+</code></pre>
 
 <ol>
-<li><p>IntSlice, Float64Slice, StringSlice<br/>
-举例：</p>
-
-<pre><code>```
-// 升序
-s := []int{5,3,6,7,4}
-sort.Ints(s)
-fmt.Println(s) //将会输出[3 4 5 6 7]
-
-// 降序
-s := []int{5, 2, 6, 3, 1, 4} // 未排序的切片数据
-sort.Sort(sort.Reverse(sort.IntSlice(s)))
-fmt.Println(s) //将会输出[6 5 4 3 2 1]
-
-// 查找排序之后大于等于指定数字的位置
-s := []int{5, 2, 6, 3, 1, 4} // 未排序的切片数据
-sort.Ints(s) //排序后的s为[1 2 3 4 5 6]
-fmt.Println(sort.SearchInts(s, 3)) //将会输出2
-```
-</code></pre></li>
-</ol></li>
+<li>创建证书文件目录并且放入证书：</li>
 </ol>
+
+<pre><code>$mkdir /DockerRegistry/cert 
+</code></pre>
+
+<ol>
+<li>创建Docker Registry登录密码：</li>
+</ol>
+
+<pre><code class="language-bash">$mkdir auth
+$docker run --entrypoint htpasswd daocloud.io/library/registry:2.4.1  -Bbn testuser testpassword &gt; auth/htpasswd
+</code></pre>
+
+<ol>
+<li>启动Registry (注意下面的证书都是要改为自己的证书)</li>
+</ol>
+
+<pre><code class="language-bash">$docker run -d -p 5000:5000 --restart=always --name registry \
+  -v `pwd`/auth:/auth \
+  -e &quot;REGISTRY_AUTH=htpasswd&quot; \
+  -e &quot;REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm&quot; \
+  -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
+  daocloud.io/library/registry:2.4.1
+</code></pre>
+
+<ol>
+<li>添加一个可视化的界面 </li>
+</ol>
+
+<pre><code class="language-bash">$docker run \
+  -d \
+  -e ENV_DOCKER_REGISTRY_HOST=ENTER-YOUR-REGISTRY-HOST-HERE \
+  -e ENV_DOCKER_REGISTRY_PORT=ENTER-PORT-TO-YOUR-REGISTRY-HOST-HERE \
+  -e ENV_MODE_BROWSE_ONLY=false
+  -p 8080:80 \
+  konradkleine/docker-registry-frontend:v2
+</code></pre>
+
+<ol>
+<li>nginx配置 (添加nginx配置)</li>
+</ol>
+
+<pre><code class="language-nginx.conf">$server {
+    server_name dev;
+    location / {
+        proxy_pass http://x.x.x.x:8080;
+        proxy_http_version 1.1;
+        proxy_set_header Connection &quot;&quot;;
+    }
+}
+</code></pre>
+
+<h2 id="toc_2">总结：</h2>
+
+<p>以上的步骤比较简单，已经满足大部分的需求，更加高端的需求可以定制registry的config.yaml文件。<br/>
+起始可以在第六步的时候不必要映射端口到host，包括第七部也可以不用，因为相同在同一台机器上的docker是可以直接连接。</p>
 
 
 		</div>
