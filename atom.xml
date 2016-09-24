@@ -4,7 +4,7 @@
   <title><![CDATA[重剑无锋，大巧不工。]]></title>
   <link href="http://blog.izgnod.com/atom.xml" rel="self"/>
   <link href="http://blog.izgnod.com/"/>
-  <updated>2016-09-20T19:19:52+08:00</updated>
+  <updated>2016-09-24T20:59:38+08:00</updated>
   <id>http://blog.izgnod.com/</id>
   <author>
     <name><![CDATA[]]></name>
@@ -20,8 +20,7 @@
     <id>http://blog.izgnod.com/14746196382822.html</id>
     <content type="html"><![CDATA[
 <ol>
-<li>WithCancel</li>
-</ol>
+<li><p>WithCancel</p>
 
 <pre><code>package main
 
@@ -102,11 +101,8 @@ func main() {
 
 }
 
-</code></pre>
-
-<ol>
-<li>TimeOut &amp;&amp; DeadLine</li>
-</ol>
+</code></pre></li>
+<li><p>TimeOut &amp;&amp; DeadLine</p>
 
 <pre><code>    package main
 
@@ -198,11 +194,8 @@ func testDeadline(c context.Context, name string, failAfter time.Duration) {
     }
 }
 
-</code></pre>
-
-<ol>
-<li>WithValue</li>
-</ol>
+</code></pre></li>
+<li><p>WithValue</p>
 
 <pre><code>package main
 
@@ -240,7 +233,8 @@ func main() {
     fmt.Println(c2.Value(&quot;k1&quot;))
 
 }
-</code></pre>
+</code></pre></li>
+</ol>
 
 ]]></content>
   </entry>
