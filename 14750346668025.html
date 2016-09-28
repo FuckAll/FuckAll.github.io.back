@@ -398,11 +398,12 @@ create -f prometheus-deployment.yaml
 <li><p>配置grafana</p>
 
 <ol>
-<li>docker直接部署或者直接用Kubernets,我这里就用docker直接部署了
-<code>
-docker run -i -d -e &quot;GF_SERVER_ROOT_URL=http://grafana.xxx.com&quot; -e &quot;GF_SECURITY_ADMIN_PASSWORD=wothing&quot;  index.tenxcloud.com/izgnod/grafana:latest
-</code>
-注意：root url 环境变量一定要配你想解析的域名，也可以是一个地址。</li>
+<li><p>docker直接部署或者直接用Kubernets,我这里就用docker直接部署了</p>
+
+<pre><code>docker run -i -d -e &quot;GF_SERVER_ROOT_URL=http://grafana.xxx.com&quot; -e &quot;GF_SECURITY_ADMIN_PASSWORD=wothing&quot;  index.tenxcloud.com/izgnod/grafana:latest
+</code></pre>
+
+<p>注意：root url 环境变量一定要配你想解析的域名，也可以是一个地址。</p></li>
 </ol></li>
 <li><p>配置nginx，指向grafana</p>
 
