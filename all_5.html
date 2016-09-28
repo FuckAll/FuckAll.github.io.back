@@ -71,6 +71,8 @@
         <li><label>容器相关</label></li>
 
           
+            <li><a title="Kubernetes 监控" href="14750346668025.html">Kubernetes 监控</a></li>
+          
             <li><a title="容器脚本" href="14726120122280.html">容器脚本</a></li>
           
             <li><a title="Kubernetes应用的滚动升级" href="14719470938560.html">Kubernetes应用的滚动升级</a></li>
@@ -184,6 +186,8 @@
                     
                       <li class="side-title"><span>容器相关</span></li>
                         
+                          <li><a title="Kubernetes 监控" href="14750346668025.html">Kubernetes 监控</a></li>
+                        
                           <li><a title="容器脚本" href="14726120122280.html">容器脚本</a></li>
                         
                           <li><a title="Kubernetes应用的滚动升级" href="14719470938560.html">Kubernetes应用的滚动升级</a></li>
@@ -258,36 +262,92 @@
 
 	
 		<div class="markdown-body">
-		<h1>Golang 小技巧</h1>
+		<h1>Curl Http 测试</h1>
 
-		<h2 id="toc_0">入参类型</h2>
+		<ol>
+<li>常用参数</li>
+</ol>
 
-<ul>
-<li>如果是map，func，chan则不需要用指针，本身就是引用类型</li>
-<li>如果是slice，方法中不需要修改，则不需要用指针</li>
-<li>如果是func， 也需要方法内部替换的，就使用指针</li>
-<li>如果是包含sysnc.Mutex的struct，则需要传指针，避免对象的复制</li>
-<li>如果是大的array，struct，传指针比较好，如何评判是否够大，例如：比方法的对象还大。</li>
-</ul>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>说明</th>
+</tr>
+</thead>
 
-<h2 id="toc_1">数组常见操作：</h2>
+<tbody>
+<tr>
+<td>-X —request [GET POST PUT DELETE]</td>
+<td>指定方法</td>
+</tr>
+<tr>
+<td>-H —header</td>
+<td>设定header</td>
+</tr>
+<tr>
+<td>-i —include</td>
+<td>显示response 中的header</td>
+</tr>
+<tr>
+<td>-d —data</td>
+<td>http的parameters</td>
+</tr>
+<tr>
+<td>-v —verbose</td>
+<td>输出详情</td>
+</tr>
+<tr>
+<td>-u —user</td>
+<td>使用者的账号，密码</td>
+</tr>
+<tr>
+<td>-b —cookie</td>
+<td>cookie</td>
+</tr>
+</tbody>
+</table>
 
-<ul>
-<li>如何高效（不涉及到内存重新的分配）将数组向前移动：</li>
-</ul>
+<p>用例：</p>
 
-<pre><code>    方法一：
-    tmp := []int64{1,2,3}
-    fmt.Printf(&quot;Befor :%p\n&quot;,&amp;tmp)
-    copy(tmp, tmp[1:])
-    tmp = tmp[:len(tmp)-1]
-    fmt.Printf(&quot;After :%p\n&quot;,&amp;tmp)
-    方法二：
-    tmp1 := []int64{1,2,3}
-    fmt.Printf(&quot;Befor :%p\n&quot;,&amp;tmp1)
-    tmp1 = tmp1[1:len(tmp1)-1]
-    fmt.Printf(&quot;After :%p\n&quot;,&amp;tmp1)
+<pre><code>curl -X GET &quot;http://www.baidu.com/&quot;
+curl -X POST &quot;http://www.baidu.com/&quot;
+curl -X PUT &quot;http://www.baidu.com/&quot;
+curl -X DELETE &quot;http://www.baidu.com/&quot;
 </code></pre>
+
+<ol>
+<li><p>HEADER 信息<br/>
+例如：（多个header对应多个-H参数）</p>
+
+<pre><code>curl -v -i -H &quot;Content-Type: application/json&quot; &quot;http://www.baidu.com/&quot;
+</code></pre></li>
+<li><p>http 参数</p>
+
+<ol>
+<li>request parameter
+例如：</li>
+</ol>
+
+<pre><code>    # 使用`&amp;`串接多个参数
+    curl -X POST -d &quot;param1=value1&amp;param2=value2&quot;
+    # 也可使用多個`-d`，效果同上
+    curl -X POST -d &quot;param1=value1&quot; -d &quot;param2=value2&quot;
+    curl -X POST -d &quot;param1=a 0space&quot;     
+    # &quot;a space&quot; url encode後空白字元會編碼成&#39;%20&#39;為&quot;a%20space&quot;，編碼後的參數可以直接使用
+    curl -X POST -d &quot;param1=a%20space&quot;     
+</code></pre>
+
+<ol>
+<li>request json
+例如：</li>
+</ol>
+
+<pre><code>    curl http://www.example.com?modifier=kent -X PUT -i -H &quot;Content-Type:application/json&quot; -H &quot;Accept:application/json&quot; -d &#39;{&quot;boolean&quot; : false, &quot;foo&quot; : &quot;bar&quot;}&#39;
+    # 不加&quot;Accept:application/json&quot;也可以
+    curl http://www.example.com?modifier=kent -X PUT -i -H &quot;Content-Type:application/json&quot; -d &#39;{&quot;boolean&quot; : false, &quot;foo&quot; : &quot;bar&quot;}&#39;
+</code></pre></li>
+</ol>
 
 
 		</div>

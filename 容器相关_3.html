@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
     
-  Web 基础 - 重剑无锋，大巧不工。
+  容器相关 - 重剑无锋，大巧不工。
   
   </title>
  <meta name="description" content="">
@@ -257,78 +257,108 @@
             </div>
             <div class="large-9 medium-9 columns">
 
- <div class="markdown-body">
-<h1>Web 基础</h1>
+ 
 
-<ol>
-<li><p>服务器响应：</p>
 
-<ol>
-<li>1xx 提示信息 - 表示请求被成功接收，继续处理</li>
-<li>2xx 成功 - 表示清酒已经被成功接收，理解，接收</li>
-<li>3xx 重定向 - 要完成请求必须要做进一步的处理</li>
-<li>4xx 客户端错误 - 请求有语法错误或者无法实现</li>
-<li>5xx 服务端错误 - 服务端未能实现合法的请求</li>
-</ol></li>
-<li><p>HTTP协议的无状态和Keep-alive的区别：</p>
+	
+		<div class="markdown-body">
+		<h1>Docker Registry</h1>
 
-<p>HTTP是一个无状态的面向连接的协议，无状态不代表HTTP不能保持TCP连接，更不能代表HTTP使用的是UDP协议（面对无连接）。<br/>
-   从HTTP/1.1起，默认都开启了Keep-Alive保持连接特性，简单地说，当一个网页打开完成后，客户端和服务器之间用于传输HTTP数据的TCP连接不会关闭，如果客户端再次访问这个服务器上的网页，会继续使用这一条已经建立的TCP连接。</p></li>
+		<ol>
+<li>安全问题：能够在不泄露公司代码的情况下，存储镜像</li>
+<li>可用性： 不依赖其他的第三方的docker仓库</li>
+<li>Ci： 公司部署方式的改变，Docker Registry成为不可或缺的一部分。</li>
 </ol>
 
+<h2 id="toc_0">搭建准备：</h2>
 
-</div>
+<ol>
+<li>镜像：registry:2</li>
+<li>镜像存储的目录：例如：/DockerRegistry/</li>
+<li>证书,安全证书</li>
+</ol>
 
-<br /><br />
-<hr />
+<h2 id="toc_1">搭建过程：</h2>
 
-<div class="row clearfix">
-  <div class="large-6 columns">
-	<div class="text-left" style="padding:15px 0px;">
-		
-	        <a href="14719470938560.html"  title="Previous Post: Kubernetes应用的滚动升级">&laquo; Kubernetes应用的滚动升级</a>
-	    
-	</div>
-  </div>
-  <div class="large-6 columns">
-	<div class="text-right" style="padding:15px 0px;">
-		
-	        <a href="14719253380529.html" 
-	        title="Next Post: Let's Encrypt 获取Nginx证书">Let's Encrypt 获取Nginx证书 &raquo;</a>
-	    
-	</div>
-  </div>
-</div>
+<ol>
+<li>首先拉取Docker Registry镜像(由于国内墙的问题,使用DaoCloud镜像)<br/></li>
+</ol>
 
-<div class="row">
-<div style="padding:0px 0.93em;" class="share-comments">
-<!-- 多说评论框 start -->
-<!-- 多说评论框 end -->
-<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
-<script type="text/javascript">
-var duoshuoQuery = {short_name:"fuckall"};
-	(function() {
-		var ds = document.createElement('script');
-		ds.type = 'text/javascript';ds.async = true;
-		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
-		ds.charset = 'UTF-8';
-		(document.getElementsByTagName('head')[0] 
-		 || document.getElementsByTagName('body')[0]).appendChild(ds);
-	})();
-	</script>
-<!-- 多说公共JS代码 end -->
-</div>
-</div>
-<script type="text/javascript">
-	$(function(){
-		var currentURL = '14719470176268.html';
-		$('#side-nav a').each(function(){
-			if($(this).attr('href') == currentURL){
-				$(this).parent().addClass('active');
-			}
-		});
-	});
-</script>  
+<pre><code>docker pull daocloud.io/library/registry:2.4.1
+</code></pre>
+
+<ol>
+<li>创建镜像存储目录：</li>
+</ol>
+
+<pre><code>$mkdir /DockerRegistry/
+</code></pre>
+
+<ol>
+<li>创建证书文件目录并且放入证书：</li>
+</ol>
+
+<pre><code>$mkdir /DockerRegistry/cert 
+</code></pre>
+
+<ol>
+<li>创建Docker Registry登录密码：</li>
+</ol>
+
+<pre><code class="language-bash">$mkdir auth
+$docker run --entrypoint htpasswd daocloud.io/library/registry:2.4.1  -Bbn testuser testpassword &gt; auth/htpasswd
+</code></pre>
+
+<ol>
+<li>启动Registry (注意下面的证书都是要改为自己的证书)</li>
+</ol>
+
+<pre><code class="language-bash">$docker run -d -p 5000:5000 --restart=always --name registry \
+  -v `pwd`/auth:/auth \
+  -e &quot;REGISTRY_AUTH=htpasswd&quot; \
+  -e &quot;REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm&quot; \
+  -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
+  daocloud.io/library/registry:2.4.1
+</code></pre>
+
+<ol>
+<li>添加一个可视化的界面 </li>
+</ol>
+
+<pre><code class="language-bash">$docker run \
+  -d \
+  -e ENV_DOCKER_REGISTRY_HOST=ENTER-YOUR-REGISTRY-HOST-HERE \
+  -e ENV_DOCKER_REGISTRY_PORT=ENTER-PORT-TO-YOUR-REGISTRY-HOST-HERE \
+  -e ENV_MODE_BROWSE_ONLY=false
+  -p 8080:80 \
+  konradkleine/docker-registry-frontend:v2
+</code></pre>
+
+<ol>
+<li>nginx配置 (添加nginx配置)</li>
+</ol>
+
+<pre><code class="language-nginx.conf">$server {
+    server_name dev;
+    location / {
+        proxy_pass http://x.x.x.x:8080;
+        proxy_http_version 1.1;
+        proxy_set_header Connection &quot;&quot;;
+    }
+}
+</code></pre>
+
+<h2 id="toc_2">总结：</h2>
+
+<p>以上的步骤比较简单，已经满足大部分的需求，更加高端的需求可以定制registry的config.yaml文件。<br/>
+起始可以在第六步的时候不必要映射端口到host，包括第七部也可以不用，因为相同在同一台机器上的docker是可以直接连接。</p>
+
+
+		</div>
+	
+
+  
+  
 </div></div>
 
 

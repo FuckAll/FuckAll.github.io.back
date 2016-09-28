@@ -71,6 +71,8 @@
         <li><label>容器相关</label></li>
 
           
+            <li><a title="Kubernetes 监控" href="14750346668025.html">Kubernetes 监控</a></li>
+          
             <li><a title="容器脚本" href="14726120122280.html">容器脚本</a></li>
           
             <li><a title="Kubernetes应用的滚动升级" href="14719470938560.html">Kubernetes应用的滚动升级</a></li>
@@ -184,6 +186,8 @@
                     
                       <li class="side-title"><span>容器相关</span></li>
                         
+                          <li><a title="Kubernetes 监控" href="14750346668025.html">Kubernetes 监控</a></li>
+                        
                           <li><a title="容器脚本" href="14726120122280.html">容器脚本</a></li>
                         
                           <li><a title="Kubernetes应用的滚动升级" href="14719470938560.html">Kubernetes应用的滚动升级</a></li>
@@ -258,24 +262,108 @@
 
 	
 		<div class="markdown-body">
-		<h1>字符串匹配算法</h1>
+		<h1>Golang Label妙用</h1>
 
 		<ol>
-<li><p>今天看golang源码关于字符串的时候发现strings.Replace方法使用的是Boyer-Moore算法</p>
+<li><p>Label 使用</p>
 
 <ol>
-<li>推荐两个博文：
+<li>Label 只能与 goto break continue 共同使用</li>
+<li><p>使用限制：</p>
 
 <ol>
-<li><a href="http://www.ruanyifeng.com/blog/2013/05/boyer-moore_string_search_algorithm.html">阮一峰字符串匹配的Boyer-Moore算法</a> </li>
-<li><a href="http://www.cs.utexas.edu/%7Emoore/best-ideas/string-searching/index.html">Moore教授自己给出的例子</a></li>
+<li><table>
+<thead>
+<tr>
+<th>关键字</th>
+<th>使用范围</th>
+<th>效果</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>goto</td>
+<td>没有任何使用限制</td>
+<td>跳转到任何地方</td>
+</tr>
+<tr>
+<td>break </td>
+<td>label只能在循环(for switch)紧挨的上方</td>
+<td>终止循环，不再进入循环</td>
+</tr>
+<tr>
+<td>continue</td>
+<td>label只能在循环(for switch)紧挨的上方</td>
+<td>暂停本轮循环</td>
+</tr>
+</tbody>
+</table></li>
 </ol></li>
-</ol></li>
-<li><p>具体的实现：</p>
+<li><p>例如：</p>
 
-<ol>
-<li>golang Strings 包中有实现</li>
-<li><a href="https://github.com/ijibu/gobm">https://github.com/ijibu/gobm</a> 这个也是模仿strings包中的实现<br/></li>
+<pre><code>func main() {
+a := 1
+LABEL1:
+
+println(&quot;LABEL1&quot;)
+println(&quot;inc a=&quot;, a)
+a += 1
+
+LABEL2:
+ println(&quot;LABEL1&quot;) // 会报错的
+
+for a &lt; 6 {
+println(a)
+if a == 3 {
+a += 1
+continue LABEL2
+}
+if a == 5 {
+break
+}
+goto LABEL1
+}
+
+}
+</code></pre></li>
+<li><p>经典用法:<br/>
+平常的循环嵌套：</p>
+
+<pre><code>for _, item := range list.Items {
+found := false
+
+for _, reserved := range reserved.Items {
+if reserved.ID == item.ID {
+found = true
+break
+}
+... do some other work ...
+}
+
+if found {
+continue
+}
+
+... do some other work ...
+}
+</code></pre>
+
+<p>使用label的嵌套:</p>
+
+<pre><code>OUTER:
+for _, item := range list.Items {
+for _, reserved := range reserved.Items {
+if reserved.ID == item.ID {
+    continue OUTER
+}
+... do some other work ...
+}
+... do some other work ...
+}
+</code></pre>
+
+<p><strong>Label放在for循环之前是表明跳出到哪一层的循环，不会影响到for循环，并不是每次跳跃之后都要重新执行for循环</strong></p></li>
 </ol></li>
 </ol>
 

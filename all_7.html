@@ -71,6 +71,8 @@
         <li><label>容器相关</label></li>
 
           
+            <li><a title="Kubernetes 监控" href="14750346668025.html">Kubernetes 监控</a></li>
+          
             <li><a title="容器脚本" href="14726120122280.html">容器脚本</a></li>
           
             <li><a title="Kubernetes应用的滚动升级" href="14719470938560.html">Kubernetes应用的滚动升级</a></li>
@@ -184,6 +186,8 @@
                     
                       <li class="side-title"><span>容器相关</span></li>
                         
+                          <li><a title="Kubernetes 监控" href="14750346668025.html">Kubernetes 监控</a></li>
+                        
                           <li><a title="容器脚本" href="14726120122280.html">容器脚本</a></li>
                         
                           <li><a title="Kubernetes应用的滚动升级" href="14719470938560.html">Kubernetes应用的滚动升级</a></li>
@@ -258,109 +262,14 @@
 
 	
 		<div class="markdown-body">
-		<h1>Golang Sort排序</h1>
+		<h1>读书</h1>
 
 		<ol>
-<li><p>Golang Sort 使用方法：</p>
-
-<ol>
-<li><p>实现Sort Interface 的三个方法</p>
-
-<pre><code>Len()
-Less(i, j int) bool
-Swap(i, j int) 
-</code></pre>
-
-<pre><code>package main
-
-import (
-    &quot;fmt&quot;
-    &quot;sort&quot;
-)
-
-//学生成绩结构体
-type StuScore struct {
-    //姓名
-    name  string
-    //成绩
-    score int
-}
-
-type StuScores []StuScore
-
-//Len()
-func (s StuScores) Len() int {
-    return len(s)
-}
-
-//Less():成绩将有低到高排序
-func (s StuScores) Less(i, j int) bool {
-    return s[i].score  &lt; s[j].score
-}
-
-//Swap()
-func (s StuScores) Swap(i, j int) {
-    s[i], s[j] = s[j], s[i]
-}
-
-func main() {
-    stus := StuScores{
-        {&quot;alan&quot;, 95},
-        {&quot;hikerell&quot;, 91},
-        {&quot;acmfly&quot;, 96},
-        {&quot;leao&quot;, 90}}
-
-    fmt.Println(&quot;Default:&quot;)
-    //原始顺序
-    for _, v := range stus {
-        fmt.Println(v.name, &quot;:&quot;, v.score)
-    }
-    fmt.Println()
-    //StuScores已经实现了sort.Interface接口
-    sort.Sort(stus)
-
-    fmt.Println(&quot;Sorted:&quot;)
-    //排好序后的结构
-    for _, v := range stus {
-        fmt.Println(v.name, &quot;:&quot;, v.score)
-    }
-
-    //判断是否已经排好顺序，将会打印true
-    fmt.Println(&quot;IS Sorted?&quot;, sort.IsSorted(stus))
-
-    fmt.Println()
-    // 排序翻转
-    sort.Sort(sort.Reverse(stus))
-    for _, v := range stus {
-        fmt.Println(v.name, &quot;:&quot;, v.score)
-        }
-    }
-</code></pre></li>
-</ol></li>
-<li><p>内部数据类型排序</p>
-
-<ol>
-<li><p>IntSlice, Float64Slice, StringSlice<br/>
-举例：</p>
-
-<pre><code>```
-// 升序
-s := []int{5,3,6,7,4}
-sort.Ints(s)
-fmt.Println(s) //将会输出[3 4 5 6 7]
-
-// 降序
-s := []int{5, 2, 6, 3, 1, 4} // 未排序的切片数据
-sort.Sort(sort.Reverse(sort.IntSlice(s)))
-fmt.Println(s) //将会输出[6 5 4 3 2 1]
-
-// 查找排序之后大于等于指定数字的位置
-s := []int{5, 2, 6, 3, 1, 4} // 未排序的切片数据
-sort.Ints(s) //排序后的s为[1 2 3 4 5 6]
-fmt.Println(sort.SearchInts(s, 3)) //将会输出2
-```
-</code></pre></li>
-</ol></li>
+<li><a href="https://link.zhihu.com/?target=http%3A//www.quzhuanpan.com/source/search.action%3Fq%3Dkindle%2520%25E7%2594%25B5%25E5%25AD%2590%25E4%25B9%25A6%26currentPage%3D1">百度云资源搜索</a></li>
+<li><a href="https://www.jiumodiary.com/">Jiumo E-Book Search 鸠摩搜书</a></li>
+<li><a href="https://link.zhihu.com/?target=http%3A//readcolor.com">读远：发掘优质电子书资源，提供好书分享、下载与推送。支持mobi/epub/pdf/txt格式。</a></li>
+<li><a href="https://link.zhihu.com/?target=http%3A//gen.lib.rus.ec">Library genesis 英文科学著作</a></li>
+<li><a href="https://link.zhihu.com/?target=http%3A//www.gutenberg.org">Gutenberg 维基古腾堡计划</a></li>
 </ol>
 
 

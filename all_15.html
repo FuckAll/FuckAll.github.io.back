@@ -71,6 +71,8 @@
         <li><label>容器相关</label></li>
 
           
+            <li><a title="Kubernetes 监控" href="14750346668025.html">Kubernetes 监控</a></li>
+          
             <li><a title="容器脚本" href="14726120122280.html">容器脚本</a></li>
           
             <li><a title="Kubernetes应用的滚动升级" href="14719470938560.html">Kubernetes应用的滚动升级</a></li>
@@ -184,6 +186,8 @@
                     
                       <li class="side-title"><span>容器相关</span></li>
                         
+                          <li><a title="Kubernetes 监控" href="14750346668025.html">Kubernetes 监控</a></li>
+                        
                           <li><a title="容器脚本" href="14726120122280.html">容器脚本</a></li>
                         
                           <li><a title="Kubernetes应用的滚动升级" href="14719470938560.html">Kubernetes应用的滚动升级</a></li>
@@ -258,245 +262,67 @@
 
 	
 		<div class="markdown-body">
-		<h1>Golang 基础类型</h1>
+		<h1>容器脚本</h1>
 
-		<h2 id="toc_0">变量声明</h2>
+		<h3 id="toc_0">容器清理脚本</h3>
 
-<ol>
-<li><p>不同基础类型的零值</p>
+<pre><code>#!/bin/sh
 
-<table>
-<thead>
-<tr>
-<th>类型</th>
-<th>零值</th>
-</tr>
-</thead>
+&gt;/tmp/run_image_ids.$$
 
-<tbody>
-<tr>
-<td>int</td>
-<td>0</td>
-</tr>
-<tr>
-<td>float</td>
-<td>0</td>
-</tr>
-<tr>
-<td>bool</td>
-<td>false</td>
-</tr>
-<tr>
-<td>string</td>
-<td>&quot;&quot;</td>
-</tr>
-<tr>
-<td>struct</td>
-<td>nil</td>
-</tr>
-<tr>
-<td>array</td>
-<td>nil</td>
-</tr>
-<tr>
-<td>slice</td>
-<td>nil</td>
-</tr>
-<tr>
-<td>map</td>
-<td>nil</td>
-</tr>
-<tr>
-<td>channel</td>
-<td>nil</td>
-</tr>
-</tbody>
-</table></li>
-<li><p>var a int 和 a := 0 的哲学</p>
+DOCKER_BIN=/usr/bin/docker
+LOG=/var/log/docker-cleanup.log
 
-<ol>
-<li><p>var a int </p>
+rm /tmp/run_image_ids.$$
 
-<p>var a int 可以用来声明局部和全局变量,如果不初始化那么就是对应的零值     var a int = 1 可以声明并且初始化</p></li>
-<li><p>a := 0</p>
+echo &quot;$(date) start-----&quot; &gt;&gt;$LOG
 
-<p>a := 0 只能用来声明局部变量，不能够声明全局变量<br/>
-a := 1 声明局部变量并且初始化</p></li>
-<li><p>在局部的变量中 var 等价 : ; var 可以使用零值， : 是必须显示指明初始化值</p></li>
-<li><p>我的使用习惯</p>
+$DOCKER_BIN ps --no-trunc -a -q | while read cid
+do
+  running=$($DOCKER_BIN inspect -f &#39;{{.State.Running}}&#39; $cid )
+  if [ &quot;$running&quot;x = &quot;true&quot;x ]
+  then
+    id=$($DOCKER_BIN inspect -f &#39;{{.Image}}&#39; $cid )
+    echo $id &gt;&gt;/tmp/run_image_ids.$$
+    continue
+  fi 
+  fini=$($DOCKER_BIN inspect -f &#39;{{.State.FinishedAt}}&#39; $cid | awk -F. &#39;{print $1}&#39;)
+  diff=$(expr $(date +&quot;%s&quot;) - $(date --date=&quot;$fini&quot; +&quot;%s&quot;))    
+  #for MacOs 
+  #diff=$(expr $(date +&quot;%s&quot;) - $(date -j -f %Y-%m-%dT%H:%M:%S &quot;$fini&quot; +&quot;%s&quot;))
+  if [ $diff -gt 86400 ]
+  then
+     $DOCKER_BIN rm -v $cid &gt;&gt;$LOG 2&gt;&amp;1
+  fi 
+done
 
-<ol>
-<li>全局变量使用 var a int = 0 显示指明初始值</li>
-<li>局部变量使用 a := 0 显示指明初始值</li>
-</ol></li>
-</ol>
 
-<p><strong>注意：</strong><br/>
-    var a int 也可以用做 var a = 0,效果是一样的，但是这里尽量的使用显示的指定类型和初始值</p></li>
-</ol>
+$DOCKER_BIN images --no-trunc | grep -v REPOSITORY | while read line
+do
+  repo_tag=$(echo $line | awk &#39;{print $1&quot;:&quot;$2}&#39;)
+  image_id=$(echo $line | awk &#39;{print $3}&#39;)
+  grep -q $image_id /tmp/run_image_ids.$$
+  if [ $? -eq 0 ]
+  then
+    continue
+  fi
+  if [ &quot;$repo_tag&quot;x = &quot;&lt;none&gt;:&lt;none&gt;&quot;x ]
+  then
+    $DOCKER_BIN rmi $image_id &gt;&gt;$LOG 2&gt;&amp;1
+  else
+    $DOCKER_BIN rmi $repo_tag &gt;&gt;$LOG 2&gt;&amp;1
+  fi
+done
 
-<h2 id="toc_1">字符串拼加性能问题</h2>
+rm /tmp/run_image_ids.$$
 
-<ol>
-<li>字符串拼加的三种方式：
 
-<ol>
-<li>+=</li>
-<li>strings.Join()</li>
-<li>bytes.Buffer</li>
-</ol></li>
-<li><p>比较：</p>
-
-<pre><code>package main
-import (
-    &quot;fmt&quot;
-
-    &quot;strings&quot;
-    &quot;time&quot;
-    &quot;bytes&quot;
-)
-
-func main() {
-    var buffer bytes.Buffer
-
-    s := time.Now()
-    for i :=0; i &lt;100000; i++ {
-        buffer.WriteString(&quot;test is here\n&quot;)
-    }
-    buffer.String() // 拼接结果
-    e := time.Now()
-    fmt.Println(&quot;taked time is &quot;, e.Sub(s).Seconds())
-
-    s = time.Now()
-    str := &quot;&quot;
-    for i :=0; i &lt;100000; i++ {
-        str += &quot;test is here\n&quot;
-    }
-    e = time.Now()
-    fmt.Println(&quot;taked time is &quot;, e.Sub(s).Seconds())
-
-    s = time.Now()
-    var sl []string
-    for i :=0; i &lt;100000; i++ {
-        sl = append(sl, &quot;test is here\n&quot;)
-    }
-    strings.Join(sl, &quot;&quot;)
-    e = time.Now()
-    fmt.Println(&quot;taked time is&quot;, e.Sub(s).Seconds())
-}
+echo &quot;$(date) end-----&quot; &gt;&gt;$LOG
 </code></pre>
 
-<p><strong>运行结果</strong></p>
-
-<pre><code>taked time is  0.0039795080000000005
-taked time is  13.403575973
-taked time is 0.017540489
-</code></pre></li>
-<li><p>[]byte 和 string </p>
-
-<ol>
-<li><p>golang 中的[]byte和string可以方便的转换</p>
-
-<ol>
-<li>[]byte -&gt; string
-string([]byte) -&gt; string </li>
-<li>string -&gt; []byte
-[]byte(string) -&gt; []byte</li>
-</ol>
-
-<p><strong>golang中[]byte和string的方法基本上是一样的</strong></p></li>
-<li><p>byte和string性能问题之buffer</p>
-
-<ol>
-<li>golang 中 bytes包中有Buffer类型以及相关方法
-
-<ol>
-<li>直接声明： var buffer bytes.Buffer</li>
-<li>方法成成：</li>
-</ol></li>
-</ol></li>
-</ol></li>
-</ol>
-
-<h2 id="toc_2">数组问题</h2>
-
-<ol>
-<li><p>声明Golang数组有两种方式</p>
-
-<pre><code>    var arr1 = new([5]int)
-    var arr2 [5]int
-</code></pre>
-
-<ol>
-<li>Golang认为数组是一种值类型，但new的时候返回的是数组的指针。</li>
-<li>第一种返回的是一个指针，传递的时候是不进行内存拷贝的。</li>
-<li><p>第二种方式返回的是数组本身，传递的时候是进行内存拷贝的。<br/>
-```<br/>
-package main</p>
-
-<p>import (<br/>
-    &quot;fmt&quot;<br/>
-)</p>
-
-<p>func main() {<br/>
-    var arr1 = new([5]int)  // 返回的是数组的地址<br/>
-    var arr2 [5]int</p>
-
-<pre><code>// 传地址进入函数，适用于需要修改数组或者数组较大
-arrayAddr(arr1)
-if arr1[0] != 1 {
-    fmt.Printf(&quot;Want arr1[0]==1 but arr1[0]==%d&quot;, arr1[0])
-}
-// 传值进入函数，进行内存的拷贝
-arrayVal(arr2)
-if arr1[1] != 0 {
-    fmt.Printf(&quot;Want arr1[1]==0 but arr1[1]==%d&quot;, arr1[1])
-}
-</code></pre>
-
-<p>}</p>
-
-<p>func arrayAddr(a *[5]int) {<br/>
-    a[0] = 1<br/>
-}</p>
-
-<p>func arrayVal(a [5]int) {<br/>
-    a[1] = 2<br/>
-}</p></li>
-</ol>
-
-<pre><code></code></pre></li>
-<li><p>切片问题<br/>
-    <strong>切片在进行传递的时候也是指针传递</strong></p>
-
-<pre><code>package main
-
-import (
-    &quot;fmt&quot;
-)
-
-func main() {
-    sliceAppend()
-
-}
-func sliceAppend() {
-    // 声明一个数组,这个并不是Slice, len == cap
-    var array = [...]int32{1, 2, 3, 4, 5, 6}
-
-    // 不能使用append，append只能用给slice
-    //array = append(array, 6)
-
-    //struct    Slice
-    //{             // must not move anything
-    //  byte*   array;      // actual data
-    //  uintgo  len;        // number of elements
-    //  uintgo  cap;        // allocated number of elements
-    //};
-    //Slice 是指向一定长度的byte指针
-</code></pre>
-
-<p><a href="media/14726074871676/Golang%20%E5%9F%BA%E7%A1%80%E7%B1%BB%E5%9E%8B.md">Golang 基础类型</a></p></li>
-</ol>
+<p><strong>清理内容</strong><br/>
+    1. 停止超过一天的容器<br/>
+    2. 一天之内没有运行过容器的镜像</p>
 
 
 		</div>

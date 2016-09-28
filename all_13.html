@@ -71,6 +71,8 @@
         <li><label>容器相关</label></li>
 
           
+            <li><a title="Kubernetes 监控" href="14750346668025.html">Kubernetes 监控</a></li>
+          
             <li><a title="容器脚本" href="14726120122280.html">容器脚本</a></li>
           
             <li><a title="Kubernetes应用的滚动升级" href="14719470938560.html">Kubernetes应用的滚动升级</a></li>
@@ -184,6 +186,8 @@
                     
                       <li class="side-title"><span>容器相关</span></li>
                         
+                          <li><a title="Kubernetes 监控" href="14750346668025.html">Kubernetes 监控</a></li>
+                        
                           <li><a title="容器脚本" href="14726120122280.html">容器脚本</a></li>
                         
                           <li><a title="Kubernetes应用的滚动升级" href="14719470938560.html">Kubernetes应用的滚动升级</a></li>
@@ -258,61 +262,57 @@
 
 	
 		<div class="markdown-body">
-		<h1>技术类博客收集</h1>
+		<h1>Golang 指针问题</h1>
 
-		<h2 id="toc_0">精华网站</h2>
-
-<ol>
-<li><a href="http://blog.jobbole.com/">伯乐在线</a>
-主要是一些原创的聚合站点</li>
-<li><a href="http://www.importnew.com/">ImportNew</a>
-Java &amp; Android 技术分享</li>
-<li><a href="http://segmentfault.com/">Segmentfault</a>
-年轻开发者社区；最前沿的技术问答，最纯粹的技术切磋</li>
-<li><a href="http://www.infoq.com/cn/">InfoQ</a>
-InfoQ - 促进软件开发领域知识与创新的传播</li>
-<li><a href="http://www.v2ex.com/">V2EX</a>
-V2EX 是创意工作者们的社区。这里目前汇聚了超过 75000 名主要来自互联网行业、游戏行业和媒体行业的创意工作</li>
-</ol>
-
-<h2 id="toc_1">互联网公司团队博客</h2>
+		<ol>
+<li><p>Golang指针<br><br/>
+<strong>除了正常的指针之外，还有以下两种指针，一种是unsafe.Pointer指针，把任何的指针看成一个正常的指针，uintptr是将任何的一个指针都看成一个整数。</strong></p>
 
 <ol>
-<li><a href="http://www.jianshu.com/p/ca676b17603e">腾讯全端 AlloyTeam 团队 Blog</a>
-Tencent  前端</li>
-<li><a href="http://blogs.360.cn/">奇虎360技术博客</a></li>
-<li><a href="http://tech.meituan.com/">美团技术团队</a></li>
-<li><a href="http://tech.uc.cn/">UC技术博客</a></li>
-<li><a href="http://www.jianshu.com/p/ca676b17603e">Tecent CDC</a></li>
-</ol>
+<li><p>unsafe.Pointer指针</p>
 
-<h2 id="toc_2">业界大牛博客推荐</h2>
+<pre><code>// unsafe.Pointer 指针
+    func test4() {
+        type data struct {
+            x [1024 * 100]byte
+        }
 
-<ol>
-<li><a href="http://www.ruanyifeng.com/blog/">阮一峰的网络日志</a></li>
-<li><a href="http://coolshell.cn/">酷 壳</a></li>
-<li><a href="http://it.deepinmind.com/">Java 译站</a></li>
-<li><a href="http://www.aips.me/">周良的博客</a></li>
-<li><a href="http://www.itzhai.com/">IT 宅</a></li>
-<li><a href="http://macshuo.com/">MacTalk-池建强的随想录</a></li>
-<li><a href="http://hedengcheng.com/">何登成的技术博客</a></li>
-<li><a href="http://yes2.me/">钟超&quot;s Blogs</a></li>
-<li><a href="http://mindhacks.cn/">刘未鹏 | MIND HACKS</a></li>
-<li><a href="http://www.raychase.net/">四火的唠叨</a></li>
-<li><a href="http://blog.codingnow.com/">云风的 BLOG</a></li>
-<li><a href="http://dbanotes.net/">Fenng</a></li>
-<li><a href="http://beyondvincent.com/">破船之家</a></li>
-<li><a href="http://blog.zhaojie.me/">老赵点滴 - 追求编程之美</a></li>
-<li><a href="http://hedengcheng.com/">何登成的技术博客</a></li>
-<li><a href="http://bluedavy.me/">BlueDavy之技术Blog</a></li>
-<li><a href="http://ifeve.com/">并发编程网</a></li>
-<li><a href="http://timyang.net/">Tim&#39;s blog</a></li>
-</ol>
+        tmp := func() unsafe.Pointer {
+             p := &amp;data{}
+             return unsafe.Pointer(p)
+        }
 
-<h2 id="toc_3">外部链接：</h2>
+        const N = 10000
+        cache := new([N]unsafe.Pointer)
+        for i := 0; i &lt; N; i++ {
+             cache[i] = tmp()
+             time.Sleep(time.Millisecond)
+        }
+ }
+</code></pre></li>
+<li><p>uintptr指针(将指针看成一个整数)</p>
 
-<ol>
-<li><a href="http://blogwall.us/">博客墙</a></li>
+<pre><code>// uintptr 指针
+func test3() {
+    type data struct {
+                x [1024 * 100]byte
+    }
+
+    tmp := func() uintptr {
+            p := &amp;data{}
+            return uintptr(unsafe.Pointer(p))
+    }
+
+    const N = 10000
+    cache := new([N]uintptr)
+    fmt.Println(reflect.TypeOf(cache))
+    for i := 0; i &lt; N; i++ {
+                cache[i] = tmp()
+                time.Sleep(time.Millisecond)
+        }
+} 
+</code></pre></li>
+</ol></li>
 </ol>
 
 
