@@ -4,7 +4,7 @@
   <title><![CDATA[重剑无锋，大巧不工。]]></title>
   <link href="http://blog.izgnod.com/atom.xml" rel="self"/>
   <link href="http://blog.izgnod.com/"/>
-  <updated>2016-09-28T12:45:36+08:00</updated>
+  <updated>2016-09-28T12:48:54+08:00</updated>
   <id>http://blog.izgnod.com/</id>
   <author>
     <name><![CDATA[]]></name>
@@ -167,8 +167,7 @@ create -f prometheus-deployment.yaml
 <li><p>配置nginx，指向grafana</p>
 
 <ol>
-<li>nginx 简单配置：</li>
-</ol>
+<li><p>nginx 简单配置：</p>
 
 <pre><code>server {
     listen       80;
@@ -181,6 +180,7 @@ create -f prometheus-deployment.yaml
  }
 }
 </code></pre></li>
+</ol></li>
 <li><p>配置grafana</p>
 
 <ol>
