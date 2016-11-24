@@ -47,6 +47,8 @@
         <li><label>读书</label></li>
 
           
+            <li><a title="最好的告别 -- 关于衰老与死亡" href="14799683000358.html">最好的告别 -- 关于衰老与死亡</a></li>
+          
             <li><a title="如何阅读一本实用型的书--《如何阅读一本书》" href="14798734458692.html">如何阅读一本实用型的书--《如何阅读一本书》</a></li>
           
 
@@ -176,6 +178,8 @@
                     
                       <li class="side-title"><span>读书</span></li>
                         
+                          <li><a title="最好的告别 -- 关于衰老与死亡" href="14799683000358.html">最好的告别 -- 关于衰老与死亡</a></li>
+                        
                           <li><a title="如何阅读一本实用型的书--《如何阅读一本书》" href="14798734458692.html">如何阅读一本实用型的书--《如何阅读一本书》</a></li>
                         
 
@@ -284,26 +288,224 @@
 
 	
 		<div class="markdown-body">
-		<h1>git 常用方法</h1>
+		<h1>Golang Context</h1>
 
-		<p>进入git 目录，是工作目录(Working Directory)</p>
+		<ol>
+<li><p>WithCancel</p>
 
-<p>git add 将文件加入到缓存区 ( Staged Snapshot ) <br/>
-git commit 将文件加入到历史中 ( Commit History)</p>
+<pre><code>package main
 
-<p>git reset --soft 将缓存区的文件，同步到指定的commit.<br/>
-git reset --mixed 将工作目录同步到指定的commit，默认的是mixed.<br/>
-git reset --hard 将工作目录和缓存区全部到指定的commit</p>
+import (
+    &quot;fmt&quot;
+    //&quot;context&quot;
+    &quot;context&quot;
+    &quot;time&quot;
+)
 
-<p>常用操作：<br/>
-git reset --mixed HEAD 将你当前的改动从缓存区中移除，但是这些改动还留在工作目录中<br/>
-git reset --hard HEAD 舍弃所有的提交改动</p>
+type otherContext struct {
+    context.Context
+    other string
+}
 
-<p>git checkout commit_id 可以快速的切换到指定的commit </p>
+func main() {
+    // Background 声称一个context的根，是空的，但不是nil，根context是不能够Cancel的
+    bkc := context.Background()
+    // 生成一个Child Context ，带有Cancel，
+    c1, cancel := context.WithCancel(bkc)
 
-<p>git revert 撤销已经提交的更改</p>
+    // context 实现了String方法可以被Sprint格式化
+    if got, want := fmt.Sprint(c1), &quot;context.Background.WithCancel&quot;; got != want {
+        fmt.Errorf(&quot;c1.String() = %q want %q&quot;, got, want)
+    }
 
-<p><a href="https://github.com/geeeeeeeeek/git-recipes/wiki">https://github.com/geeeeeeeeek/git-recipes/wiki</a></p>
+    // 所有包含Context接口的数据类型都能够当做Context接口类型使用
+    o := otherContext{c1, &quot;wonder&quot;}
+    //o := otherContext{context.Background(), &quot;wonder&quot;}
+    c2, _ := context.WithCancel(o)
+    contexts := []context.Context{c1, o, c2}
+
+    /*
+            关系图
+                bkc
+                /
+              c1(o)
+              /
+             c2
+    */
+
+    for i, c := range contexts {
+        //Done返回值是一个 &lt;-chan struct{}， 返回nil说明这个Context是不能够用关闭的例如：Background生成的Context
+        if d := c.Done(); d == nil {
+            fmt.Errorf(&quot;c[%d].Done() == %v want non-nil&quot;, i, d)
+        }
+        // context关闭的原因，如果没有则返回nil， context 关闭之后会返回指定的内容
+        if e := c.Err(); e != nil {
+            fmt.Errorf(&quot;c[%d].Err() == %v want nil&quot;, i, e)
+        }
+        // c1和o是同一个context,所以前两个打印出来的内容一样
+        tm := c.Done()
+        fmt.Println(tm)
+
+        select {
+        //此处被block住，执行default，因为context并没有关闭
+        case x := &lt;-c.Done():
+            fmt.Errorf(&quot;&lt;-c.Done() == %v want nothing (it should block)&quot;, x)
+        default:
+        }
+    }
+    // 关闭c1,也就是关闭了o，那么c2也就被关闭了，关闭之后Done所返回的channel 也就关闭了， 关闭之后的channel能够一直取出值
+    cancel()
+    time.Sleep(100 * time.Millisecond) // let cancelation propagate
+
+    //前面已经Done之后，再次执行Done
+    for i, c := range contexts {
+        select {
+        // 关闭之后c.Done就不再是空
+        case &lt;-c.Done():
+        default:
+            fmt.Errorf(&quot;&lt;-c[%d].Done() blocked, but shouldn&#39;t have&quot;, i)
+        }
+        if e := c.Err(); e != context.Canceled {
+            fmt.Errorf(&quot;c[%d].Err() == %v want %v&quot;, i, e, context.Canceled)
+        }
+    }
+
+}
+
+</code></pre></li>
+<li><p>TimeOut &amp;&amp; DeadLine</p>
+
+<pre><code>    package main
+
+import (
+    &quot;fmt&quot;
+    //&quot;context&quot;
+    &quot;context&quot;
+    &quot;strings&quot;
+    &quot;time&quot;
+)
+
+type otherContext struct {
+    context.Context
+}
+
+func main() {
+
+    // 50 millisecond 之后自动关闭
+    c, _ := context.WithDeadline(context.Background(), time.Now().Add(50*time.Millisecond))
+    if got, prefix := fmt.Sprint(c), &quot;context.Background.WithDeadline(&quot;; !strings.HasPrefix(got, prefix) {
+        fmt.Errorf(&quot;c.String() = %q want prefix %q&quot;, got, prefix)
+    }
+    testDeadline(c, &quot;WithDeadline&quot;, time.Second)
+
+    // 继承context的类型使用WithDeadline
+    c, _ = context.WithDeadline(context.Background(), time.Now().Add(50*time.Millisecond))
+    o := otherContext{c}
+    testDeadline(o, &quot;WithDeadline+otherContext&quot;, time.Second)
+
+    // Parent Context 超时时间比 Child Context 超时时间短
+    c, _ = context.WithDeadline(context.Background(), time.Now().Add(50*time.Millisecond))
+    o = otherContext{c}
+    c, _ = context.WithDeadline(o, time.Now().Add(4*time.Second))
+    // 结果为：Parent Context 超时
+    testDeadline(c, &quot;WithDeadline+otherContext+WithDeadline&quot;, 2*time.Second)
+
+    // 超时时间是负数，直接超时
+    c, _ = context.WithDeadline(context.Background(), time.Now().Add(-time.Millisecond))
+    testDeadline(c, &quot;WithDeadline+inthepast&quot;, time.Second)
+
+    // 超时时间是现在时间，直接超时
+    c, _ = context.WithDeadline(context.Background(), time.Now())
+    testDeadline(c, &quot;WithDeadline+now&quot;, time.Second)
+
+    // WithTimeout
+
+    c, _ = context.WithTimeout(context.Background(), 50*time.Millisecond)
+    if got, prefix := fmt.Sprint(c), &quot;context.Background.WithDeadline(&quot;; !strings.HasPrefix(got, prefix) {
+        fmt.Errorf(&quot;c.String() = %q want prefix %q&quot;, got, prefix)
+    }
+    testDeadline(c, &quot;WithTimeout&quot;, time.Second)
+
+    c, _ = context.WithTimeout(context.Background(), 50*time.Millisecond)
+    o = otherContext{c}
+    testDeadline(o, &quot;WithTimeout+otherContext&quot;, time.Second)
+
+    c, _ = context.WithTimeout(context.Background(), 50*time.Millisecond)
+    o = otherContext{c}
+    c, _ = context.WithTimeout(o, 3*time.Second)
+    testDeadline(c, &quot;WithTimeout+otherContext+WithTimeout&quot;, 2*time.Second)
+
+    // Cancel TimeOut
+    // Cancel 能够立马生效
+    c, _ = context.WithTimeout(context.Background(), time.Second)
+    o = otherContext{c}
+    c, cancel := context.WithTimeout(o, 2*time.Second)
+    cancel()
+    time.Sleep(100 * time.Millisecond) // let cancelation propagate
+    select {
+    case &lt;-c.Done():
+    default:
+        fmt.Errorf(&quot;&lt;-c.Done() blocked, but shouldn&#39;t have&quot;)
+    }
+    if e := c.Err(); e != context.Canceled {
+        fmt.Errorf(&quot;c.Err() == %v want %v&quot;, e, context.Canceled)
+    }
+
+}
+
+func testDeadline(c context.Context, name string, failAfter time.Duration) {
+    select {
+    case &lt;-time.After(failAfter):
+        fmt.Errorf(&quot;%s: context should have timed out&quot;, name)
+    case &lt;-c.Done():
+        // context closed
+    }
+    if e := c.Err(); e != context.DeadlineExceeded {
+        fmt.Errorf(&quot;%s: c.Err() == %v; want %v&quot;, name, e, context.DeadlineExceeded)
+    }
+}
+
+</code></pre></li>
+<li><p>WithValue</p>
+
+<pre><code>package main
+
+import (
+    &quot;fmt&quot;
+    &quot;context&quot;
+)
+
+type otherContext struct {
+    context.Context
+}
+
+type Key struct {
+    name string
+    age  int
+}
+
+func main() {
+
+    sKey := Key{&quot;izgnod&quot;, 18}
+    c0 := context.Background()
+    fmt.Println(c0)
+
+    c1 := context.WithValue(c0, &quot;k1&quot;, &quot;value1&quot;)
+    fmt.Printf(&quot;key: k1 value:%s\n&quot;, c1.Value(&quot;k1&quot;))
+
+    c2 := context.WithValue(c1, &quot;k2&quot;, sKey)
+    switch t := c2.Value(&quot;k2&quot;).(type) {
+    case Key:
+        fmt.Printf(&quot;key: k2 value:Key{name:%s,age:%d}\n&quot;, t.name, t.age)
+    default:
+        fmt.Println(&quot;unknow&quot;)
+
+    }
+    fmt.Println(c2.Value(&quot;k1&quot;))
+
+}
+</code></pre></li>
+</ol>
 
 
 		</div>

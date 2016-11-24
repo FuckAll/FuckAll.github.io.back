@@ -47,6 +47,8 @@
         <li><label>读书</label></li>
 
           
+            <li><a title="最好的告别 -- 关于衰老与死亡" href="14799683000358.html">最好的告别 -- 关于衰老与死亡</a></li>
+          
             <li><a title="如何阅读一本实用型的书--《如何阅读一本书》" href="14798734458692.html">如何阅读一本实用型的书--《如何阅读一本书》</a></li>
           
 
@@ -176,6 +178,8 @@
                     
                       <li class="side-title"><span>读书</span></li>
                         
+                          <li><a title="最好的告别 -- 关于衰老与死亡" href="14799683000358.html">最好的告别 -- 关于衰老与死亡</a></li>
+                        
                           <li><a title="如何阅读一本实用型的书--《如何阅读一本书》" href="14798734458692.html">如何阅读一本实用型的书--《如何阅读一本书》</a></li>
                         
 
@@ -284,53 +288,26 @@
 
 	
 		<div class="markdown-body">
-		<h1>Golang 控制routine</h1>
+		<h1>git 常用方法</h1>
 
-		<ol>
-<li>select 控制routine</li>
-</ol>
+		<p>进入git 目录，是工作目录(Working Directory)</p>
 
-<pre><code>    func main() {
-        // 这个地方要make，否则无法分配内存
-        ch1 := make(chan bool, 1)
-        ch2 := make(chan bool, 1)
-        
-        go test(ch1)
-        time.Sleep(time.Second * 2)
-        
-        ch2 &lt;- false
-        ch1 &lt;- false
-        time.Sleep(time.Second * 2)
-        
-        ch1 &lt;- true
-        time.Sleep(time.Second * 10)
-    }
+<p>git add 将文件加入到缓存区 ( Staged Snapshot ) <br/>
+git commit 将文件加入到历史中 ( Commit History)</p>
 
-    func test(ch1 chan bool) {
-        for {
-            //fmt.Println(&quot;wonderful&quot;)
-            //if &lt;-ch1 {
-            //  fmt.Println(&quot;exit&quot;)
-            //  return
-            //}else {
-            //  fmt.Println(&quot;else&quot;)
-            //}
-            select {
-            case a := &lt;-ch1:
-            if a {
-            fmt.Println(&quot;exit&quot;)
-            return
-            } else {
-            fmt.Println(&quot;nothing&quot;)
-            }
-            //default:
-            //  fmt.Println(&quot;default&quot;)
-            
-            }
-        }
+<p>git reset --soft 将缓存区的文件，同步到指定的commit.<br/>
+git reset --mixed 将工作目录同步到指定的commit，默认的是mixed.<br/>
+git reset --hard 将工作目录和缓存区全部到指定的commit</p>
 
- }
-</code></pre>
+<p>常用操作：<br/>
+git reset --mixed HEAD 将你当前的改动从缓存区中移除，但是这些改动还留在工作目录中<br/>
+git reset --hard HEAD 舍弃所有的提交改动</p>
+
+<p>git checkout commit_id 可以快速的切换到指定的commit </p>
+
+<p>git revert 撤销已经提交的更改</p>
+
+<p><a href="https://github.com/geeeeeeeeek/git-recipes/wiki">https://github.com/geeeeeeeeek/git-recipes/wiki</a></p>
 
 
 		</div>

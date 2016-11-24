@@ -47,6 +47,8 @@
         <li><label>读书</label></li>
 
           
+            <li><a title="最好的告别 -- 关于衰老与死亡" href="14799683000358.html">最好的告别 -- 关于衰老与死亡</a></li>
+          
             <li><a title="如何阅读一本实用型的书--《如何阅读一本书》" href="14798734458692.html">如何阅读一本实用型的书--《如何阅读一本书》</a></li>
           
 
@@ -176,6 +178,8 @@
                     
                       <li class="side-title"><span>读书</span></li>
                         
+                          <li><a title="最好的告别 -- 关于衰老与死亡" href="14799683000358.html">最好的告别 -- 关于衰老与死亡</a></li>
+                        
                           <li><a title="如何阅读一本实用型的书--《如何阅读一本书》" href="14798734458692.html">如何阅读一本实用型的书--《如何阅读一本书》</a></li>
                         
 
@@ -284,184 +288,27 @@
 
 	
 		<div class="markdown-body">
-		<h1>Kubernetes 监控</h1>
+		<h1>Docker可持续化部署如何做</h1>
 
-		<ol>
-<li><p>可选的方案：</p>
+		<p>前言：一个团队是否需要整一套可持续化部署的工作流依我来看需要衡量几个方面。</p>
 
-<ol>
-<li>Heapster + InfluxDB + Grafana </li>
-<li>Prometheus + Grafana </li>
-<li>Cadvisor+InfluxDB+Grafana </li>
-</ol>
-
-<p>最终选择：Prometheus + Grafana<br/>
-原因是：Prometheus 对Kubernetes已经有了很好的支持，并且Grafana已经有了Prometheus的数据驱动。</p></li>
-<li><p>总体规划<br/>
-规划图：</p>
-
-<p><img src="http://o9l83saod.bkt.clouddn.com/Prometheus%20+%20Grafana.jpg" alt="Prometheus + Grafana"/>      </p></li>
-<li><p>部署：<br/>
-前提：已经有了一个kubernetes集群。</p>
-
-<ol>
-<li><p>部署Prometheus，直接贴配置文件了（在kubernetes上直接部署）：</p>
-
-<ol>
-<li><p>配置文件(这里没有用https) prometheus-config.yaml</p>
-
-<pre><code>apiVersion: v1
-kind: ConfigMap
-metadata:
-name: prometheus-config
-data:
-prometheus.yml: |
-global:
-  scrape_interval: 10s
-  scrape_timeout: 10s
-  evaluation_interval: 10s
-
-scrape_configs:
-- job_name: kubernetes-nodes-cadvisor
-  scheme: https
-  tls_config:
-    insecure_skip_verify: true
-  kubernetes_sd_configs:
-  - api_servers:
-    - http://kubernetes.default.svc/
-    role: node
-  relabel_configs:
-  - action: labelmap
-    regex: __meta_kubernetes_node_label_(.+)
-  - source_labels: [__meta_kubernetes_role]
-    action: replace
-    target_label: kubernetes_role
-  metric_relabel_configs:
-  - source_labels: [id]
-    action: replace
-    regex: &#39;^/machine\.slice/machine-rkt\\x2d([^\\]+)\\.+/([^/]+)\.service$&#39;
-    target_label: rkt_container_name
-    replacement: &#39;${2}-${1}&#39;
-  - source_labels: [id]
-    action: replace
-    regex: &#39;^/system\.slice/(.+)\.service$&#39;
-    target_label: systemd_service_name
-    replacement: &#39;${1}&#39;
-- job_name: kubernetes-apiserver-cadvisor
-  scheme: https
-  tls_config:
-    insecure_skip_verify: true
-  kubernetes_sd_configs:
-  - api_servers:
-    - http://kubernetes.default.svc/
-    role: apiserver
-  relabel_configs:
-  - action: labelmap
-    regex: __meta_kubernetes_node_label_(.+)
-  - source_labels: [__meta_kubernetes_role]
-    action: replace
-    target_label: kubernetes_role
+<pre><code>    1. 团队是否有时间。如果团队创业初期，业务进度比较急，那么先用脚本
+    2. 做成之后团队收益高不高，业务简单，测试简单，部署方便，那么没有必要整这么一大套
+    3. 普及，学习，使用成本高不高。可持续化部署工作流用起来更加麻烦，连教一遍都比较麻烦，那么要谨慎了
+    4. 是否容易维护和扩展。如果做了太多的定制化，后期维护和扩展都相当麻烦，那么要注意了
 </code></pre>
 
-<p>参数参考：<a href="https://prometheus.io/docs/operating/configuration/#">https://prometheus.io/docs/operating/configuration/#</a><kubernetes_sd_config></p></li>
-<li><p>部署配置：prometheus-deployment.yaml</p>
+<ol>
+<li><p>可持续发布对我们的收益。</p>
 
-<pre><code>apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-labels:
-    name: prometheus-deployment
-    name: prometheus
-spec:
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        app: prometheus
-    spec:
-      containers:
-      - image: index.tenxcloud.com/izgnod/prometheus:v1.0.1
-        name: prometheus
-        command:
-        - &quot;/bin/prometheus&quot;
-        args:
-        - &quot;-config.file=/etc/prometheus/prometheus.yml&quot;
-        - &quot;-storage.local.path=/prometheus&quot;
-        - &quot;-storage.local.retention=24h&quot;
-        ports:
-        - containerPort: 9090
-          protocol: TCP
-        volumeMounts:
-        - mountPath: &quot;/prometheus&quot;
-          name: data
-        - mountPath: &quot;/etc/prometheus&quot;
-          name: config-volume
-        resources:
-          requests:
-            cpu: 100m
-            memory: 100Mi
-          limits:
-            cpu: 500m
-            memory: 2500Mi
-      volumes:
-      - emptyDir: {}
-        name: data
-      - configMap:
-          name: prometheus-config
-        name: config-volume
-</code></pre></li>
+<ol>
+<li>目前我们有34个微服务， </li>
+</ol></li>
+<li><p>什么是可持续发展</p></li>
+<li><p>Jenkins能够做到哪些，还有什么不足的地方</p></li>
+<li><p>工作流看起来是什么样子的</p></li>
+<li><p>如何维护和扩展</p></li>
 </ol>
-
-<p>注意：image 可以升级的时候改动</p>
-
-<ol>
-<li>运行如下命令</li>
-</ol>
-
-<pre><code>kubectl create -f prometheus-config.yaml
-create -f prometheus-deployment.yaml
-</code></pre></li>
-<li><p>配置grafana</p>
-
-<ol>
-<li><p>docker直接部署或者直接用Kubernets,我这里就用docker直接部署了</p>
-
-<pre><code>docker run -i -d -e &quot;GF_SERVER_ROOT_URL=http://grafana.xxx.com&quot; -e &quot;GF_SECURITY_ADMIN_PASSWORD=wothing&quot;  index.tenxcloud.com/izgnod/grafana:latest
-</code></pre>
-
-<p>注意：root url 环境变量一定要配你想解析的域名，也可以是一个地址。</p></li>
-</ol></li>
-<li><p>配置nginx，指向grafana</p>
-
-<ol>
-<li><p>nginx 简单配置：</p>
-
-<pre><code>server {
-    listen       80;
-    server_name  grafana.xxx.com;
-
- location / {
-     proxy_pass http://grafana_ip:3000;
-     proxy_http_version 1.1;
-     proxy_set_header Connection &quot;&quot;;
- }
-}
-</code></pre></li>
-</ol></li>
-<li><p>配置grafana</p>
-
-<ol>
-<li>首先配置database
-配置详情参考官网：<a href="https://prometheus.io/docs/visualization/grafana/">https://prometheus.io/docs/visualization/grafana/</a></li>
-<li>使用grafana模板
-推荐：<a href="https://grafana.net/dashboards/315">https://grafana.net/dashboards/315</a></li>
-</ol></li>
-<li><p>效果展示：<br/>
-<img src="http://o9l83saod.bkt.clouddn.com/grafana%E6%95%88%E6%9E%9C%E5%9B%BE.png" alt="grafana效果图"/></p></li>
-</ol></li>
-</ol>
-
-<p>总结：对容器的监控，prometheus做了很好的集成，能够开箱即用，部署简单，指标全面。这部分是对整个kubernetes集群的监控，prometheus也有对业务打点的支持，后续再写一篇关于业务打点的。</p>
 
 
 		</div>

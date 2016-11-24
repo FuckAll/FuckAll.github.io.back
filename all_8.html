@@ -47,6 +47,8 @@
         <li><label>读书</label></li>
 
           
+            <li><a title="最好的告别 -- 关于衰老与死亡" href="14799683000358.html">最好的告别 -- 关于衰老与死亡</a></li>
+          
             <li><a title="如何阅读一本实用型的书--《如何阅读一本书》" href="14798734458692.html">如何阅读一本实用型的书--《如何阅读一本书》</a></li>
           
 
@@ -176,6 +178,8 @@
                     
                       <li class="side-title"><span>读书</span></li>
                         
+                          <li><a title="最好的告别 -- 关于衰老与死亡" href="14799683000358.html">最好的告别 -- 关于衰老与死亡</a></li>
+                        
                           <li><a title="如何阅读一本实用型的书--《如何阅读一本书》" href="14798734458692.html">如何阅读一本实用型的书--《如何阅读一本书》</a></li>
                         
 
@@ -284,92 +288,263 @@
 
 	
 		<div class="markdown-body">
-		<h1>Curl Http 测试</h1>
+		<h1>Golang Postgresql</h1>
 
 		<ol>
-<li>常用参数</li>
+<li>测试用例：</li>
 </ol>
 
-<table>
-<thead>
-<tr>
-<th>属性</th>
-<th>说明</th>
-</tr>
-</thead>
+<pre><code>CREATE TABLE users (
+id uuid primary key default gen_random_uuid(),
+mobile text UNIQUE not null
+);
+INSERT INTO users (mobile) VALUES (&#39;86-1000000000&#39;)
 
-<tbody>
-<tr>
-<td>-X —request [GET POST PUT DELETE]</td>
-<td>指定方法</td>
-</tr>
-<tr>
-<td>-H —header</td>
-<td>设定header</td>
-</tr>
-<tr>
-<td>-i —include</td>
-<td>显示response 中的header</td>
-</tr>
-<tr>
-<td>-d —data</td>
-<td>http的parameters</td>
-</tr>
-<tr>
-<td>-v —verbose</td>
-<td>输出详情</td>
-</tr>
-<tr>
-<td>-u —user</td>
-<td>使用者的账号，密码</td>
-</tr>
-<tr>
-<td>-b —cookie</td>
-<td>cookie</td>
-</tr>
-</tbody>
-</table>
-
-<p>用例：</p>
-
-<pre><code>curl -X GET &quot;http://www.baidu.com/&quot;
-curl -X POST &quot;http://www.baidu.com/&quot;
-curl -X PUT &quot;http://www.baidu.com/&quot;
-curl -X DELETE &quot;http://www.baidu.com/&quot;
 </code></pre>
 
 <ol>
-<li><p>HEADER 信息<br/>
-例如：（多个header对应多个-H参数）</p>
-
-<pre><code>curl -v -i -H &quot;Content-Type: application/json&quot; &quot;http://www.baidu.com/&quot;
-</code></pre></li>
-<li><p>http 参数</p>
-
-<ol>
-<li>request parameter
-例如：</li>
+<li>全在代码里：</li>
 </ol>
 
-<pre><code>    # 使用`&amp;`串接多个参数
-    curl -X POST -d &quot;param1=value1&amp;param2=value2&quot;
-    # 也可使用多個`-d`，效果同上
-    curl -X POST -d &quot;param1=value1&quot; -d &quot;param2=value2&quot;
-    curl -X POST -d &quot;param1=a 0space&quot;     
-    # &quot;a space&quot; url encode後空白字元會編碼成&#39;%20&#39;為&quot;a%20space&quot;，編碼後的參數可以直接使用
-    curl -X POST -d &quot;param1=a%20space&quot;     
+<pre><code>package main
+
+import (
+    &quot;database/sql&quot;
+    &quot;log&quot;
+
+    //&quot;fmt&quot;
+    &quot;fmt&quot;
+    _ &quot;github.com/lib/pq&quot;
+    &quot;time&quot;
+    &quot;github.com/lib/pq&quot;
+)
+
+func main() {
+
+    // 数据库连接
+    db, err := sql.Open(&quot;postgres&quot;, &quot;user=postgres dbname=meidb sslmode=disable&quot;)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    // 连接数
+    db.SetMaxOpenConns(10) // 最大连接数
+    db.SetMaxIdleConns(5)  // 最大空闲数
+
+    for i := 0; i &lt; 10; i++ {
+        go func() {
+            db.Ping()
+        }()
+    }
+    //time.Sleep(10 * time.Second)
+
+    // Exec 执行一次，没有具体值返回
+    a, err := HowToExec(db)
+    if err != nil {
+        log.Fatal(err)
+    }
+    fmt.Println(&quot;Exec Result:&quot;, a)
+
+    // Prepare
+    for i := 0; i &lt; 10; i++ {
+        go func() {
+            p, err := HowToPrepare(db)
+            if err != nil {
+                log.Fatal(err)
+            }
+            fmt.Println(&quot;Prepare Result:&quot;, p)
+        }()
+    }
+    time.Sleep(20 * time.Second)
+
+    // QueryRow
+    result, err := HowToQueryRow(db)
+    if err != nil {
+        log.Fatal(err)
+    }
+    fmt.Println(&quot;QueryRow Result:&quot;, result)
+
+    // Query
+    total, results := HowToQuery(db)
+    fmt.Println(&quot;Query Result:&quot;, total, results)
+
+
+    // Begin
+    HowToBegin(db)
+
+    // 关闭连接
+    defer db.Close()
+
+}
+
+func HowToExec(db *sql.DB) (int64, error) {
+    m := &quot;86-1000000000&quot;
+    q := &quot;UPDATE users SET mobile=$1 WHERE mobile=$1;&quot;
+    ret, err := db.Exec(q, m)
+    if err != nil {
+        return 0, err
+    }
+    r, err := ret.RowsAffected()
+    ret.LastInsertId()
+    if err != nil {
+        return 0, err
+    }
+    return r, nil
+}
+
+func HowToPrepare(db *sql.DB) ([]string, error) {
+    m := &quot;86-1000000000&quot;
+    q := &quot;SELECT id FROM users WHERE mobile=$1&quot;
+    sm, err := db.Prepare(q)
+    defer sm.Close()
+    if err != nil {
+        return []string{}, err
+    }
+    exec, err := sm.Exec(m)
+    if err != nil {
+        log.Println(err)
+        return []string{}, nil
+    }
+    ret, err := exec.RowsAffected()
+    if err != nil {
+        log.Println(err)
+        return []string{}, nil
+    }
+    fmt.Println(&quot;Prepare Exec Result:&quot;, ret)
+
+    var queryTemp string
+    query := sm.QueryRow(m)
+    err = query.Scan(&amp;queryTemp)
+    if err != nil {
+        log.Println(err)
+        return []string{}, nil
+    }
+    fmt.Println(&quot;Prepare QueryRow Result:&quot;, queryTemp)
+
+    sq, err := sm.Query(m)
+    defer sq.Close()
+    var re []string
+    for sq.Next() {
+        var tmp string
+        err := sq.Scan(&amp;tmp)
+        if err != nil {
+            log.Println(err)
+            return []string{}, nil
+        }
+        re = append(re, tmp)
+    }
+    fmt.Println(&quot;Prepare Query Result:&quot;, re)
+
+    return re, nil
+}
+
+func HowToQueryRow(db *sql.DB) (string, error) {
+    m := &quot;86-1000000000&quot;
+    var temp string
+    row := db.QueryRow(&quot;SELECT id FROM users WHERE mobile=$1&quot;, m)
+    err := row.Scan(&amp;temp)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            // 没有查询到结果的返回,可以进行日志输出
+            return temp, nil
+        }
+        // 出错，但是不是查询结果的问题
+        return temp, err
+    }
+    return temp, nil
+}
+
+func HowToQuery(db *sql.DB) (total int, result []string) {
+    q := &quot;SELECT id FROM users WHERE mobile=$1 ORDER BY id DESC OFFSET $2 LIMIT $3;&quot;
+    qa := &quot;SELECT count(*) FROM users WHERE mobile=$1;&quot;
+    m := &quot;86-1000000000&quot;
+    var temp string
+
+    // 查询总数
+    row := db.QueryRow(qa, m)
+    err := row.Scan(&amp;total)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            return 0, []string{}
+        }
+        log.Fatal(err)
+    }
+
+    // 结果查询
+    rows, err := db.Query(q, m, 0, 20)
+    defer rows.Close() // 将query关闭之后才能将连接放回连接池
+    if err != nil {
+        log.Fatal(err)
+    }
+    // 依次的准备好每一条查出的数据
+    for rows.Next() {
+        err := rows.Scan(&amp;temp)
+        if err != nil {
+            log.Fatal(err)
+
+        }
+        result = append(result, temp)
+    }
+    return total, result
+}
+
+func HowToBegin(db *sql.DB) {
+    m := &quot;86-1000000001&quot;
+    cm := &quot;86-1000000002&quot;
+    txn, err := db.Begin()
+    if err != nil {
+        log.Println(err)
+        return
+    }
+
+    stmt, err := txn.Prepare(pq.CopyIn(&quot;users&quot;, &quot;mobile&quot;))
+    defer stmt.Close()
+
+    if err != nil {
+        log.Println(err)
+        return
+    }
+    for i := 0; i &lt; 10; i++{
+        _ , err :=stmt.Exec(m)
+        if err != nil{
+            log.Println(err)
+            return
+        }
+    }
+
+    _, err = stmt.Exec()
+    if err != nil {
+        log.Println(err)
+        return
+    }
+    _, err = txn.Exec(&quot;UPDATE users SET mobile=$1&quot;,cm)
+    if err != nil {
+        log.Println(err)
+        return
+    }
+    var id string
+    var mob string
+    err = txn.QueryRow(&quot;SELECT id, mobile FROM users WHERE mobile=$1&quot;, cm).Scan(&amp;id, &amp;mob)
+    if err != nil {
+        log.Println(err)
+        return
+    }
+    fmt.Println(id, mob)
+
+    // 事物提交
+    err = txn.Commit()
+    if err!= nil {
+        log.Fatal()
+    }
+
+    //回滚
+    //err = txn.Rollback()
+    //if err!= nil {
+    //  log.Fatal()
+    //}
+
+}
 </code></pre>
-
-<ol>
-<li>request json
-例如：</li>
-</ol>
-
-<pre><code>    curl http://www.example.com?modifier=kent -X PUT -i -H &quot;Content-Type:application/json&quot; -H &quot;Accept:application/json&quot; -d &#39;{&quot;boolean&quot; : false, &quot;foo&quot; : &quot;bar&quot;}&#39;
-    # 不加&quot;Accept:application/json&quot;也可以
-    curl http://www.example.com?modifier=kent -X PUT -i -H &quot;Content-Type:application/json&quot; -d &#39;{&quot;boolean&quot; : false, &quot;foo&quot; : &quot;bar&quot;}&#39;
-</code></pre></li>
-</ol>
 
 
 		</div>

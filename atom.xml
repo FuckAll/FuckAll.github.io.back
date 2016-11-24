@@ -4,7 +4,7 @@
   <title><![CDATA[重剑无锋，大巧不工。]]></title>
   <link href="http://blog.izgnod.com/atom.xml" rel="self"/>
   <link href="http://blog.izgnod.com/"/>
-  <updated>2016-09-28T12:50:32+08:00</updated>
+  <updated>2016-11-24T12:03:43+08:00</updated>
   <id>http://blog.izgnod.com/</id>
   <author>
     <name><![CDATA[]]></name>
@@ -12,6 +12,65 @@
   </author>
   <generator uri="http://www.mweb.im">MWeb</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[最好的告别 -- 关于衰老与死亡]]></title>
+    <link href="http://blog.izgnod.com/14799683000358.html"/>
+    <updated>2016-11-24T14:18:20+08:00</updated>
+    <id>http://blog.izgnod.com/14799683000358.html</id>
+    <content type="html"><![CDATA[
+<h3 id="toc_0">图书大纲--一句话</h3>
+
+<pre><code>1. 独立: 现代化给了人们最大的自由，自助的生活方式
+2. 崩溃:
+3. 依赖
+4. 帮助
+5. 更好的生活
+6. 放手
+7. 艰难的谈话
+8. 勇气
+</code></pre>
+
+<h4 id="toc_1">独立：</h4>
+
+<pre><code>现代化并没有降低老年人的地位，而只是降低了家庭的地位。它赋予人们，包括年轻人和老年人，一种更多自由（包括更少受制于其他几代人的自由）、自主、自助的生活方式。老年人不再受到崇拜，但那并不是因为被对年轻人的崇拜所代替，而是代之以对独立的自我崇拜。
+</code></pre>
+
+<h4 id="toc_2">崩溃 -- 接受变老这件事情</h4>
+
+<pre><code>    某种意义上，现代医学的进步带来两场革命：我们经历了生命过程的生物学转换，也经历了如何认识这一过程的文化转换。
+</code></pre>
+
+<ol>
+<li><p>人为何会衰老</p>
+
+<pre><code>我们有一个多余的肾、一叶多余的肺、一副多余的性腺，以及多余的牙齿。细胞中的DNA在常规条件下经常受到损害，但是，我们的细胞有几个DNA修复系统。如果一个关键的基因永久性地损坏了，通常其附近就有额外的相同基因。而且，如果整个细胞都坏死了，那么，别的细胞就会填补进来。身体就是一下子就崩溃了。
+</code></pre></li>
+<li><p>医生为何会回避老年病</p>
+
+<ol>
+<li>收入偏低</li>
+<li><p>老年病的复杂性</p>
+
+<pre><code>对付老年病有一套技术——一套发达的专业技能。医生没有办法修复这些问题，但是可以进行干预与关怀。
+</code></pre></li>
+<li><p>脚是老年人最大的危险</p></li>
+<li><p>承认衰老才能够活的自然</p>
+
+<pre><code>衰老是我们的宿命，死亡总有一天会降临。但是在我们体内的最后一个备用系统失灵之前，医学护理可以决定这条道路是猛然下降，还是舒展平缓地下降，使我们可以更长久地保持至关重要的生活能力。我们医学领域中的技术专家大多不考虑这个问题。我们擅长处理特定的、个别的问题：直肠癌、高血压、膝关节炎。交给我们一种病，我们能够采取一些措施。但是，给我们一个有高血压、膝关节炎以及其他各种病痛的老妇人，一个面临失去所喜欢的生活的危险的老妇人，我们几乎不知道该怎么办，往往只会把事情搞得更加糟糕。
+</code></pre></li>
+<li><p>老年病专家的晚年生活</p>
+
+<ol>
+<li>承认自己的衰老</li>
+<li>持续的关注自己的健康，并且针对健康状况采取措施</li>
+<li>继续履行自己的责任，以及自己对亲人的责任感</li>
+</ol></li>
+</ol></li>
+</ol>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[如何阅读一本实用型的书--《如何阅读一本书》]]></title>
@@ -1718,253 +1777,6 @@ echo &quot;$(date) end-----&quot; &gt;&gt;$LOG
 <p><strong>清理内容</strong><br/>
     1. 停止超过一天的容器<br/>
     2. 一天之内没有运行过容器的镜像</p>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Golang 基础类型]]></title>
-    <link href="http://blog.izgnod.com/14726074871676.html"/>
-    <updated>2016-08-31T09:38:07+08:00</updated>
-    <id>http://blog.izgnod.com/14726074871676.html</id>
-    <content type="html"><![CDATA[
-<h2 id="toc_0">变量声明</h2>
-
-<ol>
-<li><p>不同基础类型的零值</p>
-
-<table>
-<thead>
-<tr>
-<th>类型</th>
-<th>零值</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td>int</td>
-<td>0</td>
-</tr>
-<tr>
-<td>float</td>
-<td>0</td>
-</tr>
-<tr>
-<td>bool</td>
-<td>false</td>
-</tr>
-<tr>
-<td>string</td>
-<td>&quot;&quot;</td>
-</tr>
-<tr>
-<td>struct</td>
-<td>nil</td>
-</tr>
-<tr>
-<td>array</td>
-<td>nil</td>
-</tr>
-<tr>
-<td>slice</td>
-<td>nil</td>
-</tr>
-<tr>
-<td>map</td>
-<td>nil</td>
-</tr>
-<tr>
-<td>channel</td>
-<td>nil</td>
-</tr>
-</tbody>
-</table></li>
-<li><p>var a int 和 a := 0 的哲学</p>
-
-<ol>
-<li><p>var a int </p>
-
-<p>var a int 可以用来声明局部和全局变量,如果不初始化那么就是对应的零值     var a int = 1 可以声明并且初始化</p></li>
-<li><p>a := 0</p>
-
-<p>a := 0 只能用来声明局部变量，不能够声明全局变量<br/>
-a := 1 声明局部变量并且初始化</p></li>
-<li><p>在局部的变量中 var 等价 : ; var 可以使用零值， : 是必须显示指明初始化值</p></li>
-<li><p>我的使用习惯</p>
-
-<ol>
-<li>全局变量使用 var a int = 0 显示指明初始值</li>
-<li>局部变量使用 a := 0 显示指明初始值</li>
-</ol></li>
-</ol>
-
-<p><strong>注意：</strong><br/>
-    var a int 也可以用做 var a = 0,效果是一样的，但是这里尽量的使用显示的指定类型和初始值</p></li>
-</ol>
-
-<h2 id="toc_1">字符串拼加性能问题</h2>
-
-<ol>
-<li>字符串拼加的三种方式：
-
-<ol>
-<li>+=</li>
-<li>strings.Join()</li>
-<li>bytes.Buffer</li>
-</ol></li>
-<li><p>比较：</p>
-
-<pre><code>package main
-import (
-    &quot;fmt&quot;
-
-    &quot;strings&quot;
-    &quot;time&quot;
-    &quot;bytes&quot;
-)
-
-func main() {
-    var buffer bytes.Buffer
-
-    s := time.Now()
-    for i :=0; i &lt;100000; i++ {
-        buffer.WriteString(&quot;test is here\n&quot;)
-    }
-    buffer.String() // 拼接结果
-    e := time.Now()
-    fmt.Println(&quot;taked time is &quot;, e.Sub(s).Seconds())
-
-    s = time.Now()
-    str := &quot;&quot;
-    for i :=0; i &lt;100000; i++ {
-        str += &quot;test is here\n&quot;
-    }
-    e = time.Now()
-    fmt.Println(&quot;taked time is &quot;, e.Sub(s).Seconds())
-
-    s = time.Now()
-    var sl []string
-    for i :=0; i &lt;100000; i++ {
-        sl = append(sl, &quot;test is here\n&quot;)
-    }
-    strings.Join(sl, &quot;&quot;)
-    e = time.Now()
-    fmt.Println(&quot;taked time is&quot;, e.Sub(s).Seconds())
-}
-</code></pre>
-
-<p><strong>运行结果</strong></p>
-
-<pre><code>taked time is  0.0039795080000000005
-taked time is  13.403575973
-taked time is 0.017540489
-</code></pre></li>
-<li><p>[]byte 和 string </p>
-
-<ol>
-<li><p>golang 中的[]byte和string可以方便的转换</p>
-
-<ol>
-<li>[]byte -&gt; string
-string([]byte) -&gt; string </li>
-<li>string -&gt; []byte
-[]byte(string) -&gt; []byte</li>
-</ol>
-
-<p><strong>golang中[]byte和string的方法基本上是一样的</strong></p></li>
-<li><p>byte和string性能问题之buffer</p>
-
-<ol>
-<li>golang 中 bytes包中有Buffer类型以及相关方法
-
-<ol>
-<li>直接声明： var buffer bytes.Buffer</li>
-<li>方法成成：</li>
-</ol></li>
-</ol></li>
-</ol></li>
-</ol>
-
-<h2 id="toc_2">数组问题</h2>
-
-<ol>
-<li><p>声明Golang数组有两种方式</p>
-
-<pre><code>    var arr1 = new([5]int)
-    var arr2 [5]int
-</code></pre>
-
-<ol>
-<li>Golang认为数组是一种值类型，但new的时候返回的是数组的指针。</li>
-<li>第一种返回的是一个指针，传递的时候是不进行内存拷贝的。</li>
-<li><p>第二种方式返回的是数组本身，传递的时候是进行内存拷贝的。<br/>
-```<br/>
-package main</p>
-
-<p>import (<br/>
-    &quot;fmt&quot;<br/>
-)</p>
-
-<p>func main() {<br/>
-    var arr1 = new([5]int)  // 返回的是数组的地址<br/>
-    var arr2 [5]int</p>
-
-<pre><code>// 传地址进入函数，适用于需要修改数组或者数组较大
-arrayAddr(arr1)
-if arr1[0] != 1 {
-    fmt.Printf(&quot;Want arr1[0]==1 but arr1[0]==%d&quot;, arr1[0])
-}
-// 传值进入函数，进行内存的拷贝
-arrayVal(arr2)
-if arr1[1] != 0 {
-    fmt.Printf(&quot;Want arr1[1]==0 but arr1[1]==%d&quot;, arr1[1])
-}
-</code></pre>
-
-<p>}</p>
-
-<p>func arrayAddr(a *[5]int) {<br/>
-    a[0] = 1<br/>
-}</p>
-
-<p>func arrayVal(a [5]int) {<br/>
-    a[1] = 2<br/>
-}</p></li>
-</ol>
-
-<pre><code></code></pre></li>
-<li><p>切片问题<br/>
-    <strong>切片在进行传递的时候也是指针传递</strong></p>
-
-<pre><code>package main
-
-import (
-    &quot;fmt&quot;
-)
-
-func main() {
-    sliceAppend()
-
-}
-func sliceAppend() {
-    // 声明一个数组,这个并不是Slice, len == cap
-    var array = [...]int32{1, 2, 3, 4, 5, 6}
-
-    // 不能使用append，append只能用给slice
-    //array = append(array, 6)
-
-    //struct    Slice
-    //{             // must not move anything
-    //  byte*   array;      // actual data
-    //  uintgo  len;        // number of elements
-    //  uintgo  cap;        // allocated number of elements
-    //};
-    //Slice 是指向一定长度的byte指针
-</code></pre>
-
-<p><a href="media/14726074871676/Golang%20%E5%9F%BA%E7%A1%80%E7%B1%BB%E5%9E%8B.md">Golang 基础类型</a></p></li>
-</ol>
 
 ]]></content>
   </entry>

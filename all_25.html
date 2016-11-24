@@ -47,6 +47,8 @@
         <li><label>读书</label></li>
 
           
+            <li><a title="最好的告别 -- 关于衰老与死亡" href="14799683000358.html">最好的告别 -- 关于衰老与死亡</a></li>
+          
             <li><a title="如何阅读一本实用型的书--《如何阅读一本书》" href="14798734458692.html">如何阅读一本实用型的书--《如何阅读一本书》</a></li>
           
 
@@ -176,6 +178,8 @@
                     
                       <li class="side-title"><span>读书</span></li>
                         
+                          <li><a title="最好的告别 -- 关于衰老与死亡" href="14799683000358.html">最好的告别 -- 关于衰老与死亡</a></li>
+                        
                           <li><a title="如何阅读一本实用型的书--《如何阅读一本书》" href="14798734458692.html">如何阅读一本实用型的书--《如何阅读一本书》</a></li>
                         
 
@@ -284,158 +288,63 @@
 
 	
 		<div class="markdown-body">
-		<h1>PostgreSql主从配置</h1>
+		<h1>股票量价比</h1>
 
-		<h2 id="toc_0">PostgreSql主从配置</h2>
-
-<ol>
-<li><p>PostgreSql安装：</p>
+		<ol>
+<li>价增量升
 
 <ol>
-<li><p>导入PostgreSql 9.5 源</p>
-
-<pre><code>$rpm -Uvh http://yum.postgresql.org/9.5/redhat/rhel-7-x86_64/pgdg-centos95-9.5-2.noarch.rpm
-</code></pre></li>
-<li><p>安装Postgresql</p>
-
-<pre><code>  $yum install postgresql95-server postgresql95 # 这里一般是会安装最新的9.5稳定版，如果用到Postgresql插件，需要安装扩展，建议安装方式： yum install postgresql95*
-</code></pre></li>
-<li><p>初始化目录结构</p>
-
-<pre><code>  $/usr/pgsql-9.5/bin/postgresql95-setup initdb #这里是Centos7 的目录位置
-</code></pre></li>
-<li><p>启动（这个可以在后面的主从配置完成之后进行启动）</p>
-
-<pre><code>  $service  postgresql-9.5 start
-  $chkconfig postgresql-9.5 on #设置开机启动
-</code></pre></li>
+<li>定义：股价随着股票的成交量上涨。</li>
+<li>信号：一般来说这是股票上涨的信号</li>
 </ol></li>
-<li><p>PostgreSql 主从配置意义：</p>
+<li>价增量减
 
 <ol>
-<li><p>主从配置能够在一台主机宕机的情况下立马切换到另外一台主机上，减少损失</p></li>
-<li><p>主从配置能够在读写分离，减轻数据库的压力,主库进行写，从库进行读。</p></li>
-<li><p>主从配置能够保证多数据库中的数据一致性。</p></li>
+<li>定义： 价格上涨，成交量反跌。</li>
+<li>信号： 股票下跌信号，多头占主力，但是由于成交量的低迷，多头无法长时间维持，最终下跌。</li>
 </ol></li>
-<li><p>主从配置流程：<br/>
-注意：这里使用的是Postgresql 9.5.3进行。由于Postgresql版本之间会有细微的差别。</p>
+<li>价减量减
 
 <ol>
-<li><p>Master 配置：</p>
+<li>定义： 价格下降，成交量减少。</li>
+<li>信号： 股票上涨信号， 卖方是主力，并且持股坚定，不轻易出，卖方看向高位，等待拉高。</li>
+</ol></li>
+<li>价减量升：
 
 <ol>
-<li><p>配置:postgresql.conf 文件</p>
-
-<pre><code>listen_addresses = &#39;*&#39;          # what IP address(es) to listen on;
-wal_level = hot_standby         # wal 日志的级别
-max_wal_senders = 5             # 控制主库最多可以有多少个并发的standby数据库；
-wal_keep_segments = 64          # 16M为单位，wal日志生成的单位，尽量的设置较大，防止日志没有来得及到standby就被循环覆盖了，这个如果数据量大的时候要慎重。
-synchronous_standby_names = &#39;*&#39; #synchronous_standby_names 这个参数对应着slave配置文件中的recovery.conf 中的primary_conninfo
-</code></pre></li>
-<li><p>配置:pg_hba.conf文件(这个文件主要是用来配置数据库连接权限的)</p>
-
-<pre><code># local      DATABASE  USER  METHOD  [OPTIONS]
-# host       DATABASE  USER  ADDRESS  METHOD  [OPTIONS]
-# hostssl    DATABASE  USER  ADDRESS  METHOD  [OPTIONS]
-# hostnossl  DATABASE  USER  ADDRESS  METHOD  [OPTIONS]
-#第一列是指定能够连接数据库的类型，local是本地连接，host是远程的主机。
-#第二列是指能够连接那些数据库
-#第三列是哪个用户能够连接数据库
-#第四列是地址
-#第五列是认证的方式
-local   all             postgres                                trust
-local   all             all                                     peer
-host    all             all             0.0.0.0/0               md5
-host    replication     all             0.0.0.0/0               trust
-host    all             all             ::1/128                 md5
-</code></pre>
-
-<p>配置说明：</p>
-
-<ol>
-<li>允许本地的postgres连接</li>
-<li>允许所有的本地连接认证方式是获取本地的操作系统的用户名。</li>
+<li>定义：价格下降，成交量升高。</li>
+<li>信号： 股票下跌信号，空头占优，不坚定的卖方出货，空头打压。</li>
 </ol></li>
-</ol></li>
-<li><p>Slave 配置：</p>
-
-<ol>
-<li><p>配置:postgresql.conf 文件</p>
-
-<pre><code>listen_addresses = &#39;*&#39;          # what IP address(es) to listen on;
-wal_level = hot_standby
-max_connections = 1000
-hot_standby = on
-hot_standby_feedback = on
-</code></pre></li>
-<li><p>配置:pg_hba.conf文件(这个文件主要是用来配置数据库连接权限的)</p>
-
-<pre><code>local   all             postgres                                trust
-local   all             all                                     peer
-host    all             all             0.0.0.0/0               md5
-host    replication     all             0.0.0.0/0               trust
-host    all             all             ::1/128                 md5
-</code></pre></li>
-<li><p>配置: recovery.conf文件</p>
-
-<pre><code>primary_conninfo = &#39;host=x.x.x.x user=test password=123 port=5432&#39;
-EOF
-</code></pre></li>
-</ol></li>
-<li><p>过程如下：</p>
-
-<ol>
-<li><p>Master</p>
-
-<ol>
-<li>启动Mater节点（没有任何的主从配置过程）</li>
-<li><p>修改postgres的密码, 创建主从同步需要的账号</p>
-
-<pre><code>su postgres
-psql -c &quot;ALTER USER postgres WITH PASSWORD &#39;123&#39;;&quot;
-psql -c &quot; CREATE ROLE repluser REPLICATION LOGIN PASSWORD &#39;123&#39;;&quot;
-</code></pre></li>
-<li><p>然后修改配置成如上的配置。</p></li>
-<li><p>重启Master</p></li>
-</ol></li>
-<li><p>Master打开备份状态：</p>
-
-<pre><code>```
-psql -U postgres -c &quot;select pg_start_backup(&#39;initial_backup&#39;);&quot;
-```
-</code></pre>
-
-<ol>
-<li><p>将内容拷贝到远程的slave节点。</p>
-
-<pre><code>rsync -cva --inplace --exclude=*pg_xlog* /var/lib/pgsql/9.5/data/ slave_ipaddress:/var/lib/pgsql/9.5/data/
-</code></pre></li>
-<li><p>退出备份状态</p>
-
-<pre><code>psql -U postgres -c &quot;select pg_stop_backup();&quot;
-</code></pre></li>
-</ol></li>
-</ol></li>
-<li><p>Slave</p>
-
-<ol>
-<li>修改成如上的slave配置</li>
-<li><p>注意一下/var/lib/pgsql/9.5/data/目录的权限问题，尤其是recovery.conf</p>
-
-<pre><code>chown -R postgres.postgres /var/lib/pgsql/9.5/data/
-</code></pre></li>
-</ol></li>
-</ol></li>
-<li><p>检验方式：<br/>
-    输入一下命令：</p>
-
-<pre><code>```
-select * from pg_stat_replication;
-```
-
-可以从输出的信息中看到是否同步成功。
-</code></pre></li>
 </ol>
+
+<p><strong>总结：价格和成交量保持一致的增长，降低态势，说明多头占主力，反之空头占主力，这也就影响到了股票的趋势。</strong></p>
+
+<ol>
+<li><p>天量天价</p>
+
+<ol>
+<li>股价上行应该是一个渐进的过程，成交量的方法</li>
+<li><p>要有一段时间的上涨<br/>
+放量滞涨，天量天价的一个特征，廊坊发展，国中水务。<br/>
+天量天价不要再买入了，是卖出的信号。</p>
+
+<p>上证指数8天结构的调整,第9天是一个变盘的，跌破20日线是向下，但是目前是5日线和20日线震荡，8 + 5 = 13天的结构，回落，再反弹，再选择方向，大概方向是偏好的。突破5日线或者跌破20日线。</p>
+
+<ol>
+<li>脉冲式建仓，回落0.382，买入</li>
+<li>回落式建仓</li>
+<li>回落反拉式建仓</li>
+</ol></li>
+</ol></li>
+<li><p>地量地价<br/>
+放量不是买点，放量之后再缩量就是买点</p></li>
+<li><p>底部放量</p></li>
+</ol>
+
+<p>蹄子线： 就是涨跌不超过百分之三，大部分情况是庄家吸筹</p>
+
+<p>买阴线，卖阳线<br/>
+买缩量，卖放量</p>
 
 
 		</div>
