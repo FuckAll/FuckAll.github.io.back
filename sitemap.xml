@@ -2,7 +2,22 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
   <loc>http://blog.izgnod.com/</loc>
-  <lastmod>2016-09-28T12:50:31+08:00</lastmod>
+  <lastmod>2016-11-24T12:03:42+08:00</lastmod>
+</url>
+
+<url>
+  <loc>http://blog.izgnod.com/14798734458692.html</loc>
+  <lastmod>2016-11-23T11:57:25+08:00</lastmod>
+</url>
+
+<url>
+  <loc>http://blog.izgnod.com/14764202917938.html</loc>
+  <lastmod>2016-10-14T12:44:51+08:00</lastmod>
+</url>
+
+<url>
+  <loc>http://blog.izgnod.com/14761747399282.html</loc>
+  <lastmod>2016-10-11T16:32:19+08:00</lastmod>
 </url>
 
 <url>
@@ -177,6 +192,10 @@
 
 <url>
   <loc>http://blog.izgnod.com/%E6%B5%8B%E8%AF%95.html</loc>
+</url>
+
+<url>
+  <loc>http://blog.izgnod.com/%E8%AF%BB%E4%B9%A6.html</loc>
 </url>
 
 

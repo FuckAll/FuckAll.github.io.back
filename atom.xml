@@ -4,7 +4,7 @@
   <title><![CDATA[重剑无锋，大巧不工。]]></title>
   <link href="http://blog.izgnod.com/atom.xml" rel="self"/>
   <link href="http://blog.izgnod.com/"/>
-  <updated>2016-09-28T12:48:54+08:00</updated>
+  <updated>2016-09-28T12:50:32+08:00</updated>
   <id>http://blog.izgnod.com/</id>
   <author>
     <name><![CDATA[]]></name>
@@ -12,6 +12,98 @@
   </author>
   <generator uri="http://www.mweb.im">MWeb</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[如何阅读一本实用型的书--《如何阅读一本书》]]></title>
+    <link href="http://blog.izgnod.com/14798734458692.html"/>
+    <updated>2016-11-23T11:57:25+08:00</updated>
+    <id>http://blog.izgnod.com/14798734458692.html</id>
+    <content type="html"><![CDATA[
+<h4 id="toc_0">1. 实用型书的基本原则：</h4>
+
+<h5 id="toc_1">观点一： 任何的实用型的书都不能解决书中关心的实际问题，实际问题的解决只能靠实际行动解决。</h5>
+
+<h6 id="toc_2">论据：</h6>
+
+<pre><code>1. 由于不同的时间、地点、环境需要有不同的处理方法，实用型的书不能与你有一模一样的情况。
+2. 理论性的原则只能归纳出出色的行事规则，但是这个需要有个人的判断力，在不同的情境中使用。
+</code></pre>
+
+<h4 id="toc_3">2.实用型书的类型</h4>
+
+<ol>
+<li>说明规则的，例如：说明书，烹饪书等</li>
+<li>阐述理论的，例如：经济，政治等著作等</li>
+</ol>
+
+<h4 id="toc_4">3. 如何判断实用型书的类型。</h4>
+
+<ol>
+<li>说明规则的书，重在阐述一个可行的方法，一般会用比较肯定的语气，甚至是命令的语气说明方法的可行，也会写一些原理的方面的内容，为了衬托方法的确切可行。</li>
+<li>阐述理论的书， 通过理论的阐述，告诉你一个比较通用的规则。这个的前提是读者能够同意并且能够接受作者的原理或者假设为前提。</li>
+</ol>
+
+<h4 id="toc_5">4. 如何对一本实用型的书进行提问</h4>
+
+<ol>
+<li>作者的目的是什么</li>
+<li>他建议用什么样的方法达到</li>
+</ol>
+
+<h4 id="toc_6">5. 如何真正理解作者的目的</h4>
+
+<ol>
+<li>又能够了解作者的假设，作者的环境</li>
+<li>在第一点的基础上，了解作者想要做什么，是否是你真正关心的话题</li>
+<li>作者想要你做什么，以及他要你这么做的目的</li>
+<li>内容是否真实, 作者描述的案例，宗旨，通过你的判断是否可以接受</li>
+<li>同意作者的做法之后，也接受了作者的说法，开始将学到的东西辅助时间，并且形成子午的判断，这样就产生了我们和作者，和书之间的联系</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[个人选股]]></title>
+    <link href="http://blog.izgnod.com/14764202917938.html"/>
+    <updated>2016-10-14T12:44:51+08:00</updated>
+    <id>http://blog.izgnod.com/14764202917938.html</id>
+    <content type="html"><![CDATA[
+<ol>
+<li>要有3个程序，判断几率，用乘法</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Docker可持续化部署如何做]]></title>
+    <link href="http://blog.izgnod.com/14761747399282.html"/>
+    <updated>2016-10-11T16:32:19+08:00</updated>
+    <id>http://blog.izgnod.com/14761747399282.html</id>
+    <content type="html"><![CDATA[
+<p>前言：一个团队是否需要整一套可持续化部署的工作流依我来看需要衡量几个方面。</p>
+
+<pre><code>    1. 团队是否有时间。如果团队创业初期，业务进度比较急，那么先用脚本
+    2. 做成之后团队收益高不高，业务简单，测试简单，部署方便，那么没有必要整这么一大套
+    3. 普及，学习，使用成本高不高。可持续化部署工作流用起来更加麻烦，连教一遍都比较麻烦，那么要谨慎了
+    4. 是否容易维护和扩展。如果做了太多的定制化，后期维护和扩展都相当麻烦，那么要注意了
+</code></pre>
+
+<ol>
+<li><p>可持续发布对我们的收益。</p>
+
+<ol>
+<li>目前我们有34个微服务， </li>
+</ol></li>
+<li><p>什么是可持续发展</p></li>
+<li><p>Jenkins能够做到哪些，还有什么不足的地方</p></li>
+<li><p>工作流看起来是什么样子的</p></li>
+<li><p>如何维护和扩展</p></li>
+</ol>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Kubernetes 监控]]></title>
@@ -1873,217 +1965,6 @@ func sliceAppend() {
 
 <p><a href="media/14726074871676/Golang%20%E5%9F%BA%E7%A1%80%E7%B1%BB%E5%9E%8B.md">Golang 基础类型</a></p></li>
 </ol>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[PostgreSql语句集锦]]></title>
-    <link href="http://blog.izgnod.com/14724588246571.html"/>
-    <updated>2016-08-29T16:20:24+08:00</updated>
-    <id>http://blog.izgnod.com/14724588246571.html</id>
-    <content type="html"><![CDATA[
-<ol>
-<li><p>更正Jsonb中数据：</p>
-
-<ol>
-<li><img src="media/14724588246571/14724588641183.jpg" alt=""/></li>
-</ol>
-
-<p>将其中不合法的数据改成:[&quot;镭射祛斑&quot;,&quot;c10&quot;, &quot;白瓷娃娃&quot;, &quot;黄雀斑&quot;, &quot;雀斑&quot;, &quot;色斑&quot;,&quot;微整形&quot;]<br/>
-语句：<br/>
-其中的问题：多个字段在一个双引号中，其中是中文的逗号。</p>
-
-<pre><code>UPDATE table_name SET tags=to_jsonb(string_to_array(jsonb_array_elements_text(tags),&#39;，&#39;)) WHERE tags!=&#39;null&#39;;
-</code></pre></li>
-</ol>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Postgresql 备份与恢复]]></title>
-    <link href="http://blog.izgnod.com/14724369503027.html"/>
-    <updated>2016-08-29T10:15:50+08:00</updated>
-    <id>http://blog.izgnod.com/14724369503027.html</id>
-    <content type="html"><![CDATA[
-<h2 id="toc_0">备份和定时备份</h2>
-
-<ol>
-<li><p>备份命令</p>
-
-<pre><code>pg_dump -h host_ip -p host_port -U datebase_user -d database_name -vF c -C -c -f test1.bkp test1 
--a 为只输出数据库中的数据（此处没有用）
--v 打出执行信息
--F 输出为指定的格式 c 为custom
--c dump的时候将drop database xxx 语句放入到dump的内容中
--C dump的时候将Create database xxx 语句放入到dump的内容中
--f 指定输出dump的名称
-最后一个为数据库的名字
-</code></pre></li>
-<li><p>定时命令：</p>
-
-<ol>
-<li>脚本内容backup_db.sh(全量导出，这里导出的是自定义格式，只能够被全量恢复和部分恢复)</li>
-</ol>
-
-<pre><code>#/bin/bash
-DATE=`date +&quot;%Y_%m_%d&quot;`
-/usr/bin/pg_dump -U postgres -vF c -C -c -f /share/meidb_$DATE.bak meidb
-## 备份到香港阿里云（这里要把key加好）
-##chmod 777 /share/meidb_$DATE.bak
-/usr/bin/scp -P hostPort -i /root/.ssh/id_rsa /share/meidb_$DATE.bak
-root@Hostname:/backup/ &gt;&gt; /share/scp.log 2&gt;&amp;1
-</code></pre></li>
-</ol>
-
-<h2 id="toc_1">如何恢复数据</h2>
-
-<ol>
-<li><p>全量数据恢复方法</p>
-
-<ol>
-<li><p>如果需要将原先的库进行删除并且重建</p>
-
-<ol>
-<li>执行命令：</li>
-</ol>
-
-<pre><code>pg_restore -h host_ip -p host_port -U postgres -d postgres -v -C  -c test1.bkp
-</code></pre></li>
-</ol></li>
-<li><p>部分恢复的方法：</p>
-
-<ol>
-<li><p>创建恢复表的目录批量恢复方法：</p>
-
-<ol>
-<li>执行命创建恢复目录：</li>
-</ol>
-
-<pre><code>pg_restore -l test1db_2016_18_29.bkp -f table.lst
- -l, --list print summarized TOC of the archive
- -f, --file=FILENAME output file name
-</code></pre>
-
-<ol>
-<li><p>修改恢复表目录：</p>
-
-<ol>
-<li><p>修改前内容例如：</p>
-
-<pre><code>; Archive created at 2016-08-29 11:16:17 CST
-;     dbname: meidb
-;     TOC Entries: 65
-;     Compression: -1
-;     Dump Version: 1.12-0
-;     Format: CUSTOM
-;     Integer: 4 bytes
-;     Offset: 8 bytes
-;     Dumped from database version: 9.5.3
-;     Dumped by pg_dump version: 9.5.3
-;
-;
-; Selected TOC Entries:
-;
-4168; 0 18518 TABLE DATA public account_items postgres
-4169; 0 18530 TABLE DATA public accounts postgres
-4170; 0 18551 TABLE DATA public activities postgres
-4235; 0 0 SEQUENCE SET public activities_num_seq postgres
-4172; 0 18564 TABLE DATA public activity_enrolls postgres
-4173; 0 18576 TABLE DATA public balance_changes postgres
-
-</code></pre></li>
-<li><p>将其余的注释，然后只留下需要恢复的表明即可：<br/>
-    小技巧：vim替换模式:（:16,78s#<sup>4#;4#g）</sup><br/>
-    修改后内容如下(例如要恢复表accounts)：</p>
-
-<pre><code>;     Archive created at 2016-08-29 11:16:17 CST
-;     dbname: meidb
-;     TOC Entries: 65
-;     Compression: -1
-;     Dump Version: 1.12-0
-;     Format: CUSTOM
-;     Integer: 4 bytes
-;     Offset: 8 bytes
-;     Dumped from database version: 9.5.3
-;     Dumped by pg_dump version: 9.5.3
-;
-;
-; Selected TOC Entries:
-;
-;4168; 0 18518 TABLE DATA public account_items postgres
-4169; 0 18530 TABLE DATA public accounts postgres
-;4170; 0 18551 TABLE DATA public activities postgres
-;4235; 0 0 SEQUENCE SET public activities_num_seq postgres
-;4172; 0 18564 TABLE DATA public activity_enrolls postgres
-;4173; 0 18576 TABLE DATA public balance_changes postgres
-
-</code></pre></li>
-<li><p>恢复命令：</p>
-
-<pre><code>pg_restore -U postgres -h hostname -p port -vaxd database_name -L table.lst test1
-</code></pre></li>
-</ol></li>
-</ol></li>
-<li><p>指定恢复表的方式</p>
-
-<ol>
-<li><p>恢复命令</p>
-
-<pre><code>pg_restore -U postgres  -v -c -d meidb -t account test1.bkp
-</code></pre>
-
-<p><strong>多个文件恢复</strong></p>
-
-<pre><code>pg_restore -U postgres  -v -c -d meidb -t account -t account_items  test.bkp
-</code></pre></li>
-</ol></li>
-</ol></li>
-</ol>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[选股模型]]></title>
-    <link href="http://blog.izgnod.com/14723863067284.html"/>
-    <updated>2016-08-28T20:11:46+08:00</updated>
-    <id>http://blog.izgnod.com/14723863067284.html</id>
-    <content type="html"><![CDATA[
-<pre><code>1. 长阳重炮
-    2. 在低位温和放量之后出现了一根带量长阳（或涨停），同时成交量为上叉阳量托，马上直扑追涨。
-
-
-    3. 量五日线2北，大阳线，实体的上沿可以做多，止损放到下沿
-2. 吞并翻转
-    3. 第一个交易日长阴（跌停）， 第二个交易日涨停，包容第一个交易日长阴。可以在第二个交易日涨停的刹那追涨买入
-3. 螺旋桨
-    4. 均线多头排列： 10日线在5日线以上至少
-    5. 影线长度8%
-    6. 量站上5日均量线
-4. 牛熊不败
-5. 三外有三
-6. 喜鹊闹梅
-    7. 
-7. 切割线
-    8. 一阳穿四线
-    9. 量站上5日线
-    10. 量比大于3%几率非常大
-8. 故地重游
-9. 开闸放水
-10. 强势牛回头
-11. 倒挂金钩
-    12. 均线多头排列
-    13. 高开3%左右
-    14. 5日线附近可以开买
-12. 蹄子线
-13. 金字塔
-14. 三步选股
-15. 双锤筑底
-16. 三只天鹅
-17. 攻击线
-</code></pre>
 
 ]]></content>
   </entry>

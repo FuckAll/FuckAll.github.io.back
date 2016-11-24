@@ -44,6 +44,14 @@
       <li><a href="index.html">Home</a></li>
       
         <li class="divider"></li>
+        <li><label>读书</label></li>
+
+          
+            <li><a title="如何阅读一本实用型的书--《如何阅读一本书》" href="14798734458692.html">如何阅读一本实用型的书--《如何阅读一本书》</a></li>
+          
+
+      
+        <li class="divider"></li>
         <li><label>Golang</label></li>
 
           
@@ -70,6 +78,8 @@
         <li class="divider"></li>
         <li><label>容器相关</label></li>
 
+          
+            <li><a title="Docker可持续化部署如何做" href="14761747399282.html">Docker可持续化部署如何做</a></li>
           
             <li><a title="Kubernetes 监控" href="14750346668025.html">Kubernetes 监控</a></li>
           
@@ -110,6 +120,8 @@
         <li class="divider"></li>
         <li><label>股票基础</label></li>
 
+          
+            <li><a title="个人选股" href="14764202917938.html">个人选股</a></li>
           
             <li><a title="选股模型" href="14723863067284.html">选股模型</a></li>
           
@@ -162,6 +174,12 @@
                   <ul id="side-nav" class="side-nav">
 
                     
+                      <li class="side-title"><span>读书</span></li>
+                        
+                          <li><a title="如何阅读一本实用型的书--《如何阅读一本书》" href="14798734458692.html">如何阅读一本实用型的书--《如何阅读一本书》</a></li>
+                        
+
+                    
                       <li class="side-title"><span>Golang</span></li>
                         
                           <li><a title="Golang Context" href="14746196382822.html">Golang Context</a></li>
@@ -185,6 +203,8 @@
 
                     
                       <li class="side-title"><span>容器相关</span></li>
+                        
+                          <li><a title="Docker可持续化部署如何做" href="14761747399282.html">Docker可持续化部署如何做</a></li>
                         
                           <li><a title="Kubernetes 监控" href="14750346668025.html">Kubernetes 监控</a></li>
                         
@@ -219,6 +239,8 @@
 
                     
                       <li class="side-title"><span>股票基础</span></li>
+                        
+                          <li><a title="个人选股" href="14764202917938.html">个人选股</a></li>
                         
                           <li><a title="选股模型" href="14723863067284.html">选股模型</a></li>
                         
@@ -262,53 +284,184 @@
 
 	
 		<div class="markdown-body">
-		<h1>Golang 控制routine</h1>
+		<h1>Kubernetes 监控</h1>
 
 		<ol>
-<li>select 控制routine</li>
+<li><p>可选的方案：</p>
+
+<ol>
+<li>Heapster + InfluxDB + Grafana </li>
+<li>Prometheus + Grafana </li>
+<li>Cadvisor+InfluxDB+Grafana </li>
 </ol>
 
-<pre><code>    func main() {
-        // 这个地方要make，否则无法分配内存
-        ch1 := make(chan bool, 1)
-        ch2 := make(chan bool, 1)
-        
-        go test(ch1)
-        time.Sleep(time.Second * 2)
-        
-        ch2 &lt;- false
-        ch1 &lt;- false
-        time.Sleep(time.Second * 2)
-        
-        ch1 &lt;- true
-        time.Sleep(time.Second * 10)
-    }
+<p>最终选择：Prometheus + Grafana<br/>
+原因是：Prometheus 对Kubernetes已经有了很好的支持，并且Grafana已经有了Prometheus的数据驱动。</p></li>
+<li><p>总体规划<br/>
+规划图：</p>
 
-    func test(ch1 chan bool) {
-        for {
-            //fmt.Println(&quot;wonderful&quot;)
-            //if &lt;-ch1 {
-            //  fmt.Println(&quot;exit&quot;)
-            //  return
-            //}else {
-            //  fmt.Println(&quot;else&quot;)
-            //}
-            select {
-            case a := &lt;-ch1:
-            if a {
-            fmt.Println(&quot;exit&quot;)
-            return
-            } else {
-            fmt.Println(&quot;nothing&quot;)
-            }
-            //default:
-            //  fmt.Println(&quot;default&quot;)
-            
-            }
-        }
+<p><img src="http://o9l83saod.bkt.clouddn.com/Prometheus%20+%20Grafana.jpg" alt="Prometheus + Grafana"/>      </p></li>
+<li><p>部署：<br/>
+前提：已经有了一个kubernetes集群。</p>
 
- }
+<ol>
+<li><p>部署Prometheus，直接贴配置文件了（在kubernetes上直接部署）：</p>
+
+<ol>
+<li><p>配置文件(这里没有用https) prometheus-config.yaml</p>
+
+<pre><code>apiVersion: v1
+kind: ConfigMap
+metadata:
+name: prometheus-config
+data:
+prometheus.yml: |
+global:
+  scrape_interval: 10s
+  scrape_timeout: 10s
+  evaluation_interval: 10s
+
+scrape_configs:
+- job_name: kubernetes-nodes-cadvisor
+  scheme: https
+  tls_config:
+    insecure_skip_verify: true
+  kubernetes_sd_configs:
+  - api_servers:
+    - http://kubernetes.default.svc/
+    role: node
+  relabel_configs:
+  - action: labelmap
+    regex: __meta_kubernetes_node_label_(.+)
+  - source_labels: [__meta_kubernetes_role]
+    action: replace
+    target_label: kubernetes_role
+  metric_relabel_configs:
+  - source_labels: [id]
+    action: replace
+    regex: &#39;^/machine\.slice/machine-rkt\\x2d([^\\]+)\\.+/([^/]+)\.service$&#39;
+    target_label: rkt_container_name
+    replacement: &#39;${2}-${1}&#39;
+  - source_labels: [id]
+    action: replace
+    regex: &#39;^/system\.slice/(.+)\.service$&#39;
+    target_label: systemd_service_name
+    replacement: &#39;${1}&#39;
+- job_name: kubernetes-apiserver-cadvisor
+  scheme: https
+  tls_config:
+    insecure_skip_verify: true
+  kubernetes_sd_configs:
+  - api_servers:
+    - http://kubernetes.default.svc/
+    role: apiserver
+  relabel_configs:
+  - action: labelmap
+    regex: __meta_kubernetes_node_label_(.+)
+  - source_labels: [__meta_kubernetes_role]
+    action: replace
+    target_label: kubernetes_role
 </code></pre>
+
+<p>参数参考：<a href="https://prometheus.io/docs/operating/configuration/#">https://prometheus.io/docs/operating/configuration/#</a><kubernetes_sd_config></p></li>
+<li><p>部署配置：prometheus-deployment.yaml</p>
+
+<pre><code>apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+labels:
+    name: prometheus-deployment
+    name: prometheus
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+      - image: index.tenxcloud.com/izgnod/prometheus:v1.0.1
+        name: prometheus
+        command:
+        - &quot;/bin/prometheus&quot;
+        args:
+        - &quot;-config.file=/etc/prometheus/prometheus.yml&quot;
+        - &quot;-storage.local.path=/prometheus&quot;
+        - &quot;-storage.local.retention=24h&quot;
+        ports:
+        - containerPort: 9090
+          protocol: TCP
+        volumeMounts:
+        - mountPath: &quot;/prometheus&quot;
+          name: data
+        - mountPath: &quot;/etc/prometheus&quot;
+          name: config-volume
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 500m
+            memory: 2500Mi
+      volumes:
+      - emptyDir: {}
+        name: data
+      - configMap:
+          name: prometheus-config
+        name: config-volume
+</code></pre></li>
+</ol>
+
+<p>注意：image 可以升级的时候改动</p>
+
+<ol>
+<li>运行如下命令</li>
+</ol>
+
+<pre><code>kubectl create -f prometheus-config.yaml
+create -f prometheus-deployment.yaml
+</code></pre></li>
+<li><p>配置grafana</p>
+
+<ol>
+<li><p>docker直接部署或者直接用Kubernets,我这里就用docker直接部署了</p>
+
+<pre><code>docker run -i -d -e &quot;GF_SERVER_ROOT_URL=http://grafana.xxx.com&quot; -e &quot;GF_SECURITY_ADMIN_PASSWORD=wothing&quot;  index.tenxcloud.com/izgnod/grafana:latest
+</code></pre>
+
+<p>注意：root url 环境变量一定要配你想解析的域名，也可以是一个地址。</p></li>
+</ol></li>
+<li><p>配置nginx，指向grafana</p>
+
+<ol>
+<li><p>nginx 简单配置：</p>
+
+<pre><code>server {
+    listen       80;
+    server_name  grafana.xxx.com;
+
+ location / {
+     proxy_pass http://grafana_ip:3000;
+     proxy_http_version 1.1;
+     proxy_set_header Connection &quot;&quot;;
+ }
+}
+</code></pre></li>
+</ol></li>
+<li><p>配置grafana</p>
+
+<ol>
+<li>首先配置database
+配置详情参考官网：<a href="https://prometheus.io/docs/visualization/grafana/">https://prometheus.io/docs/visualization/grafana/</a></li>
+<li>使用grafana模板
+推荐：<a href="https://grafana.net/dashboards/315">https://grafana.net/dashboards/315</a></li>
+</ol></li>
+<li><p>效果展示：<br/>
+<img src="http://o9l83saod.bkt.clouddn.com/grafana%E6%95%88%E6%9E%9C%E5%9B%BE.png" alt="grafana效果图"/></p></li>
+</ol></li>
+</ol>
+
+<p>总结：对容器的监控，prometheus做了很好的集成，能够开箱即用，部署简单，指标全面。这部分是对整个kubernetes集群的监控，prometheus也有对业务打点的支持，后续再写一篇关于业务打点的。</p>
 
 
 		</div>

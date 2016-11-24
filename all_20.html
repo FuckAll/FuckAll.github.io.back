@@ -44,6 +44,14 @@
       <li><a href="index.html">Home</a></li>
       
         <li class="divider"></li>
+        <li><label>读书</label></li>
+
+          
+            <li><a title="如何阅读一本实用型的书--《如何阅读一本书》" href="14798734458692.html">如何阅读一本实用型的书--《如何阅读一本书》</a></li>
+          
+
+      
+        <li class="divider"></li>
         <li><label>Golang</label></li>
 
           
@@ -70,6 +78,8 @@
         <li class="divider"></li>
         <li><label>容器相关</label></li>
 
+          
+            <li><a title="Docker可持续化部署如何做" href="14761747399282.html">Docker可持续化部署如何做</a></li>
           
             <li><a title="Kubernetes 监控" href="14750346668025.html">Kubernetes 监控</a></li>
           
@@ -110,6 +120,8 @@
         <li class="divider"></li>
         <li><label>股票基础</label></li>
 
+          
+            <li><a title="个人选股" href="14764202917938.html">个人选股</a></li>
           
             <li><a title="选股模型" href="14723863067284.html">选股模型</a></li>
           
@@ -162,6 +174,12 @@
                   <ul id="side-nav" class="side-nav">
 
                     
+                      <li class="side-title"><span>读书</span></li>
+                        
+                          <li><a title="如何阅读一本实用型的书--《如何阅读一本书》" href="14798734458692.html">如何阅读一本实用型的书--《如何阅读一本书》</a></li>
+                        
+
+                    
                       <li class="side-title"><span>Golang</span></li>
                         
                           <li><a title="Golang Context" href="14746196382822.html">Golang Context</a></li>
@@ -185,6 +203,8 @@
 
                     
                       <li class="side-title"><span>容器相关</span></li>
+                        
+                          <li><a title="Docker可持续化部署如何做" href="14761747399282.html">Docker可持续化部署如何做</a></li>
                         
                           <li><a title="Kubernetes 监控" href="14750346668025.html">Kubernetes 监控</a></li>
                         
@@ -219,6 +239,8 @@
 
                     
                       <li class="side-title"><span>股票基础</span></li>
+                        
+                          <li><a title="个人选股" href="14764202917938.html">个人选股</a></li>
                         
                           <li><a title="选股模型" href="14723863067284.html">选股模型</a></li>
                         
@@ -262,34 +284,21 @@
 
 	
 		<div class="markdown-body">
-		<h1>股票线图</h1>
+		<h1>PostgreSql语句集锦</h1>
 
 		<ol>
-<li><p>k线</p>
+<li><p>更正Jsonb中数据：</p>
 
 <ol>
-<li><p>锤子线和上吊线：</p>
+<li><img src="media/14724588246571/14724588641183.jpg" alt=""/></li>
+</ol>
 
-<ol>
-<li><p>定义： 锤子线和上吊线是相对于增长和下跌来说的，如果后市是上涨那么久叫锤子线，如果是下跌，那么就叫上吊线。如图：<br/>
-<img src="media/14723721762973/14723767546699.jpg" alt=""/></p></li>
-<li><p>使用前提： </p>
+<p>将其中不合法的数据改成:[&quot;镭射祛斑&quot;,&quot;c10&quot;, &quot;白瓷娃娃&quot;, &quot;黄雀斑&quot;, &quot;雀斑&quot;, &quot;色斑&quot;,&quot;微整形&quot;]<br/>
+语句：<br/>
+其中的问题：多个字段在一个双引号中，其中是中文的逗号。</p>
 
-<ol>
-<li>长时间的下跌，出现锤子线，或者长时间的上涨出现锤子线(上吊线)</li>
-<li>下影线要是实体的2倍以上。</li>
-<li>一般是没有上影线，如果有也是很短的</li>
-</ol></li>
-<li><p>如何使用：</p>
-
-<ol>
-<li>锤子线的出现时证明着走向有很大的可能进行逆转，当长期下跌，在底部出现锤子线，很可能已经找到支撑位，空头试图拉低，但是被多头拉回，空头的企图没有得逞，这就说明此时多头是占主。</li>
-<li>何时出手，如果是锤子之后上涨趋势，那么第二天高开跳空或者是价位到达前一天锤子线实体的收盘价可出手，如果开始是下降趋势，然后反弹，反弹到前一天锤子线实体的收盘价可出手买入。如果是上吊线，那么最好早抛。 </li>
-</ol></li>
-</ol></li>
-</ol></li>
-<li><p>5日，10日，20日，30日，60日平均线</p></li>
-<li></li>
+<pre><code>UPDATE table_name SET tags=to_jsonb(string_to_array(jsonb_array_elements_text(tags),&#39;，&#39;)) WHERE tags!=&#39;null&#39;;
+</code></pre></li>
 </ol>
 
 

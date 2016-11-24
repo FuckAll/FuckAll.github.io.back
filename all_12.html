@@ -44,6 +44,14 @@
       <li><a href="index.html">Home</a></li>
       
         <li class="divider"></li>
+        <li><label>读书</label></li>
+
+          
+            <li><a title="如何阅读一本实用型的书--《如何阅读一本书》" href="14798734458692.html">如何阅读一本实用型的书--《如何阅读一本书》</a></li>
+          
+
+      
+        <li class="divider"></li>
         <li><label>Golang</label></li>
 
           
@@ -70,6 +78,8 @@
         <li class="divider"></li>
         <li><label>容器相关</label></li>
 
+          
+            <li><a title="Docker可持续化部署如何做" href="14761747399282.html">Docker可持续化部署如何做</a></li>
           
             <li><a title="Kubernetes 监控" href="14750346668025.html">Kubernetes 监控</a></li>
           
@@ -110,6 +120,8 @@
         <li class="divider"></li>
         <li><label>股票基础</label></li>
 
+          
+            <li><a title="个人选股" href="14764202917938.html">个人选股</a></li>
           
             <li><a title="选股模型" href="14723863067284.html">选股模型</a></li>
           
@@ -162,6 +174,12 @@
                   <ul id="side-nav" class="side-nav">
 
                     
+                      <li class="side-title"><span>读书</span></li>
+                        
+                          <li><a title="如何阅读一本实用型的书--《如何阅读一本书》" href="14798734458692.html">如何阅读一本实用型的书--《如何阅读一本书》</a></li>
+                        
+
+                    
                       <li class="side-title"><span>Golang</span></li>
                         
                           <li><a title="Golang Context" href="14746196382822.html">Golang Context</a></li>
@@ -185,6 +203,8 @@
 
                     
                       <li class="side-title"><span>容器相关</span></li>
+                        
+                          <li><a title="Docker可持续化部署如何做" href="14761747399282.html">Docker可持续化部署如何做</a></li>
                         
                           <li><a title="Kubernetes 监控" href="14750346668025.html">Kubernetes 监控</a></li>
                         
@@ -219,6 +239,8 @@
 
                     
                       <li class="side-title"><span>股票基础</span></li>
+                        
+                          <li><a title="个人选股" href="14764202917938.html">个人选股</a></li>
                         
                           <li><a title="选股模型" href="14723863067284.html">选股模型</a></li>
                         
@@ -262,47 +284,109 @@
 
 	
 		<div class="markdown-body">
-		<h1>Golang 反射问题</h1>
+		<h1>Golang Label妙用</h1>
 
 		<ol>
-<li><p>指针的反射</p>
+<li><p>Label 使用</p>
 
-<pre><code>func test6() {
-        type User struct {
-            Username string
-        }
-        type Admin struct {
-            User
-            title string
-        }
-        u := new(Admin)
-        t := reflect.TypeOf(u)
-        if t.Kind() == reflect.Ptr {
-            t = t.Elem()
-        }
+<ol>
+<li>Label 只能与 goto break continue 共同使用</li>
+<li><p>使用限制：</p>
+
+<ol>
+<li><table>
+<thead>
+<tr>
+<th>关键字</th>
+<th>使用范围</th>
+<th>效果</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>goto</td>
+<td>没有任何使用限制</td>
+<td>跳转到任何地方</td>
+</tr>
+<tr>
+<td>break </td>
+<td>label只能在循环(for switch)紧挨的上方</td>
+<td>终止循环，不再进入循环</td>
+</tr>
+<tr>
+<td>continue</td>
+<td>label只能在循环(for switch)紧挨的上方</td>
+<td>暂停本轮循环</td>
+</tr>
+</tbody>
+</table></li>
+</ol></li>
+<li><p>例如：</p>
+
+<pre><code>func main() {
+a := 1
+LABEL1:
+
+println(&quot;LABEL1&quot;)
+println(&quot;inc a=&quot;, a)
+a += 1
+
+LABEL2:
+ println(&quot;LABEL1&quot;) // 会报错的
+
+for a &lt; 6 {
+println(a)
+if a == 3 {
+a += 1
+continue LABEL2
+}
+if a == 5 {
+break
+}
+goto LABEL1
+}
+
 }
 </code></pre></li>
-<li><p>结构体的反射</p>
+<li><p>经典用法:<br/>
+平常的循环嵌套：</p>
 
-<pre><code>// 反射结构体内容
-func test5() {
-        type User struct {
-                Username string
-        }
-        type Admin struct {
-                User
-                title string
-       }
-       func() {
-                var u Admin
-                t := reflect.TypeOf(u)
-                for i, n := 0, t.NumField(); i &lt; n; i++ {
-                    f := t.Field(i)
-                    fmt.Println(f.Name, f.Type)
-                }
-       }()
-  }
-</code></pre></li>
+<pre><code>for _, item := range list.Items {
+found := false
+
+for _, reserved := range reserved.Items {
+if reserved.ID == item.ID {
+found = true
+break
+}
+... do some other work ...
+}
+
+if found {
+continue
+}
+
+... do some other work ...
+}
+</code></pre>
+
+<p>使用label的嵌套:</p>
+
+<pre><code>OUTER:
+for _, item := range list.Items {
+for _, reserved := range reserved.Items {
+if reserved.ID == item.ID {
+    continue OUTER
+}
+... do some other work ...
+}
+... do some other work ...
+}
+</code></pre>
+
+<p><strong>Label放在for循环之前是表明跳出到哪一层的循环，不会影响到for循环，并不是每次跳跃之后都要重新执行for循环</strong></p></li>
+</ol></li>
 </ol>
 
 

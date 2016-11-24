@@ -44,6 +44,14 @@
       <li><a href="index.html">Home</a></li>
       
         <li class="divider"></li>
+        <li><label>读书</label></li>
+
+          
+            <li><a title="如何阅读一本实用型的书--《如何阅读一本书》" href="14798734458692.html">如何阅读一本实用型的书--《如何阅读一本书》</a></li>
+          
+
+      
+        <li class="divider"></li>
         <li><label>Golang</label></li>
 
           
@@ -70,6 +78,8 @@
         <li class="divider"></li>
         <li><label>容器相关</label></li>
 
+          
+            <li><a title="Docker可持续化部署如何做" href="14761747399282.html">Docker可持续化部署如何做</a></li>
           
             <li><a title="Kubernetes 监控" href="14750346668025.html">Kubernetes 监控</a></li>
           
@@ -110,6 +120,8 @@
         <li class="divider"></li>
         <li><label>股票基础</label></li>
 
+          
+            <li><a title="个人选股" href="14764202917938.html">个人选股</a></li>
           
             <li><a title="选股模型" href="14723863067284.html">选股模型</a></li>
           
@@ -162,6 +174,12 @@
                   <ul id="side-nav" class="side-nav">
 
                     
+                      <li class="side-title"><span>读书</span></li>
+                        
+                          <li><a title="如何阅读一本实用型的书--《如何阅读一本书》" href="14798734458692.html">如何阅读一本实用型的书--《如何阅读一本书》</a></li>
+                        
+
+                    
                       <li class="side-title"><span>Golang</span></li>
                         
                           <li><a title="Golang Context" href="14746196382822.html">Golang Context</a></li>
@@ -185,6 +203,8 @@
 
                     
                       <li class="side-title"><span>容器相关</span></li>
+                        
+                          <li><a title="Docker可持续化部署如何做" href="14761747399282.html">Docker可持续化部署如何做</a></li>
                         
                           <li><a title="Kubernetes 监控" href="14750346668025.html">Kubernetes 监控</a></li>
                         
@@ -219,6 +239,8 @@
 
                     
                       <li class="side-title"><span>股票基础</span></li>
+                        
+                          <li><a title="个人选股" href="14764202917938.html">个人选股</a></li>
                         
                           <li><a title="选股模型" href="14723863067284.html">选股模型</a></li>
                         
@@ -262,26 +284,27 @@
 
 	
 		<div class="markdown-body">
-		<h1>git 常用方法</h1>
+		<h1>Docker可持续化部署如何做</h1>
 
-		<p>进入git 目录，是工作目录(Working Directory)</p>
+		<p>前言：一个团队是否需要整一套可持续化部署的工作流依我来看需要衡量几个方面。</p>
 
-<p>git add 将文件加入到缓存区 ( Staged Snapshot ) <br/>
-git commit 将文件加入到历史中 ( Commit History)</p>
+<pre><code>    1. 团队是否有时间。如果团队创业初期，业务进度比较急，那么先用脚本
+    2. 做成之后团队收益高不高，业务简单，测试简单，部署方便，那么没有必要整这么一大套
+    3. 普及，学习，使用成本高不高。可持续化部署工作流用起来更加麻烦，连教一遍都比较麻烦，那么要谨慎了
+    4. 是否容易维护和扩展。如果做了太多的定制化，后期维护和扩展都相当麻烦，那么要注意了
+</code></pre>
 
-<p>git reset --soft 将缓存区的文件，同步到指定的commit.<br/>
-git reset --mixed 将工作目录同步到指定的commit，默认的是mixed.<br/>
-git reset --hard 将工作目录和缓存区全部到指定的commit</p>
+<ol>
+<li><p>可持续发布对我们的收益。</p>
 
-<p>常用操作：<br/>
-git reset --mixed HEAD 将你当前的改动从缓存区中移除，但是这些改动还留在工作目录中<br/>
-git reset --hard HEAD 舍弃所有的提交改动</p>
-
-<p>git checkout commit_id 可以快速的切换到指定的commit </p>
-
-<p>git revert 撤销已经提交的更改</p>
-
-<p><a href="https://github.com/geeeeeeeeek/git-recipes/wiki">https://github.com/geeeeeeeeek/git-recipes/wiki</a></p>
+<ol>
+<li>目前我们有34个微服务， </li>
+</ol></li>
+<li><p>什么是可持续发展</p></li>
+<li><p>Jenkins能够做到哪些，还有什么不足的地方</p></li>
+<li><p>工作流看起来是什么样子的</p></li>
+<li><p>如何维护和扩展</p></li>
+</ol>
 
 
 		</div>
